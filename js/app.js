@@ -422,6 +422,7 @@ function renderResults() {
               <th>Company</th>
               <th>Sector</th>
               <th>Match Tier</th>
+              <th>Financial Score</th>
               <th>Rationale</th>
             </tr>
           </thead>
@@ -498,6 +499,7 @@ function renderHoldingRow(entry) {
       <td data-label="Company">${escapeHtml(entry.company.name)}</td>
       <td data-label="Sector">${escapeHtml(entry.company.sector)}</td>
       <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${entry.tier} Match</span></td>
+      <td data-label="Financial Score">${renderFinancialScoreBadge(entry.company)}</td>
       <td data-label="Rationale">
         <div>${escapeHtml(entry.rationale)}</div>
         ${entry.note ? `<div class="partial-note">${escapeHtml(entry.note)}</div>` : ''}
@@ -514,6 +516,16 @@ function renderHoldingRow(entry) {
       </td>
     </tr>
   `;
+}
+
+const FINANCIAL_SCORE_LABEL_CLASS = { Strong: 'success', Good: 'success', Fair: 'warn', Weak: 'danger' };
+
+function renderFinancialScoreBadge(company) {
+  const fm = company.financial_metrics;
+  const score = Math.round(fm.overall_financial_score);
+  const label = fm.overall_financial_score_label;
+  const colorClass = FINANCIAL_SCORE_LABEL_CLASS[label] || 'warn';
+  return `<span class="financial-score-badge financial-score-${colorClass}">${score} (${escapeHtml(label)})</span>`;
 }
 
 function renderFinancialDetails(company) {

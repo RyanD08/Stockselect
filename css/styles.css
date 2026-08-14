@@ -869,6 +869,30 @@ h2 .category-icon {
   color: var(--warn-text);
 }
 
+.financial-score-badge {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.financial-score-success {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.financial-score-warn {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.financial-score-danger {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
 .partial-note {
   color: var(--warn-text);
   font-size: 0.82rem;
