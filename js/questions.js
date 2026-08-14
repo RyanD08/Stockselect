@@ -47,6 +47,22 @@ const QUESTIONS = [
   { id: 22, category: 'risk', type: 'risk', text: 'Willingness to accept lower returns for values alignment', short: 'Accept lower returns for values' },
   { id: 23, category: 'risk', type: 'risk', text: 'Preference for large, established "blue-chip" companies over smaller, emerging companies', short: 'Blue-chip over emerging companies' },
   { id: 24, category: 'risk', type: 'risk', text: 'Preference for dividend-paying income stocks over growth-focused reinvestment', short: 'Dividend income over growth reinvestment' },
+
+  // Single-select, not a 1-5 rating — picks which return field feeds the
+  // financial-quality criterion (see scoring.js financialQualityAlignment).
+  {
+    id: 25,
+    category: 'risk',
+    type: 'horizon',
+    text: 'My typical investment time horizon is:',
+    short: 'Investment time horizon',
+    options: [
+      { value: 'short', label: 'Short-term (next several months)' },
+      { value: 'medium', label: 'Medium-term (about a year)' },
+      { value: 'long', label: 'Long-term (5+ years)' },
+    ],
+    default: 'long',
+  },
 ];
 
 // Minimal single-color line icons (24x24, stroke=currentColor) — one per

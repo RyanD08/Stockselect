@@ -16,7 +16,7 @@
       "Not investment advice. For prototype/demo purposes only."
     ],
     "schema_notes": "Each company has: identity fields (ticker/name/sector/hq_country), objective screen flags (sin-stock booleans), qualitative ESG category ratings (Environmental/Social/Governance, each 1-5 scale where 5 = strong positive alignment, paired with a confidence level), and a qualitative performance tier used for the risk-profile matching step.",
-    "schema_version": "2.1",
+    "schema_version": "2.2",
     "changelog_v2": [
       "Removed 'religious_compliance' field (was 'Low' confidence / not independently screened for all 40 companies -> no real signal). Corresponding survey question (halal/kosher/faith-based screening) removed from the questionnaire.",
       "Removed 'data_privacy_reputation' field (previously only populated for 1 of 40 companies). Corresponding survey question (data privacy practices) removed from the questionnaire.",
@@ -26,7 +26,8 @@
       "Added 'dividend_policy' to support a new survey question (income/dividend preference vs. growth reinvestment).",
       "Added 'revenue_geography' to support a revised, dataset-supportable version of the 'country of operation' question (domestic vs. globally diversified revenue, rather than an unscreened list of countries of concern).",
       "All new fields are illustrative/Medium-confidence estimates consistent with this file's existing proof-of-concept status -- see data_confidence_legend and important_caveats. They must be replaced with a live market-data feed before real client use.",
-      "Expanded dataset from 40 to 100 companies (v2.1) across 11 sectors, including additional gambling (DKNG, MGM) and defense (GD) exposure for exclusion-screen testing. All new entries follow the same v2 schema (market_profile, financial_leverage, dividend_policy, revenue_geography) and the same illustrative/Medium-confidence conventions as the original 40."
+      "Expanded dataset from 40 to 100 companies (v2.1) across 11 sectors, including additional gambling (DKNG, MGM) and defense (GD) exposure for exclusion-screen testing. All new entries follow the same v2 schema (market_profile, financial_leverage, dividend_policy, revenue_geography) and the same illustrative/Medium-confidence conventions as the original 40.",
+      "Added financial_metrics block to every company (P/E, PEG, revenue growth YoY, profit margin, ROE, FCF margin, analyst consensus + price-target upside, 6-month/1-year return alongside the existing 5-year estimate) to support professional-grade financial scoring and the time-horizon-aware return selection described in Patch v6."
     ]
   },
   "companies": [
@@ -92,6 +93,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 32,
+        "peg_ratio": 5.33,
+        "revenue_growth_yoy_pct": 6,
+        "profit_margin_pct": 26,
+        "roe_pct": 145,
+        "free_cash_flow_margin_pct": 27,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 8,
+        "six_month_return_pct": 12,
+        "one_year_return_pct": 18,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -156,6 +171,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 34,
+        "peg_ratio": 2.43,
+        "revenue_growth_yoy_pct": 14,
+        "profit_margin_pct": 36,
+        "roe_pct": 38,
+        "free_cash_flow_margin_pct": 30,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 10,
+        "six_month_return_pct": 10,
+        "one_year_return_pct": 20,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -220,6 +249,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 45,
+        "peg_ratio": 0.75,
+        "revenue_growth_yoy_pct": 60,
+        "profit_margin_pct": 55,
+        "roe_pct": 90,
+        "free_cash_flow_margin_pct": 45,
+        "analyst_consensus": "Strong Buy",
+        "analyst_price_target_upside_pct": 15,
+        "six_month_return_pct": 25,
+        "one_year_return_pct": 45,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -284,6 +327,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 24,
+        "peg_ratio": 2.0,
+        "revenue_growth_yoy_pct": 12,
+        "profit_margin_pct": 27,
+        "roe_pct": 30,
+        "free_cash_flow_margin_pct": 25,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 12,
+        "six_month_return_pct": 8,
+        "one_year_return_pct": 16,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -348,6 +405,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 26,
+        "peg_ratio": 1.44,
+        "revenue_growth_yoy_pct": 18,
+        "profit_margin_pct": 35,
+        "roe_pct": 32,
+        "free_cash_flow_margin_pct": 28,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 10,
+        "six_month_return_pct": 15,
+        "one_year_return_pct": 22,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -412,6 +483,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 40,
+        "peg_ratio": 3.64,
+        "revenue_growth_yoy_pct": 11,
+        "profit_margin_pct": 8,
+        "roe_pct": 20,
+        "free_cash_flow_margin_pct": 6,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 14,
+        "six_month_return_pct": 9,
+        "one_year_return_pct": 14,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -476,6 +561,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 60,
+        "peg_ratio": 7.5,
+        "revenue_growth_yoy_pct": 8,
+        "profit_margin_pct": 8,
+        "roe_pct": 15,
+        "free_cash_flow_margin_pct": 5,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 2,
+        "six_month_return_pct": -5,
+        "one_year_return_pct": 10,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -540,6 +639,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 15,
+        "peg_ratio": 3.75,
+        "revenue_growth_yoy_pct": 4,
+        "profit_margin_pct": 20,
+        "roe_pct": 22,
+        "free_cash_flow_margin_pct": 18,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 6,
+        "six_month_return_pct": 4,
+        "one_year_return_pct": 5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -604,6 +717,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 22.1,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.4,
+        "profit_margin_pct": 20.4,
+        "roe_pct": 18.5,
+        "free_cash_flow_margin_pct": 11.2,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -5,
+        "six_month_return_pct": 9.2,
+        "one_year_return_pct": 11.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -668,6 +795,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 23.6,
+        "peg_ratio": 1.35,
+        "revenue_growth_yoy_pct": 17.5,
+        "profit_margin_pct": 15.0,
+        "roe_pct": 18.1,
+        "free_cash_flow_margin_pct": 13.8,
+        "analyst_consensus": "Strong Buy",
+        "analyst_price_target_upside_pct": 1.1,
+        "six_month_return_pct": 17.9,
+        "one_year_return_pct": 32.7,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -732,6 +873,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 12,
+        "peg_ratio": 2.0,
+        "revenue_growth_yoy_pct": 6,
+        "profit_margin_pct": 32,
+        "roe_pct": 16,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 6,
+        "six_month_return_pct": 10,
+        "one_year_return_pct": 17,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -796,6 +951,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 30,
+        "peg_ratio": 3.0,
+        "revenue_growth_yoy_pct": 10,
+        "profit_margin_pct": 54,
+        "roe_pct": 42,
+        "free_cash_flow_margin_pct": 45,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 9,
+        "six_month_return_pct": 6,
+        "one_year_return_pct": 12,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -860,6 +1029,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 12.5,
+        "peg_ratio": 1.37,
+        "revenue_growth_yoy_pct": 9.1,
+        "profit_margin_pct": 18.9,
+        "roe_pct": 14.6,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -1.3,
+        "six_month_return_pct": 6.4,
+        "one_year_return_pct": 10.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -924,6 +1107,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 13,
+        "peg_ratio": 6.5,
+        "revenue_growth_yoy_pct": 2,
+        "profit_margin_pct": 10,
+        "roe_pct": 15,
+        "free_cash_flow_margin_pct": 12,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 4,
+        "six_month_return_pct": 3,
+        "one_year_return_pct": 9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -988,6 +1185,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 12.5,
+        "peg_ratio": 2.12,
+        "revenue_growth_yoy_pct": 5.9,
+        "profit_margin_pct": 13.7,
+        "roe_pct": 14.6,
+        "free_cash_flow_margin_pct": 12.2,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -1.0,
+        "six_month_return_pct": 4.4,
+        "one_year_return_pct": 16.2,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1052,6 +1263,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.9,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -3.9,
+        "profit_margin_pct": 12.3,
+        "roe_pct": 7.2,
+        "free_cash_flow_margin_pct": 4.3,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 10.6,
+        "six_month_return_pct": -2.0,
+        "one_year_return_pct": -0.2,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1116,6 +1341,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 35.4,
+        "peg_ratio": 4.85,
+        "revenue_growth_yoy_pct": 7.3,
+        "profit_margin_pct": 21.6,
+        "roe_pct": 27.7,
+        "free_cash_flow_margin_pct": 15.1,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 7.2,
+        "six_month_return_pct": 11.1,
+        "one_year_return_pct": 22.7,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1180,6 +1419,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.4,
+        "peg_ratio": 7.25,
+        "revenue_growth_yoy_pct": 2.4,
+        "profit_margin_pct": 9.8,
+        "roe_pct": 30.1,
+        "free_cash_flow_margin_pct": 8.0,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 4.8,
+        "six_month_return_pct": 6.2,
+        "one_year_return_pct": 10.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1244,6 +1497,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 24,
+        "peg_ratio": 4.8,
+        "revenue_growth_yoy_pct": 5,
+        "profit_margin_pct": 22,
+        "roe_pct": 42,
+        "free_cash_flow_margin_pct": 20,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 5,
+        "six_month_return_pct": 4,
+        "one_year_return_pct": 7,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1308,6 +1575,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 30,
+        "peg_ratio": 5.0,
+        "revenue_growth_yoy_pct": 6,
+        "profit_margin_pct": 3,
+        "roe_pct": 20,
+        "free_cash_flow_margin_pct": 3,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 6,
+        "six_month_return_pct": 12,
+        "one_year_return_pct": 18,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1372,6 +1653,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 48,
+        "peg_ratio": 6.86,
+        "revenue_growth_yoy_pct": 7,
+        "profit_margin_pct": 3,
+        "roe_pct": 30,
+        "free_cash_flow_margin_pct": 3,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 4,
+        "six_month_return_pct": 10,
+        "one_year_return_pct": 22,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1436,6 +1731,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18.3,
+        "peg_ratio": 2.95,
+        "revenue_growth_yoy_pct": 6.2,
+        "profit_margin_pct": 13.5,
+        "roe_pct": 29.9,
+        "free_cash_flow_margin_pct": 3.9,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -2.4,
+        "six_month_return_pct": 3.8,
+        "one_year_return_pct": 12.9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1500,6 +1809,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 22.2,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.6,
+        "profit_margin_pct": 12.2,
+        "roe_pct": 21.1,
+        "free_cash_flow_margin_pct": 9.8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -1.3,
+        "six_month_return_pct": 1.6,
+        "one_year_return_pct": 4.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1564,6 +1887,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 26.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1.7,
+        "profit_margin_pct": 12.1,
+        "roe_pct": 31.2,
+        "free_cash_flow_margin_pct": 9.8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -1.8,
+        "six_month_return_pct": -3.0,
+        "one_year_return_pct": -2.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1628,6 +1965,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 9,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1,
+        "profit_margin_pct": 40,
+        "roe_pct": 95,
+        "free_cash_flow_margin_pct": 35,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 3,
+        "six_month_return_pct": 5,
+        "one_year_return_pct": 8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1692,6 +2043,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18,
+        "peg_ratio": 2.25,
+        "revenue_growth_yoy_pct": 8,
+        "profit_margin_pct": 25,
+        "roe_pct": 110,
+        "free_cash_flow_margin_pct": 22,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 6,
+        "six_month_return_pct": 10,
+        "one_year_return_pct": 15,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1756,6 +2121,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.9,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.4,
+        "profit_margin_pct": 14.7,
+        "roe_pct": 17.9,
+        "free_cash_flow_margin_pct": 13.4,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 1.4,
+        "six_month_return_pct": 3.8,
+        "one_year_return_pct": 6.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1820,6 +2199,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 20.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.4,
+        "profit_margin_pct": 10.9,
+        "roe_pct": 20.7,
+        "free_cash_flow_margin_pct": 6.1,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -4.1,
+        "six_month_return_pct": 9.4,
+        "one_year_return_pct": 14.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1884,6 +2277,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 25,
+        "peg_ratio": 2.5,
+        "revenue_growth_yoy_pct": 10,
+        "profit_margin_pct": 12,
+        "roe_pct": 20,
+        "free_cash_flow_margin_pct": 8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 5,
+        "six_month_return_pct": 2,
+        "one_year_return_pct": 3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -1948,6 +2355,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 24.8,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -5,
+        "profit_margin_pct": 13.2,
+        "roe_pct": 19.5,
+        "free_cash_flow_margin_pct": 10.6,
+        "analyst_consensus": "Sell",
+        "analyst_price_target_upside_pct": 3.8,
+        "six_month_return_pct": -4.9,
+        "one_year_return_pct": -8.7,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2012,6 +2433,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18,
+        "peg_ratio": 4.5,
+        "revenue_growth_yoy_pct": 4,
+        "profit_margin_pct": 10,
+        "roe_pct": 85,
+        "free_cash_flow_margin_pct": 9,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 7,
+        "six_month_return_pct": 5,
+        "one_year_return_pct": 10,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2076,6 +2511,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.1,
+        "peg_ratio": 3.03,
+        "revenue_growth_yoy_pct": 6.3,
+        "profit_margin_pct": 11.5,
+        "roe_pct": 14.8,
+        "free_cash_flow_margin_pct": 4.6,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -2.2,
+        "six_month_return_pct": 4.3,
+        "one_year_return_pct": 15.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2140,6 +2589,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.1,
+        "peg_ratio": 3.29,
+        "revenue_growth_yoy_pct": 5.2,
+        "profit_margin_pct": 13.8,
+        "roe_pct": 28.9,
+        "free_cash_flow_margin_pct": 11.3,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 8.9,
+        "six_month_return_pct": 13.6,
+        "one_year_return_pct": 19.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2204,6 +2667,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": null,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 10,
+        "profit_margin_pct": -5,
+        "roe_pct": null,
+        "free_cash_flow_margin_pct": -3,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 8,
+        "six_month_return_pct": -3,
+        "one_year_return_pct": -6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2268,6 +2745,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 21.1,
+        "peg_ratio": 1.82,
+        "revenue_growth_yoy_pct": 11.6,
+        "profit_margin_pct": 10.2,
+        "roe_pct": 11.8,
+        "free_cash_flow_margin_pct": 4.2,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -2.7,
+        "six_month_return_pct": 6.9,
+        "one_year_return_pct": 16.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2332,6 +2823,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.0,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.8,
+        "profit_margin_pct": 16.7,
+        "roe_pct": 17.3,
+        "free_cash_flow_margin_pct": 13.5,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 1.7,
+        "six_month_return_pct": 2.6,
+        "one_year_return_pct": 8.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2396,6 +2901,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 13.2,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.5,
+        "profit_margin_pct": 15.6,
+        "roe_pct": 12.4,
+        "free_cash_flow_margin_pct": 9.8,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 2.8,
+        "six_month_return_pct": 2.3,
+        "one_year_return_pct": 11.2,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2460,6 +2979,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 21.0,
+        "peg_ratio": 2.14,
+        "revenue_growth_yoy_pct": 9.8,
+        "profit_margin_pct": 5.4,
+        "roe_pct": 25.5,
+        "free_cash_flow_margin_pct": 10.3,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 9.6,
+        "six_month_return_pct": 11.4,
+        "one_year_return_pct": 19.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2524,6 +3057,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.4,
+        "profit_margin_pct": 12.7,
+        "roe_pct": 11.5,
+        "free_cash_flow_margin_pct": 3.7,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 0.4,
+        "six_month_return_pct": 3.4,
+        "one_year_return_pct": 5.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2588,6 +3135,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix based on general public knowledge of the business; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 14.7,
+        "peg_ratio": 1.75,
+        "revenue_growth_yoy_pct": 8.4,
+        "profit_margin_pct": 14.9,
+        "roe_pct": 26.8,
+        "free_cash_flow_margin_pct": 8.2,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -1.6,
+        "six_month_return_pct": 5.8,
+        "one_year_return_pct": 8.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2652,6 +3213,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 30.3,
+        "peg_ratio": 5.32,
+        "revenue_growth_yoy_pct": 5.7,
+        "profit_margin_pct": 19.2,
+        "roe_pct": 34.4,
+        "free_cash_flow_margin_pct": 26.7,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 12.7,
+        "six_month_return_pct": 5.2,
+        "one_year_return_pct": 6.9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2716,6 +3291,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 32.1,
+        "peg_ratio": 13.96,
+        "revenue_growth_yoy_pct": 2.3,
+        "profit_margin_pct": 26.9,
+        "roe_pct": 15.6,
+        "free_cash_flow_margin_pct": 28.7,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -2.4,
+        "six_month_return_pct": -0.3,
+        "one_year_return_pct": 7.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2780,6 +3369,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 31.0,
+        "peg_ratio": 2.3,
+        "revenue_growth_yoy_pct": 13.5,
+        "profit_margin_pct": 28.4,
+        "roe_pct": 37.8,
+        "free_cash_flow_margin_pct": 20.2,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 0.9,
+        "six_month_return_pct": 11.7,
+        "one_year_return_pct": 21.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2844,6 +3447,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 33.2,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -2.2,
+        "profit_margin_pct": 30.4,
+        "roe_pct": 19.3,
+        "free_cash_flow_margin_pct": 17.2,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 14.0,
+        "six_month_return_pct": -8.4,
+        "one_year_return_pct": -9.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2908,6 +3525,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 37.2,
+        "peg_ratio": 3.8,
+        "revenue_growth_yoy_pct": 9.8,
+        "profit_margin_pct": 18.1,
+        "roe_pct": 16.2,
+        "free_cash_flow_margin_pct": 31.9,
+        "analyst_consensus": "Strong Buy",
+        "analyst_price_target_upside_pct": -0.8,
+        "six_month_return_pct": 12.3,
+        "one_year_return_pct": 27.7,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -2972,6 +3603,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 24.4,
+        "peg_ratio": 4.07,
+        "revenue_growth_yoy_pct": 6.0,
+        "profit_margin_pct": 34.8,
+        "roe_pct": 33.2,
+        "free_cash_flow_margin_pct": 22.2,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 6.0,
+        "six_month_return_pct": 1.8,
+        "one_year_return_pct": 5.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3036,6 +3681,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 22.5,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.4,
+        "profit_margin_pct": 31.8,
+        "roe_pct": 19.2,
+        "free_cash_flow_margin_pct": 25.1,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -0.5,
+        "six_month_return_pct": -0.1,
+        "one_year_return_pct": 4.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3100,6 +3759,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 30.3,
+        "peg_ratio": 5.61,
+        "revenue_growth_yoy_pct": 5.4,
+        "profit_margin_pct": 24.0,
+        "roe_pct": 24.2,
+        "free_cash_flow_margin_pct": 31.0,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -0.4,
+        "six_month_return_pct": 9.5,
+        "one_year_return_pct": 16.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3164,6 +3837,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 22.0,
+        "peg_ratio": 1.42,
+        "revenue_growth_yoy_pct": 15.5,
+        "profit_margin_pct": 19.9,
+        "roe_pct": 18.5,
+        "free_cash_flow_margin_pct": 19.9,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 6.7,
+        "six_month_return_pct": 21.0,
+        "one_year_return_pct": 35.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3228,6 +3915,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 20.2,
+        "peg_ratio": 2.66,
+        "revenue_growth_yoy_pct": 7.6,
+        "profit_margin_pct": 25.0,
+        "roe_pct": 17.8,
+        "free_cash_flow_margin_pct": 15.7,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -4.5,
+        "six_month_return_pct": 2.4,
+        "one_year_return_pct": 12.6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3292,6 +3993,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.0,
+        "peg_ratio": 6.33,
+        "revenue_growth_yoy_pct": 3.0,
+        "profit_margin_pct": 16.2,
+        "roe_pct": 15.3,
+        "free_cash_flow_margin_pct": 9.8,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -4.0,
+        "six_month_return_pct": 3.3,
+        "one_year_return_pct": -0.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3356,6 +4071,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.1,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.2,
+        "profit_margin_pct": 15.2,
+        "roe_pct": 24.8,
+        "free_cash_flow_margin_pct": 13.0,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 13.9,
+        "six_month_return_pct": -0.4,
+        "one_year_return_pct": 0.2,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3420,6 +4149,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 21.6,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.0,
+        "profit_margin_pct": 18.9,
+        "roe_pct": 21.8,
+        "free_cash_flow_margin_pct": 19.6,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -1.7,
+        "six_month_return_pct": 2.5,
+        "one_year_return_pct": 1.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3484,6 +4227,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 25.0,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.0,
+        "profit_margin_pct": 13.0,
+        "roe_pct": 30.6,
+        "free_cash_flow_margin_pct": 7.9,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 11.1,
+        "six_month_return_pct": -0.1,
+        "one_year_return_pct": 2.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3548,6 +4305,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.5,
+        "peg_ratio": 3.89,
+        "revenue_growth_yoy_pct": 4.5,
+        "profit_margin_pct": 4.9,
+        "roe_pct": 14.5,
+        "free_cash_flow_margin_pct": 11.7,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 12.2,
+        "six_month_return_pct": 4.0,
+        "one_year_return_pct": 5.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3612,6 +4383,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 27.2,
+        "peg_ratio": 4.61,
+        "revenue_growth_yoy_pct": 5.9,
+        "profit_margin_pct": 10.3,
+        "roe_pct": 19.1,
+        "free_cash_flow_margin_pct": 12.2,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 1.1,
+        "six_month_return_pct": 10.2,
+        "one_year_return_pct": 20.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3676,6 +4461,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 27.4,
+        "peg_ratio": 2.19,
+        "revenue_growth_yoy_pct": 12.5,
+        "profit_margin_pct": 8.8,
+        "roe_pct": 16.9,
+        "free_cash_flow_margin_pct": 13.4,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -1.8,
+        "six_month_return_pct": 11.8,
+        "one_year_return_pct": 27.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3740,6 +4539,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 24.7,
+        "peg_ratio": 5.37,
+        "revenue_growth_yoy_pct": 4.6,
+        "profit_margin_pct": 9.8,
+        "roe_pct": 19.5,
+        "free_cash_flow_margin_pct": 13.9,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -0.2,
+        "six_month_return_pct": 6.1,
+        "one_year_return_pct": 13.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3804,6 +4617,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.8,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.2,
+        "profit_margin_pct": 14.1,
+        "roe_pct": 18.8,
+        "free_cash_flow_margin_pct": 12.1,
+        "analyst_consensus": "Sell",
+        "analyst_price_target_upside_pct": -0.3,
+        "six_month_return_pct": -5.2,
+        "one_year_return_pct": -4.9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3868,6 +4695,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 32.3,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.2,
+        "profit_margin_pct": 11.6,
+        "roe_pct": 28.2,
+        "free_cash_flow_margin_pct": 7.5,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -1.1,
+        "six_month_return_pct": 2.9,
+        "one_year_return_pct": -1.2,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3932,6 +4773,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 14.4,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -3.1,
+        "profit_margin_pct": 17.8,
+        "roe_pct": 20.2,
+        "free_cash_flow_margin_pct": 18.9,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 9.2,
+        "six_month_return_pct": -3.7,
+        "one_year_return_pct": -8.6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -3996,6 +4851,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 15.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.4,
+        "profit_margin_pct": 11.8,
+        "roe_pct": 24.0,
+        "free_cash_flow_margin_pct": 17.6,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -5,
+        "six_month_return_pct": 4.3,
+        "one_year_return_pct": 4.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4060,6 +4929,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 15.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1.6,
+        "profit_margin_pct": 11.8,
+        "roe_pct": 20.0,
+        "free_cash_flow_margin_pct": 16.5,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -5.0,
+        "six_month_return_pct": 3.8,
+        "one_year_return_pct": 7.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4124,6 +5007,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 21.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.6,
+        "profit_margin_pct": 19.5,
+        "roe_pct": 27.6,
+        "free_cash_flow_margin_pct": 10.9,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 7.9,
+        "six_month_return_pct": 4.6,
+        "one_year_return_pct": 8.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4188,6 +5085,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.3,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -2.5,
+        "profit_margin_pct": 16.0,
+        "roe_pct": 25.1,
+        "free_cash_flow_margin_pct": 16.9,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 10.9,
+        "six_month_return_pct": 8.2,
+        "one_year_return_pct": 9.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4252,6 +5163,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.5,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.8,
+        "profit_margin_pct": 13.7,
+        "roe_pct": 15.1,
+        "free_cash_flow_margin_pct": 14.0,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -2.8,
+        "six_month_return_pct": 6.7,
+        "one_year_return_pct": 8.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4316,6 +5241,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18.0,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -4.3,
+        "profit_margin_pct": 12.0,
+        "roe_pct": 18.6,
+        "free_cash_flow_margin_pct": 16.8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 1.8,
+        "six_month_return_pct": -1.5,
+        "one_year_return_pct": -8.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4380,6 +5319,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.8,
+        "peg_ratio": 2.37,
+        "revenue_growth_yoy_pct": 7.1,
+        "profit_margin_pct": 11.9,
+        "roe_pct": 24.7,
+        "free_cash_flow_margin_pct": 16.8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 8.2,
+        "six_month_return_pct": -0.1,
+        "one_year_return_pct": 6.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4444,6 +5397,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 11.8,
+        "peg_ratio": 1.27,
+        "revenue_growth_yoy_pct": 9.3,
+        "profit_margin_pct": 34.5,
+        "roe_pct": 18.0,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 5.1,
+        "six_month_return_pct": 0.8,
+        "one_year_return_pct": 8.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4508,6 +5475,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.2,
+        "peg_ratio": 2.1,
+        "revenue_growth_yoy_pct": 7.7,
+        "profit_margin_pct": 19.9,
+        "roe_pct": 17.7,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -3.2,
+        "six_month_return_pct": 6.1,
+        "one_year_return_pct": 19.7,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4572,6 +5553,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.2,
+        "peg_ratio": 8.1,
+        "revenue_growth_yoy_pct": 2.0,
+        "profit_margin_pct": 23.1,
+        "roe_pct": 16.2,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -5,
+        "six_month_return_pct": 4.1,
+        "one_year_return_pct": 10.9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4636,6 +5631,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 15.1,
+        "peg_ratio": 6.04,
+        "revenue_growth_yoy_pct": 2.5,
+        "profit_margin_pct": 18.3,
+        "roe_pct": 9.2,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 8.9,
+        "six_month_return_pct": 5.8,
+        "one_year_return_pct": 8.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4700,6 +5709,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 13.6,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.0,
+        "profit_margin_pct": 28.8,
+        "roe_pct": 10.5,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 1.9,
+        "six_month_return_pct": 8.2,
+        "one_year_return_pct": 15.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4764,6 +5787,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 34,
+        "peg_ratio": 2.83,
+        "revenue_growth_yoy_pct": 12,
+        "profit_margin_pct": 46,
+        "roe_pct": 175,
+        "free_cash_flow_margin_pct": 42,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 10,
+        "six_month_return_pct": 7,
+        "one_year_return_pct": 18,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4828,6 +5865,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 11.6,
+        "peg_ratio": 3.87,
+        "revenue_growth_yoy_pct": 3.0,
+        "profit_margin_pct": 26.9,
+        "roe_pct": 16.8,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 12.8,
+        "six_month_return_pct": 11.9,
+        "one_year_return_pct": 17.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4892,6 +5943,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 13.3,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.1,
+        "profit_margin_pct": 33.0,
+        "roe_pct": 13.6,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 7.9,
+        "six_month_return_pct": 8.1,
+        "one_year_return_pct": 19.6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -4956,6 +6021,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 9.3,
+        "peg_ratio": 2.66,
+        "revenue_growth_yoy_pct": 3.5,
+        "profit_margin_pct": 12.7,
+        "roe_pct": 11.7,
+        "free_cash_flow_margin_pct": 5.1,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 2.3,
+        "six_month_return_pct": 1.6,
+        "one_year_return_pct": 6.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5020,6 +6099,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 11.9,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1.6,
+        "profit_margin_pct": 9.7,
+        "roe_pct": 14.7,
+        "free_cash_flow_margin_pct": 7.2,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 2.5,
+        "six_month_return_pct": 4.8,
+        "one_year_return_pct": 9.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5084,6 +6177,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 12.5,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.1,
+        "profit_margin_pct": 13.0,
+        "roe_pct": 15.4,
+        "free_cash_flow_margin_pct": 12.9,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 9.8,
+        "six_month_return_pct": 2.2,
+        "one_year_return_pct": 7.6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5148,6 +6255,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18.2,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1.9,
+        "profit_margin_pct": 11.2,
+        "roe_pct": 9.1,
+        "free_cash_flow_margin_pct": 3.5,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 9.5,
+        "six_month_return_pct": 6.0,
+        "one_year_return_pct": 9.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5212,6 +6333,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.2,
+        "peg_ratio": 4.78,
+        "revenue_growth_yoy_pct": 3.6,
+        "profit_margin_pct": 15.9,
+        "roe_pct": 6.5,
+        "free_cash_flow_margin_pct": -2.5,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 9.4,
+        "six_month_return_pct": 1.6,
+        "one_year_return_pct": -1.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5276,6 +6411,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.9,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.4,
+        "profit_margin_pct": 11.0,
+        "roe_pct": 8.5,
+        "free_cash_flow_margin_pct": -2.0,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 0.1,
+        "six_month_return_pct": 3.9,
+        "one_year_return_pct": 3.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5340,6 +6489,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 15.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.6,
+        "profit_margin_pct": 14.2,
+        "roe_pct": 11.2,
+        "free_cash_flow_margin_pct": -0.1,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 13.0,
+        "six_month_return_pct": 2.8,
+        "one_year_return_pct": 11.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5404,6 +6567,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 21.3,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.2,
+        "profit_margin_pct": 17.4,
+        "roe_pct": 19.8,
+        "free_cash_flow_margin_pct": 12.4,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -0.4,
+        "six_month_return_pct": 0.7,
+        "one_year_return_pct": 0.4,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5468,6 +6645,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.8,
+        "peg_ratio": 4.6,
+        "revenue_growth_yoy_pct": 4.3,
+        "profit_margin_pct": 9.9,
+        "roe_pct": 15.8,
+        "free_cash_flow_margin_pct": 12.1,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 3.9,
+        "six_month_return_pct": -2.0,
+        "one_year_return_pct": 1.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5532,6 +6723,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 20.6,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -0.8,
+        "profit_margin_pct": 18.6,
+        "roe_pct": 31.3,
+        "free_cash_flow_margin_pct": 14.9,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 5.8,
+        "six_month_return_pct": 4.0,
+        "one_year_return_pct": 4.6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5596,6 +6801,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.1,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1.5,
+        "profit_margin_pct": 10.8,
+        "roe_pct": 19.4,
+        "free_cash_flow_margin_pct": 7.3,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 11.6,
+        "six_month_return_pct": 5.6,
+        "one_year_return_pct": 6.6,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5660,6 +6879,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.7,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.5,
+        "profit_margin_pct": 18.4,
+        "roe_pct": 18.3,
+        "free_cash_flow_margin_pct": 9.6,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 7.4,
+        "six_month_return_pct": -0.1,
+        "one_year_return_pct": -2.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5724,6 +6957,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18.8,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -1.4,
+        "profit_margin_pct": 10.5,
+        "roe_pct": 20.8,
+        "free_cash_flow_margin_pct": 6.8,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 4.8,
+        "six_month_return_pct": 9.9,
+        "one_year_return_pct": 13.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5788,6 +7035,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 17.4,
+        "peg_ratio": 2.0,
+        "revenue_growth_yoy_pct": 8.7,
+        "profit_margin_pct": 11.7,
+        "roe_pct": 14.7,
+        "free_cash_flow_margin_pct": 9.3,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": -1.5,
+        "six_month_return_pct": 14.8,
+        "one_year_return_pct": 26.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5852,6 +7113,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 18.6,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": -4.2,
+        "profit_margin_pct": 11.6,
+        "roe_pct": 28.3,
+        "free_cash_flow_margin_pct": 5.1,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -5,
+        "six_month_return_pct": -3.4,
+        "one_year_return_pct": 0.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5916,6 +7191,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.4,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.6,
+        "profit_margin_pct": 10.9,
+        "roe_pct": 12.7,
+        "free_cash_flow_margin_pct": 9.3,
+        "analyst_consensus": "Sell",
+        "analyst_price_target_upside_pct": -5,
+        "six_month_return_pct": 1.8,
+        "one_year_return_pct": 3.2,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -5980,6 +7269,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 19.4,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.3,
+        "profit_margin_pct": 16.0,
+        "roe_pct": 27.3,
+        "free_cash_flow_margin_pct": 8.2,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 4.7,
+        "six_month_return_pct": -1.0,
+        "one_year_return_pct": 5.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6044,6 +7347,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 15.2,
+        "peg_ratio": 2.05,
+        "revenue_growth_yoy_pct": 7.4,
+        "profit_margin_pct": 14.6,
+        "roe_pct": 18.8,
+        "free_cash_flow_margin_pct": 7.9,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": -1.0,
+        "six_month_return_pct": 0.9,
+        "one_year_return_pct": 8.9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6108,6 +7425,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.6,
+        "peg_ratio": 7.9,
+        "revenue_growth_yoy_pct": 2.1,
+        "profit_margin_pct": 8.0,
+        "roe_pct": 16.0,
+        "free_cash_flow_margin_pct": 9.8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 12.9,
+        "six_month_return_pct": 2.5,
+        "one_year_return_pct": -0.3,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6172,6 +7503,20 @@
         "profile": "Primarily Domestic",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 13.0,
+        "peg_ratio": 1.57,
+        "revenue_growth_yoy_pct": 8.3,
+        "profit_margin_pct": 12.4,
+        "roe_pct": 12.8,
+        "free_cash_flow_margin_pct": 8.4,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 8.7,
+        "six_month_return_pct": 5.7,
+        "one_year_return_pct": 6.1,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6236,6 +7581,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 20.3,
+        "peg_ratio": 6.34,
+        "revenue_growth_yoy_pct": 3.2,
+        "profit_margin_pct": 28.1,
+        "roe_pct": 4.2,
+        "free_cash_flow_margin_pct": 20.6,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 7.3,
+        "six_month_return_pct": 1.2,
+        "one_year_return_pct": 5.8,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6300,6 +7659,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 21.2,
+        "peg_ratio": 4.82,
+        "revenue_growth_yoy_pct": 4.4,
+        "profit_margin_pct": 21.7,
+        "roe_pct": 4.1,
+        "free_cash_flow_margin_pct": 20.0,
+        "analyst_consensus": "Buy",
+        "analyst_price_target_upside_pct": 8.1,
+        "six_month_return_pct": -3.1,
+        "one_year_return_pct": -2.9,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6364,6 +7737,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 23.8,
+        "peg_ratio": 8.81,
+        "revenue_growth_yoy_pct": 2.7,
+        "profit_margin_pct": 13.3,
+        "roe_pct": 15.6,
+        "free_cash_flow_margin_pct": 4.0,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 6.4,
+        "six_month_return_pct": -0.2,
+        "one_year_return_pct": -0.5,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     },
     {
@@ -6428,6 +7815,20 @@
         "profile": "Globally Diversified",
         "confidence": "Medium",
         "note": "Approximate domestic-vs-international revenue mix; replace with exact 10-K segment revenue breakdown before production use."
+      },
+      "financial_metrics": {
+        "pe_ratio": 16.9,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 1.5,
+        "profit_margin_pct": 15.7,
+        "roe_pct": 20.6,
+        "free_cash_flow_margin_pct": 5.8,
+        "analyst_consensus": "Hold",
+        "analyst_price_target_upside_pct": 10.8,
+        "six_month_return_pct": 3.5,
+        "one_year_return_pct": 9.0,
+        "confidence": "Medium",
+        "note": "Illustrative estimate for prototype scoring/display, not sourced from a live market-data or fundamentals feed. Some fields (e.g. free_cash_flow_margin_pct, peg_ratio) are marked null where not meaningful (financial-sector companies, unprofitable companies, or negative/near-zero growth). Replace with a licensed fundamentals feed before production use."
       }
     }
   ]

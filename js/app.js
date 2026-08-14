@@ -10,24 +10,36 @@ const state = {
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
   touchedQuestionIds: new Set(), // questions the client has explicitly tapped an answer for — drives the "answered" highlight
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
+  expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
+  timeHorizon: 'long',
   dataset: null,
   datasetError: null,
 };
 
 QUESTIONS.forEach((q) => {
+  if (q.type === 'horizon') return; // single-select, stored separately in state.timeHorizon
   state.answers[q.id] = 3; // neutral default
 });
 
 const appEl = document.getElementById('app');
 
-function render() {
+// Re-renders the current view without moving the scroll position — for
+// in-place UI toggles (accordion expand/collapse, financial-details
+// dropdown) where jumping the viewport back to top would be jarring.
+function renderInPlace() {
   if (state.view === 'intro') renderIntro();
   else if (state.view === 'survey') renderSurvey();
   else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
+}
+
+// For actual navigation (view/step changes) — re-renders and scrolls to
+// top so each new screen or survey step is read from the beginning.
+function render() {
+  renderInPlace();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -137,6 +149,18 @@ function renderSurvey() {
     });
   }
 
+  document.querySelectorAll('.horizon-option input').forEach((input) => {
+    input.addEventListener('change', () => {
+      state.timeHorizon = input.value;
+      const questionId = Number(input.name.replace('horizon-', ''));
+      state.touchedQuestionIds.add(questionId);
+      document.getElementById(`question-row-${questionId}`).classList.add('touched');
+      document.querySelectorAll('.horizon-option').forEach((label) => {
+        label.classList.toggle('selected', label.querySelector('input').value === state.timeHorizon);
+      });
+    });
+  });
+
   document.querySelectorAll('.category-chip').forEach((btn) => {
     if (btn.disabled) return;
     btn.addEventListener('click', () => {
@@ -191,6 +215,8 @@ function renderCategoryChip(category, index) {
 }
 
 function renderQuestionRow(q) {
+  if (q.type === 'horizon') return renderHorizonQuestionRow(q);
+
   const current = state.answers[q.id];
   const isTouched = state.touchedQuestionIds.has(q.id);
   return `
@@ -210,6 +236,27 @@ function renderQuestionRow(q) {
       <div class="scale-labels"><span>Not important</span><span>Very important</span></div>
       ${q.needsHomeCountry ? renderHomeCountryInput() : ''}
       ${q.needsTiesSector ? renderTiesSectorSelect() : ''}
+    </div>
+  `;
+}
+
+function renderHorizonQuestionRow(q) {
+  const isTouched = state.touchedQuestionIds.has(q.id);
+  return `
+    <div id="question-row-${q.id}" class="question-row ${isTouched ? 'touched' : ''}">
+      <p class="question-text">${escapeHtml(q.text)}</p>
+      <div class="horizon-options">
+        ${q.options
+          .map(
+            (opt) => `
+          <label class="horizon-option ${state.timeHorizon === opt.value ? 'selected' : ''}">
+            <input type="radio" name="horizon-${q.id}" value="${escapeHtml(opt.value)}" ${state.timeHorizon === opt.value ? 'checked' : ''} />
+            <span>${escapeHtml(opt.label)}</span>
+          </label>
+        `
+          )
+          .join('')}
+      </div>
     </div>
   `;
 }
@@ -258,7 +305,7 @@ function renderReview() {
       const key = btn.dataset.categoryKey;
       if (state.reviewExpanded.has(key)) state.reviewExpanded.delete(key);
       else state.reviewExpanded.add(key);
-      render();
+      renderInPlace();
     });
   });
 
@@ -280,9 +327,10 @@ function renderReview() {
 
 function renderReviewCategory(category, categoryIndex) {
   const questions = questionsForCategory(category.key);
+  const ratedQuestions = questions.filter((q) => q.type !== 'horizon');
   const isCommunity = category.key === 'community';
   const isExpanded = state.reviewExpanded.has(category.key);
-  const avg = questions.reduce((sum, q) => sum + state.answers[q.id], 0) / questions.length;
+  const avg = ratedQuestions.reduce((sum, q) => sum + state.answers[q.id], 0) / ratedQuestions.length;
 
   return `
     <div class="review-category ${isExpanded ? 'expanded' : ''}">
@@ -303,11 +351,11 @@ function renderReviewCategory(category, categoryIndex) {
           ? `
         <ul class="review-answer-list">
           ${questions
-            .map(
-              (q) => `
-            <li><span class="review-q-text">${escapeHtml(q.text)}</span><span class="review-q-answer">${state.answers[q.id]}/5</span></li>
-          `
-            )
+            .map((q) => {
+              const answerLabel =
+                q.type === 'horizon' ? q.options.find((opt) => opt.value === state.timeHorizon).label : `${state.answers[q.id]}/5`;
+              return `<li><span class="review-q-text">${escapeHtml(q.text)}</span><span class="review-q-answer">${escapeHtml(answerLabel)}</span></li>`;
+            })
             .join('')}
           ${
             isCommunity
@@ -333,6 +381,7 @@ function renderResults() {
   const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers, {
     homeCountry: state.homeCountry,
     tiesSector: state.tiesSector,
+    timeHorizon: state.timeHorizon,
   });
   const topPriorities = QUESTIONS.filter((q) => q.id <= 20 && state.answers[q.id] === 5);
 
@@ -372,7 +421,6 @@ function renderResults() {
               <th>Ticker</th>
               <th>Company</th>
               <th>Sector</th>
-              <th>Allocation</th>
               <th>Match Tier</th>
               <th>Rationale</th>
             </tr>
@@ -394,10 +442,10 @@ function renderResults() {
         <strong>Important disclaimer:</strong> This tool is illustrative and educational only. It is built on a
         limited, 100-company sample dataset with estimated — not independently verified — values and performance
         data for many criteria (labor practices, governance details, financial leverage, market-cap tier, beta,
-        five-year returns, and revenue geography in particular rely on rough, illustrative estimates rather than a
-        live market-data feed). It is not licensed financial advice, and the results should not be relied upon for
-        actual investment decisions. Please consult a registered financial advisor before making any investment
-        decisions.
+        returns, revenue geography, and fundamentals such as P/E, revenue growth, margins, ROE, and analyst
+        consensus all rely on rough, illustrative estimates rather than a live market-data feed). It is not
+        licensed financial advice, and the results should not be relied upon for actual investment decisions.
+        Please consult a registered financial advisor before making any investment decisions.
       </div>
 
       <div class="nav-row">
@@ -407,6 +455,15 @@ function renderResults() {
     </section>
   `;
 
+  document.querySelectorAll('.financial-toggle-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const ticker = btn.dataset.ticker;
+      if (state.expandedFinancialDetails.has(ticker)) state.expandedFinancialDetails.delete(ticker);
+      else state.expandedFinancialDetails.add(ticker);
+      renderInPlace();
+    });
+  });
+
   document.getElementById('edit-answers-btn').addEventListener('click', () => {
     state.editOrigin = null;
     state.view = 'review';
@@ -415,10 +472,13 @@ function renderResults() {
 
   document.getElementById('restart-btn').addEventListener('click', () => {
     QUESTIONS.forEach((q) => {
+      if (q.type === 'horizon') return;
       state.answers[q.id] = 3;
     });
     state.homeCountry = 'United States';
     state.tiesSector = '';
+    state.timeHorizon = 'long';
+    state.expandedFinancialDetails.clear();
     state.categoryIndex = 0;
     state.furthestCategoryIndex = 0;
     state.editOrigin = null;
@@ -430,18 +490,45 @@ function renderResults() {
 function renderHoldingRow(entry) {
   const tierClass = entry.tier === 'Strong' ? 'tier-strong' : 'tier-partial';
   const rowClass = entry.tier === 'Strong' ? 'row-strong' : 'row-partial';
+  const ticker = entry.company.ticker;
+  const isFinDetailsOpen = state.expandedFinancialDetails.has(ticker);
   return `
     <tr class="${rowClass}">
-      <td data-label="Ticker">${escapeHtml(entry.company.ticker)}</td>
+      <td data-label="Ticker">${escapeHtml(ticker)}</td>
       <td data-label="Company">${escapeHtml(entry.company.name)}</td>
       <td data-label="Sector">${escapeHtml(entry.company.sector)}</td>
-      <td data-label="Allocation">${entry.allocationPct.toFixed(2)}%</td>
       <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${entry.tier} Match</span></td>
       <td data-label="Rationale">
         <div>${escapeHtml(entry.rationale)}</div>
         ${entry.note ? `<div class="partial-note">${escapeHtml(entry.note)}</div>` : ''}
+        <button type="button" class="financial-toggle-btn" data-ticker="${escapeHtml(ticker)}">
+          <span class="financial-toggle-chevron ${isFinDetailsOpen ? 'open' : ''}">${chevronIcon()}</span>
+          Why this stock, financially
+        </button>
+        ${isFinDetailsOpen ? renderFinancialDetails(entry.company) : ''}
       </td>
     </tr>
+  `;
+}
+
+function renderFinancialDetails(company) {
+  const fm = company.financial_metrics;
+  const peText =
+    fm.pe_ratio === null || fm.pe_ratio === undefined
+      ? 'P/E ratio: not meaningful (company is not currently profitable)'
+      : `P/E ratio: ${fm.pe_ratio} (lower = cheaper relative to earnings)`;
+  const growthText = `Revenue growth: ${fm.revenue_growth_yoy_pct}% year-over-year`;
+  const consensusText = `Analyst consensus: ${fm.analyst_consensus}`;
+  const yieldTier = company.dividend_policy && company.dividend_policy.yield_tier;
+  const dividendText = yieldTier ? `Dividend yield: ${yieldTier}` : 'Dividend yield: none (does not currently pay a dividend)';
+
+  return `
+    <ul class="financial-details-list">
+      <li>${escapeHtml(peText)}</li>
+      <li>${escapeHtml(growthText)}</li>
+      <li>${escapeHtml(consensusText)}</li>
+      <li>${escapeHtml(dividendText)}</li>
+    </ul>
   `;
 }
 

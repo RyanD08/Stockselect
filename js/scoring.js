@@ -21,13 +21,16 @@
  * "generally well-regarded" placeholder of the same numeric value. Objective
  * facts (sin-stock flags, leverage, dividends, etc.) are never dampened.
  *
- * Financial performance (recent returns, beta, market cap, dividend yield)
- * is folded in as one more preference-type criterion in the exact same
- * weighted sum — not a separate post-hoc blend. Its importance weight comes
- * from the client's Q22 answer ("willingness to accept lower returns for
- * values alignment"), inverted, so it behaves exactly like any other
- * question: a client who rates it a 5-equivalent priority gets the same
- * proportional influence as a 5/5 on any values question, no more.
+ * Financial quality — valuation (P/E, PEG), growth, profitability (margin,
+ * ROE, FCF margin), analyst sentiment, and a time-horizon-selected return
+ * (Q25) weighted by beta/market-cap/dividends per the client's Risk
+ * Profile — is folded in as one more preference-type criterion in the
+ * exact same weighted sum (see financialQualityAlignment), not a separate
+ * post-hoc blend. Its importance weight comes from the client's Q22 answer
+ * ("willingness to accept lower returns for values alignment"), inverted,
+ * so it behaves exactly like any other question: a client who rates it a
+ * 5-equivalent priority gets the same proportional influence as a 5/5 on
+ * any values question, no more.
  *
  * contribution_i = clientImportance_i (1-5) * a_i
  * score = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
@@ -173,9 +176,9 @@ function scoreCompany(company, answers, ctx, riskProfile) {
     denominator += importance;
   });
 
-  // Financial performance as one more weighted criterion (see header comment).
+  // Financial quality as one more weighted criterion (see header comment).
   const financialImportance = 6 - (answers[22] || 3);
-  const financialAlignment = financialPerformanceAlignment(company, riskProfile);
+  const financialAlignment = financialQualityAlignment(company, riskProfile, ctx.timeHorizon);
   numerator += financialImportance * financialAlignment;
   denominator += financialImportance;
 
@@ -227,7 +230,7 @@ function buildRationale(alignments, answers, financialImportance, financialAlign
     importance: answers[qId] || 3,
     alignment: alignments[qId],
   }));
-  candidates.push({ label: 'Strong recent financial performance', importance: financialImportance, alignment: financialAlignment });
+  candidates.push({ label: 'Strong financial fundamentals', importance: financialImportance, alignment: financialAlignment });
 
   const highPriority = candidates.filter((c) => c.importance >= HIGH_PRIORITY_THRESHOLD);
   const pool = highPriority.length > 0 ? highPriority : candidates;
@@ -290,18 +293,14 @@ function dividendYieldRank(dividendPolicy) {
   return DIVIDEND_YIELD_RANK[tier] !== undefined ? DIVIDEND_YIELD_RANK[tier] : 0;
 }
 
-// Fixed-scale (not pool-relative) 0-1 normalizers, so financial performance
+// Fixed-scale (not pool-relative) 0-1 normalizers, so financial quality
 // composes as an ordinary per-company alignment function exactly like the
 // ESG-based ones above, instead of needing a second normalization pass over
 // a candidate set. Bounds are set from the dataset's actual observed range
-// (five-year returns roughly -8 to 55; beta roughly 0.4 to 2.0) with a
-// little headroom, and clamped to [0,1] so outliers just cap out rather
-// than skewing the scale.
+// with a little headroom, and clamped to [0,1] so outliers just cap out
+// rather than skewing the scale.
 function clamp01(v) {
   return Math.max(0, Math.min(1, v));
-}
-function returnAlignment(returnPct) {
-  return clamp01((returnPct - -10) / (40 - -10));
 }
 function betaAlignment(beta) {
   // higher beta = more reward (risk tolerance) — used for Growth clients
@@ -317,24 +316,78 @@ function marketCapAlignment(tier) {
 function dividendYieldAlignment(dividendPolicy) {
   return dividendYieldRank(dividendPolicy) / 4;
 }
-function riskAdjustedReturnAlignment(returnPct, beta) {
-  const riskAdjusted = beta > 0 ? returnPct / beta : returnPct;
-  return clamp01((riskAdjusted - -10) / (50 - -10));
+
+// A missing fundamental (null in the dataset — unprofitable, not
+// meaningful for the sector, or too-low growth to compute) is treated as
+// neutral rather than penalized, consistent with how every other
+// preference-type criterion in this file treats "no data."
+const NEUTRAL_ALIGNMENT = 0.5;
+
+function peAlignment(pe) {
+  if (pe === null || pe === undefined) return NEUTRAL_ALIGNMENT;
+  return clamp01((60 - pe) / (60 - 8)); // lower P/E = cheaper relative to earnings = better
+}
+function pegAlignment(peg) {
+  if (peg === null || peg === undefined) return NEUTRAL_ALIGNMENT;
+  return clamp01((6 - peg) / (6 - 0.5));
+}
+function revenueGrowthAlignment(growthPct) {
+  return clamp01((growthPct - -5) / (40 - -5));
+}
+function profitMarginAlignment(marginPct) {
+  return clamp01((marginPct - -5) / (40 - -5));
+}
+function roeAlignment(roePct) {
+  if (roePct === null || roePct === undefined) return NEUTRAL_ALIGNMENT;
+  // Buyback-driven ROE spikes (e.g. low/negative shareholder equity) are an
+  // accounting artifact, not extraordinary quality — cap before normalizing
+  // so they don't mechanically dominate the composite.
+  const capped = Math.min(roePct, 60);
+  return clamp01(capped / 60);
+}
+function fcfMarginAlignment(fcfMarginPct) {
+  if (fcfMarginPct === null || fcfMarginPct === undefined) return NEUTRAL_ALIGNMENT; // not meaningful for financial-sector companies
+  return clamp01((fcfMarginPct - -5) / (35 - -5));
+}
+const ANALYST_CONSENSUS_SCORE = { 'Strong Buy': 1.0, Buy: 0.75, Hold: 0.5, Sell: 0.25, 'Strong Sell': 0.0 };
+function analystConsensusAlignment(consensus) {
+  return ANALYST_CONSENSUS_SCORE[consensus] !== undefined ? ANALYST_CONSENSUS_SCORE[consensus] : NEUTRAL_ALIGNMENT;
+}
+function analystUpsideAlignment(upsidePct) {
+  return clamp01((upsidePct - -5) / (15 - -5));
 }
 
-// Financial performance, folded into scoreCompany as one more
-// preference-type criterion (reward-only, 0-1, never penalizes). Which raw
-// attributes matter, and in which direction, depends on the client's
-// derived Risk Profile — mirrors the existing Section 3.3 tie-break logic
-// in quantitativeTieBreakKey, just expressed as a 0-1 reward instead of an
-// ordinal comparator.
-function financialPerformanceAlignment(company, riskProfile) {
+// Bounds per time horizon, since 6-month/1-year/5-year returns naturally
+// span different ranges (a great 6-month return and a great 5-year
+// annualized return are not the same number).
+const HORIZON_RETURN_BOUNDS = {
+  short: [-10, 25],
+  medium: [-12, 45],
+  long: [-10, 40],
+};
+
+function horizonReturnValue(company, timeHorizon) {
+  if (timeHorizon === 'short') return company.financial_metrics.six_month_return_pct;
+  if (timeHorizon === 'medium') return company.financial_metrics.one_year_return_pct;
+  return company.performance_tier.five_year_annualized_return_pct_est;
+}
+
+// The client's selected time horizon (Q25) picks which return field is
+// used; the client's derived Risk Profile still decides how that return is
+// weighted against beta/cap/dividends — mirrors the existing Section 3.3
+// tie-break logic in quantitativeTieBreakKey, just expressed as a 0-1
+// reward instead of an ordinal comparator. This is one of the 9 metrics
+// averaged into financialQualityAlignment below, not a separate score.
+function timeHorizonReturnAlignment(company, riskProfile, timeHorizon) {
+  const bounds = HORIZON_RETURN_BOUNDS[timeHorizon] || HORIZON_RETURN_BOUNDS.long;
   const beta = company.market_profile.beta_est;
-  const ret = company.performance_tier.five_year_annualized_return_pct_est;
+  const ret = horizonReturnValue(company, timeHorizon);
+  const [min, max] = bounds;
+  const retAlign = clamp01((ret - min) / (max - min));
 
   if (riskProfile === 'Growth') {
     // reward high return AND high beta (risk tolerance, not risk-adjusted)
-    return (returnAlignment(ret) + betaAlignment(beta)) / 2;
+    return (retAlign + betaAlignment(beta)) / 2;
   }
   if (riskProfile === 'Conservative') {
     // reward large cap + high dividend yield + stability, lightly reward return
@@ -342,17 +395,42 @@ function financialPerformanceAlignment(company, riskProfile) {
       0.3 * marketCapAlignment(company.market_profile.market_cap_tier) +
       0.3 * dividendYieldAlignment(company.dividend_policy) +
       0.3 * stabilityAlignment(beta) +
-      0.1 * returnAlignment(ret)
+      0.1 * retAlign
     );
   }
-  // Balanced: reward risk-adjusted return (five-year return / beta)
-  return riskAdjustedReturnAlignment(ret, beta);
+  // Balanced: reward risk-adjusted return. Dividing by a sub-1 beta can push
+  // the result above the raw return range, so the top bound gets 25%
+  // headroom rather than clamping every low-beta company's ratio to 1.
+  const riskAdjusted = beta > 0 ? ret / beta : ret;
+  return clamp01((riskAdjusted - min) / (max * 1.25 - min));
+}
+
+// Financial quality, folded into scoreCompany as one more preference-type
+// criterion (reward-only, 0-1, never penalizes) — the average of 9
+// normalized sub-metrics: 8 fundamentals/analyst signals plus the
+// risk-profile-aware, time-horizon-selected return above. Equal weight
+// across all 9; no sub-metric is privileged over the others.
+function financialQualityAlignment(company, riskProfile, timeHorizon) {
+  const fm = company.financial_metrics;
+  const components = [
+    peAlignment(fm.pe_ratio),
+    pegAlignment(fm.peg_ratio),
+    revenueGrowthAlignment(fm.revenue_growth_yoy_pct),
+    profitMarginAlignment(fm.profit_margin_pct),
+    roeAlignment(fm.roe_pct),
+    fcfMarginAlignment(fm.free_cash_flow_margin_pct),
+    analystConsensusAlignment(fm.analyst_consensus),
+    analystUpsideAlignment(fm.analyst_price_target_upside_pct),
+    timeHorizonReturnAlignment(company, riskProfile, timeHorizon),
+  ];
+  return components.reduce((sum, v) => sum + v, 0) / components.length;
 }
 
 function buildPortfolio(dataset, answers, clientContext) {
   const ctx = {
     homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
     tiesSector: (clientContext && clientContext.tiesSector) || null,
+    timeHorizon: (clientContext && clientContext.timeHorizon) || 'long',
   };
   const riskProfile = deriveRiskProfile(answers);
   const tierRank = { Strong: 0, Partial: 1 };
