@@ -1,5 +1,5 @@
 /**
- * Values-fit scoring engine (v3).
+ * Values-fit scoring engine.
  *
  * Every scored question (ids 1-20; ids 21-24 are Risk Philosophy and are
  * combined into a derived Risk Profile instead — see deriveRiskProfile) is
@@ -21,18 +21,21 @@
  * "generally well-regarded" placeholder of the same numeric value. Objective
  * facts (sin-stock flags, leverage, dividends, etc.) are never dampened.
  *
+ * Financial performance (recent returns, beta, market cap, dividend yield)
+ * is folded in as one more preference-type criterion in the exact same
+ * weighted sum — not a separate post-hoc blend. Its importance weight comes
+ * from the client's Q22 answer ("willingness to accept lower returns for
+ * values alignment"), inverted, so it behaves exactly like any other
+ * question: a client who rates it a 5-equivalent priority gets the same
+ * proportional influence as a 5/5 on any values question, no more.
+ *
  * contribution_i = clientImportance_i (1-5) * a_i
- * ValuesFitScore = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
+ * score = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
  *
  * 50 is the neutral starting point; the score moves up or down only as far
  * as the client's own stated priorities and the company's real attributes
- * justify.
- *
- * The final ranking score blends ValuesFitScore with a risk-profile-aware
- * FinancialScore, weighted by how much the client said they prioritize
- * returns over values alignment (deriveProfitPriorityWeight) — see
- * buildPortfolio. Strong Match always ranks above Partial Match regardless
- * of either score.
+ * justify. Strong Match always ranks above Partial Match; score only orders
+ * within a tier.
  */
 
 const SCORED_QUESTION_IDS = Array.from({ length: 20 }, (_, i) => i + 1); // 1-20
@@ -157,7 +160,7 @@ const ALIGNMENT_FNS = {
   20: (c) => (c.revenue_geography.profile === 'Primarily Domestic' ? 1 : 0),
 };
 
-function scoreCompany(company, answers, ctx) {
+function scoreCompany(company, answers, ctx, riskProfile) {
   let numerator = 0;
   let denominator = 0;
   const alignments = {};
@@ -170,9 +173,15 @@ function scoreCompany(company, answers, ctx) {
     denominator += importance;
   });
 
+  // Financial performance as one more weighted criterion (see header comment).
+  const financialImportance = 6 - (answers[22] || 3);
+  const financialAlignment = financialPerformanceAlignment(company, riskProfile);
+  numerator += financialImportance * financialAlignment;
+  denominator += financialImportance;
+
   const raw = denominator > 0 ? 50 + 50 * (numerator / denominator) : 50;
   const score = Math.round(Math.min(100, Math.max(0, raw)));
-  return { score, alignments };
+  return { score, alignments, financialImportance, financialAlignment };
 }
 
 // Q21-24 all share the same underlying axis once inverted: a raw answer of
@@ -212,20 +221,26 @@ function lowerFirst(str) {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-function buildRationale(alignments, answers) {
-  const highPriorityIds = SCORED_QUESTION_IDS.filter((qId) => (answers[qId] || 3) >= HIGH_PRIORITY_THRESHOLD);
-  const candidateIds = highPriorityIds.length > 0 ? highPriorityIds : SCORED_QUESTION_IDS;
+function buildRationale(alignments, answers, financialImportance, financialAlignment) {
+  const candidates = SCORED_QUESTION_IDS.map((qId) => ({
+    label: getQuestion(qId).short,
+    importance: answers[qId] || 3,
+    alignment: alignments[qId],
+  }));
+  candidates.push({ label: 'Strong recent financial performance', importance: financialImportance, alignment: financialAlignment });
 
-  const ranked = candidateIds
-    .filter((qId) => alignments[qId] > 0)
-    .sort((a, b) => alignments[b] - alignments[a])
+  const highPriority = candidates.filter((c) => c.importance >= HIGH_PRIORITY_THRESHOLD);
+  const pool = highPriority.length > 0 ? highPriority : candidates;
+
+  const ranked = pool
+    .filter((c) => c.alignment > 0)
+    .sort((a, b) => b.alignment - a.alignment)
     .slice(0, 2);
 
   if (ranked.length === 0) {
     return 'Reasonable overall values alignment across your stated priorities.';
   }
-  const labels = ranked.map((qId) => getQuestion(qId).short);
-  return `Strong fit on ${labels.join(' and ')}.`;
+  return `Strong fit on ${ranked.map((c) => c.label).join(' and ')}.`;
 }
 
 const MARKET_CAP_RANK = { Mega: 3, Large: 2, Mid: 1, Small: 0 };
@@ -267,16 +282,6 @@ function compareArrays(a, b) {
   return 0;
 }
 
-// v3: how much financial performance should influence the *primary*
-// ranking (not just tie-breaks), derived from the client's answer to Q22
-// ("willingness to accept lower returns for values alignment"). Capped at
-// 0.5 so this stays a values-based tool — financial data can shape at most
-// half of the final ranking, never fully override stated values.
-function deriveProfitPriorityWeight(answers) {
-  const q22 = answers[22] || 3;
-  return ((5 - q22) / 4) * 0.5;
-}
-
 const DIVIDEND_YIELD_RANK = { High: 4, Medium: 3, Low: 2, 'Very Low': 1, None: 0 };
 
 function dividendYieldRank(dividendPolicy) {
@@ -285,59 +290,64 @@ function dividendYieldRank(dividendPolicy) {
   return DIVIDEND_YIELD_RANK[tier] !== undefined ? DIVIDEND_YIELD_RANK[tier] : 0;
 }
 
-// Returns a function mapping a raw value to 0-1 via min-max normalization
-// over `values`. If every value in the pool is identical, there's nothing
-// to differentiate on, so everyone gets a neutral 0.5.
-function minMaxNormalize(values) {
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  if (max === min) return () => 0.5;
-  return (v) => (v - min) / (max - min);
+// Fixed-scale (not pool-relative) 0-1 normalizers, so financial performance
+// composes as an ordinary per-company alignment function exactly like the
+// ESG-based ones above, instead of needing a second normalization pass over
+// a candidate set. Bounds are set from the dataset's actual observed range
+// (five-year returns roughly -8 to 55; beta roughly 0.4 to 2.0) with a
+// little headroom, and clamped to [0,1] so outliers just cap out rather
+// than skewing the scale.
+function clamp01(v) {
+  return Math.max(0, Math.min(1, v));
+}
+function returnAlignment(returnPct) {
+  return clamp01((returnPct - -10) / (40 - -10));
+}
+function betaAlignment(beta) {
+  // higher beta = more reward (risk tolerance) — used for Growth clients
+  return clamp01((beta - 0.3) / (2.2 - 0.3));
+}
+function stabilityAlignment(beta) {
+  // lower beta = more reward — used for Conservative clients
+  return 1 - betaAlignment(beta);
+}
+function marketCapAlignment(tier) {
+  return (MARKET_CAP_RANK[tier] || 0) / 3;
+}
+function dividendYieldAlignment(dividendPolicy) {
+  return dividendYieldRank(dividendPolicy) / 4;
+}
+function riskAdjustedReturnAlignment(returnPct, beta) {
+  const riskAdjusted = beta > 0 ? returnPct / beta : returnPct;
+  return clamp01((riskAdjusted - -10) / (50 - -10));
 }
 
-// Computes a 0-100 Financial Score for each company in `companies`,
-// min-max normalized *within that pool* (not the full dataset) so the
-// scale stays meaningful for the client's actual candidate set. Which raw
+// Financial performance, folded into scoreCompany as one more
+// preference-type criterion (reward-only, 0-1, never penalizes). Which raw
 // attributes matter, and in which direction, depends on the client's
-// derived Risk Profile.
-function computeFinancialScores(companies, riskProfile) {
-  const betas = companies.map((c) => c.market_profile.beta_est);
-  const returns = companies.map((c) => c.performance_tier.five_year_annualized_return_pct_est);
-  const capRanks = companies.map((c) => MARKET_CAP_RANK[c.market_profile.market_cap_tier] || 0);
-  const yieldRanks = companies.map((c) => dividendYieldRank(c.dividend_policy));
-  const riskAdjustedReturns = companies.map((c, i) => (betas[i] > 0 ? returns[i] / betas[i] : returns[i]));
+// derived Risk Profile — mirrors the existing Section 3.3 tie-break logic
+// in quantitativeTieBreakKey, just expressed as a 0-1 reward instead of an
+// ordinal comparator.
+function financialPerformanceAlignment(company, riskProfile) {
+  const beta = company.market_profile.beta_est;
+  const ret = company.performance_tier.five_year_annualized_return_pct_est;
 
-  const normBeta = minMaxNormalize(betas);
-  const normReturn = minMaxNormalize(returns);
-  const normCap = minMaxNormalize(capRanks);
-  const normYield = minMaxNormalize(yieldRanks);
-  const normRiskAdjusted = minMaxNormalize(riskAdjustedReturns);
-
-  const financialScores = new Map();
-  companies.forEach((c, i) => {
-    let raw; // 0-1 composite before scaling to 0-100
-    if (riskProfile === 'Growth') {
-      // reward high return AND high beta (risk tolerance, not risk-adjusted)
-      raw = (normReturn(returns[i]) + normBeta(betas[i])) / 2;
-    } else if (riskProfile === 'Conservative') {
-      // reward large cap + high dividend yield, penalize high beta, lightly reward return
-      raw = 0.3 * normCap(capRanks[i]) + 0.3 * normYield(yieldRanks[i]) + 0.3 * (1 - normBeta(betas[i])) + 0.1 * normReturn(returns[i]);
-    } else {
-      // Balanced: reward risk-adjusted return (five-year return / beta)
-      raw = normRiskAdjusted(riskAdjustedReturns[i]);
-    }
-    financialScores.set(c.ticker, Math.round(raw * 100));
-  });
-  return financialScores;
+  if (riskProfile === 'Growth') {
+    // reward high return AND high beta (risk tolerance, not risk-adjusted)
+    return (returnAlignment(ret) + betaAlignment(beta)) / 2;
+  }
+  if (riskProfile === 'Conservative') {
+    // reward large cap + high dividend yield + stability, lightly reward return
+    return (
+      0.3 * marketCapAlignment(company.market_profile.market_cap_tier) +
+      0.3 * dividendYieldAlignment(company.dividend_policy) +
+      0.3 * stabilityAlignment(beta) +
+      0.1 * returnAlignment(ret)
+    );
+  }
+  // Balanced: reward risk-adjusted return (five-year return / beta)
+  return riskAdjustedReturnAlignment(ret, beta);
 }
-
-// How large a pre-financial-blend candidate pool to draw from before
-// normalizing Financial Score. Wide enough to leave room for the
-// diversification pass to reshuffle, narrow enough that the 0-100
-// financial scale stays meaningful for companies actually in contention —
-// normalizing across the full company universe would let irrelevant
-// high-return/low-fit companies skew the scale (see v3 patch, Fix 2).
-const CANDIDATE_POOL_SIZE = 40;
 
 function buildPortfolio(dataset, answers, clientContext) {
   const ctx = {
@@ -345,19 +355,18 @@ function buildPortfolio(dataset, answers, clientContext) {
     tiesSector: (clientContext && clientContext.tiesSector) || null,
   };
   const riskProfile = deriveRiskProfile(answers);
-  const profitPriorityWeight = deriveProfitPriorityWeight(answers);
   const tierRank = { Strong: 0, Partial: 1 };
 
   const scored = dataset.companies.map((company) => {
-    const { score, alignments } = scoreCompany(company, answers, ctx);
+    const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
     const { tier, conflicts } = classifyTier(alignments, answers);
     return {
       company,
-      valuesFitScore: score,
+      score,
       alignments,
       tier,
       conflicts,
-      rationale: buildRationale(alignments, answers),
+      rationale: buildRationale(alignments, answers, financialImportance, financialAlignment),
       note: tier === 'Partial' ? buildPartialMatchNote(conflicts) : null,
       riskMatchRank: riskProfileMatchRank(company, riskProfile),
       quantKey: quantitativeTieBreakKey(company, riskProfile),
@@ -365,37 +374,22 @@ function buildPortfolio(dataset, answers, clientContext) {
     };
   });
 
-  // Shared tie-break chain: Strong before Partial as a hard rule, then the
-  // given primary score, then risk-profile fit / quantitative data /
-  // controversy count / ticker as successive tie-breakers (Section 3.3).
-  function compareEntries(a, b, primaryScoreKey) {
+  // Strong before Partial as a hard rule; score orders within a tier; then
+  // risk-profile fit / quantitative data / controversy count / ticker as
+  // successive tie-breakers (Section 3.3).
+  scored.sort((a, b) => {
     if (tierRank[a.tier] !== tierRank[b.tier]) return tierRank[a.tier] - tierRank[b.tier];
-    if (b[primaryScoreKey] !== a[primaryScoreKey]) return b[primaryScoreKey] - a[primaryScoreKey];
+    if (b.score !== a.score) return b.score - a.score;
     if (a.riskMatchRank !== b.riskMatchRank) return a.riskMatchRank - b.riskMatchRank;
     const quantCompare = compareArrays(a.quantKey, b.quantKey);
     if (quantCompare !== 0) return quantCompare;
     if (a.controversyCount !== b.controversyCount) return a.controversyCount - b.controversyCount;
     return a.company.ticker.localeCompare(b.company.ticker);
-  }
-
-  // Provisional values-only sort, used only to pick the candidate pool that
-  // Financial Score gets normalized against (v3 Fix 2).
-  scored.sort((a, b) => compareEntries(a, b, 'valuesFitScore'));
-  const candidatePool = scored.slice(0, Math.min(CANDIDATE_POOL_SIZE, scored.length));
-
-  const financialScores = computeFinancialScores(candidatePool.map((entry) => entry.company), riskProfile);
-  candidatePool.forEach((entry) => {
-    entry.financialScore = financialScores.get(entry.company.ticker);
-    entry.finalScore = (1 - profitPriorityWeight) * entry.valuesFitScore + profitPriorityWeight * entry.financialScore;
   });
-
-  // Final ranking: Strong still sorts above Partial as a hard rule;
-  // FinalScore (values + financial blend) orders within each tier.
-  candidatePool.sort((a, b) => compareEntries(a, b, 'finalScore'));
 
   const sectorCounts = {};
   const selected = [];
-  for (const entry of candidatePool) {
+  for (const entry of scored) {
     if (selected.length >= MAX_PORTFOLIO_SIZE) break;
     const sector = entry.company.sector;
     const countInSector = sectorCounts[sector] || 0;
@@ -409,5 +403,5 @@ function buildPortfolio(dataset, answers, clientContext) {
     entry.allocationPct = allocationPct;
   });
 
-  return { riskProfile, profitPriorityWeight, holdings: selected };
+  return { riskProfile, holdings: selected };
 }

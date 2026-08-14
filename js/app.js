@@ -163,7 +163,7 @@ function renderTiesSectorSelect() {
 }
 
 function renderResults() {
-  const { riskProfile, profitPriorityWeight, holdings } = buildPortfolio(state.dataset, state.answers, {
+  const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers, {
     homeCountry: state.homeCountry,
     tiesSector: state.tiesSector,
   });
@@ -172,12 +172,6 @@ function renderResults() {
   appEl.innerHTML = `
     <section class="card results-card">
       <h1>Your Values-Based Portfolio</h1>
-
-      ${
-        profitPriorityWeight > 0.1
-          ? '<p class="profit-priority-note">Because you indicated a strong preference for returns over values alignment, financial performance is weighted more heavily in this ranking.</p>'
-          : ''
-      }
 
       <div class="summary-grid">
         <div class="summary-box">

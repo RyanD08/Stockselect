@@ -247,16 +247,6 @@ h3 {
 
 /* Results */
 
-.profit-priority-note {
-  background: var(--warn-bg);
-  color: var(--warn-text);
-  border: 1px solid #f0ddb3;
-  border-radius: 8px;
-  padding: 0.65rem 1rem;
-  font-size: 0.88rem;
-  margin: 0.75rem 0 0;
-}
-
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
