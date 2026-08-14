@@ -633,6 +633,17 @@ h2 .category-icon {
   border-radius: 8px;
 }
 
+.financial-score-framing-note {
+  margin: 0 0 1rem;
+  padding: 0.7rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
 .sector-chart h3 {
   margin-bottom: 0.75rem;
 }
@@ -883,14 +894,10 @@ h2 .category-icon {
   color: var(--success-text);
 }
 
-.financial-score-warn {
-  background: var(--warn-bg);
-  color: var(--warn-text);
-}
-
-.financial-score-danger {
-  background: var(--danger-bg);
-  color: var(--danger-text);
+.financial-score-neutral {
+  background: var(--bg);
+  color: var(--muted);
+  border: 1px solid var(--border);
 }
 
 .partial-note {

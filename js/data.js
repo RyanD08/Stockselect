@@ -5,7 +5,7 @@
  * the survey and scoring logic never touch the data source directly.
  */
 
-const DATA_SOURCE_URL = 'data/values_portfolio_dataset_v4_100.json';
+const DATA_SOURCE_URL = 'data/values_portfolio_dataset_v5_100.json';
 
 async function loadDataset() {
   const response = await fetch(DATA_SOURCE_URL);

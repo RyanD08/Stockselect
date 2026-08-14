@@ -414,6 +414,12 @@ function renderResults() {
 
       ${renderSectorChart(holdings)}
 
+      <p class="financial-score-framing-note">
+        The Financial Score column compares each company's financial profile to others in this tool's ~100-company
+        universe of established public companies. A below-average score does not mean the company is a bad
+        investment — it means it ranks lower on these specific metrics relative to a strong peer group.
+      </p>
+
       <div class="table-wrap">
         <table class="results-table">
           <thead>
@@ -518,13 +524,18 @@ function renderHoldingRow(entry) {
   `;
 }
 
-const FINANCIAL_SCORE_LABEL_CLASS = { Strong: 'success', Good: 'success', Fair: 'warn', Weak: 'danger' };
+// v11: only "Above Average" gets a positive accent. "Average" and "Below
+// Average" both stay neutral/gray on purpose — this label is relative
+// positioning, not a warning, and reusing the warn/danger colors already
+// used for Partial Match and the Financial Caution badge would visually
+// contradict that framing (see the caution note in renderResults).
+const FINANCIAL_SCORE_LABEL_CLASS = { 'Above Average': 'success', Average: 'neutral', 'Below Average': 'neutral' };
 
 function renderFinancialScoreBadge(company) {
   const fm = company.financial_metrics;
   const score = Math.round(fm.overall_financial_score);
   const label = fm.overall_financial_score_label;
-  const colorClass = FINANCIAL_SCORE_LABEL_CLASS[label] || 'warn';
+  const colorClass = FINANCIAL_SCORE_LABEL_CLASS[label] || 'neutral';
   return `<span class="financial-score-badge financial-score-${colorClass}">${score} (${escapeHtml(label)})</span>`;
 }
 
