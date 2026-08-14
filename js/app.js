@@ -8,6 +8,8 @@ const state = {
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
+  touchedQuestionIds: new Set(), // questions the client has explicitly tapped an answer for — drives the "answered" highlight
+  reviewExpanded: new Set(), // category keys currently expanded on the Review screen
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -26,6 +28,7 @@ function render() {
   else if (state.view === 'survey') renderSurvey();
   else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderIntro() {
@@ -39,7 +42,24 @@ function renderIntro() {
         equally-weighted portfolio from our sample company dataset that
         reflects your priorities.
       </p>
-      <p class="lede">This takes about 3-5 minutes. Nothing you enter is saved or sent anywhere.</p>
+
+      <div class="category-preview-row">
+        ${CATEGORIES.map(
+          (cat) => `
+          <div class="category-preview-item">
+            <span class="category-icon">${cat.icon}</span>
+            <span class="category-preview-label">${escapeHtml(cat.label)}</span>
+          </div>
+        `
+        ).join('')}
+      </div>
+
+      <div class="mini-stepper">
+        ${CATEGORIES.map(() => '<span class="mini-stepper-dot"></span>').join('')}
+        <span class="mini-stepper-text">${CATEGORIES.length} short steps &middot; ~3-5 min</span>
+      </div>
+
+      <p class="lede">Nothing you enter is saved or sent anywhere.</p>
       <button id="start-btn" class="btn btn-primary" ${state.dataset ? '' : 'disabled'}>
         ${state.dataset ? 'Start the Questionnaire' : 'Loading data...'}
       </button>
@@ -70,7 +90,7 @@ function renderSurvey() {
         ${CATEGORIES.map((cat, i) => renderCategoryChip(cat, i)).join('')}
       </div>
       <p class="step-label">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
-      <h2>${escapeHtml(category.label)}</h2>
+      <h2><span class="category-icon">${category.icon}</span>${escapeHtml(category.label)}</h2>
       <p class="scale-hint">For each item, rate how important it is to you: 1 = not important, 5 = very important.</p>
       <div class="questions-list">
         ${questions.map(renderQuestionRow).join('')}
@@ -92,9 +112,13 @@ function renderSurvey() {
     document.querySelectorAll(`.scale-btn[data-question="${q.id}"]`).forEach((btn) => {
       btn.addEventListener('click', () => {
         state.answers[q.id] = Number(btn.dataset.value);
-        document
-          .querySelectorAll(`.scale-btn[data-question="${q.id}"]`)
-          .forEach((b) => b.classList.toggle('selected', b === btn));
+        state.touchedQuestionIds.add(q.id);
+        document.querySelectorAll(`.scale-btn[data-question="${q.id}"]`).forEach((b) => {
+          const isSelected = b === btn;
+          b.classList.toggle('selected', isSelected);
+          b.innerHTML = isSelected ? checkmarkIcon() : b.dataset.value;
+        });
+        document.getElementById(`question-row-${q.id}`).classList.add('touched');
       });
     });
   });
@@ -151,28 +175,34 @@ function renderSurvey() {
 // A previously-seen category is jumpable at any time (in normal flow or
 // while editing from Review); a category not yet reached in the forward
 // flow is shown but disabled, since its answers haven't been presented yet.
+// Doubles as the survey's felt progress indicator (a connected stepper),
+// not just a text label, so it's one component instead of two.
 function renderCategoryChip(category, index) {
   const isJumpable = index <= state.furthestCategoryIndex;
   const classes = ['category-chip'];
   if (index === state.categoryIndex) classes.push('active');
   if (isJumpable) classes.push('visited');
   return `
-    <button type="button" class="${classes.join(' ')}" data-index="${index}" ${isJumpable ? '' : 'disabled'}>
-      ${index + 1}. ${escapeHtml(category.label)}
+    <button type="button" class="${classes.join(' ')}" data-index="${index}" ${isJumpable ? '' : 'disabled'} title="${escapeHtml(category.label)}">
+      <span class="category-chip-icon">${category.icon}</span>
+      <span class="category-chip-label">${index + 1}. ${escapeHtml(category.label)}</span>
     </button>
   `;
 }
 
 function renderQuestionRow(q) {
   const current = state.answers[q.id];
+  const isTouched = state.touchedQuestionIds.has(q.id);
   return `
-    <div class="question-row">
+    <div id="question-row-${q.id}" class="question-row ${isTouched ? 'touched' : ''}">
       <p class="question-text">${escapeHtml(q.text)}</p>
       <div class="scale">
         ${[1, 2, 3, 4, 5]
           .map(
             (v) => `
-          <button type="button" class="scale-btn ${v === current ? 'selected' : ''}" data-question="${q.id}" data-value="${v}">${v}</button>
+          <button type="button" class="scale-btn ${v === current ? 'selected' : ''}" data-question="${q.id}" data-value="${v}">
+            ${v === current ? checkmarkIcon() : v}
+          </button>
         `
           )
           .join('')}
@@ -182,6 +212,10 @@ function renderQuestionRow(q) {
       ${q.needsTiesSector ? renderTiesSectorSelect() : ''}
     </div>
   `;
+}
+
+function checkmarkIcon() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 }
 
 function renderHomeCountryInput() {
@@ -219,8 +253,18 @@ function renderReview() {
     </section>
   `;
 
-  document.querySelectorAll('.review-edit-btn').forEach((btn) => {
+  document.querySelectorAll('.review-category-toggle').forEach((btn) => {
     btn.addEventListener('click', () => {
+      const key = btn.dataset.categoryKey;
+      if (state.reviewExpanded.has(key)) state.reviewExpanded.delete(key);
+      else state.reviewExpanded.add(key);
+      render();
+    });
+  });
+
+  document.querySelectorAll('.review-edit-btn').forEach((btn) => {
+    btn.addEventListener('click', (evt) => {
+      evt.stopPropagation();
       state.categoryIndex = Number(btn.dataset.categoryIndex);
       state.editOrigin = 'review';
       state.view = 'survey';
@@ -237,31 +281,52 @@ function renderReview() {
 function renderReviewCategory(category, categoryIndex) {
   const questions = questionsForCategory(category.key);
   const isCommunity = category.key === 'community';
+  const isExpanded = state.reviewExpanded.has(category.key);
+  const avg = questions.reduce((sum, q) => sum + state.answers[q.id], 0) / questions.length;
+
   return `
-    <div class="review-category">
+    <div class="review-category ${isExpanded ? 'expanded' : ''}">
       <div class="review-category-header">
-        <h3>${escapeHtml(category.label)}</h3>
+        <button type="button" class="review-category-toggle" data-category-key="${category.key}">
+          <span class="review-chevron">${chevronIcon()}</span>
+          <span class="category-icon">${category.icon}</span>
+          <span class="review-category-title">${escapeHtml(category.label)}</span>
+          <span class="review-avg-meter">
+            <span class="review-avg-track"><span class="review-avg-fill" style="width:${(avg / 5) * 100}%"></span></span>
+            <span class="review-avg-label">avg ${avg.toFixed(1)}/5</span>
+          </span>
+        </button>
         <button type="button" class="review-edit-btn" data-category-index="${categoryIndex}">Edit</button>
       </div>
-      <ul class="review-answer-list">
-        ${questions
-          .map(
-            (q) => `
-          <li><span class="review-q-text">${escapeHtml(q.text)}</span><span class="review-q-answer">${state.answers[q.id]}/5</span></li>
-        `
-          )
-          .join('')}
-        ${
-          isCommunity
-            ? `
-          <li><span class="review-q-text">Home country</span><span class="review-q-answer">${escapeHtml(state.homeCountry)}</span></li>
-          <li><span class="review-q-text">Industry ties</span><span class="review-q-answer">${state.tiesSector ? escapeHtml(state.tiesSector) : 'None'}</span></li>
-        `
-            : ''
-        }
-      </ul>
+      ${
+        isExpanded
+          ? `
+        <ul class="review-answer-list">
+          ${questions
+            .map(
+              (q) => `
+            <li><span class="review-q-text">${escapeHtml(q.text)}</span><span class="review-q-answer">${state.answers[q.id]}/5</span></li>
+          `
+            )
+            .join('')}
+          ${
+            isCommunity
+              ? `
+            <li><span class="review-q-text">Home country</span><span class="review-q-answer">${escapeHtml(state.homeCountry)}</span></li>
+            <li><span class="review-q-text">Industry ties</span><span class="review-q-answer">${state.tiesSector ? escapeHtml(state.tiesSector) : 'None'}</span></li>
+          `
+              : ''
+          }
+        </ul>
+      `
+          : ''
+      }
     </div>
   `;
+}
+
+function chevronIcon() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
 }
 
 function renderResults() {
@@ -286,7 +351,7 @@ function renderResults() {
         </div>
         <div class="summary-box">
           <h3>Your Risk Profile</h3>
-          <p class="risk-badge risk-${riskProfile.toLowerCase()}">${riskProfile}</p>
+          <p class="risk-badge risk-${riskProfile.toLowerCase()}"><span class="risk-icon">${riskProfileIcon(riskProfile)}</span>${riskProfile}</p>
           <p class="muted">${riskProfileBlurb(riskProfile)}</p>
         </div>
       </div>
@@ -297,6 +362,9 @@ function renderResults() {
         No more than 3 holdings are drawn from any single sector. Strong Matches are always listed ahead of Partial
         Matches. Domestic-company match is based on headquarters in <strong>${escapeHtml(state.homeCountry)}</strong>.
       </p>
+
+      ${renderSectorChart(holdings)}
+
       <div class="table-wrap">
         <table class="results-table">
           <thead>
@@ -361,19 +429,62 @@ function renderResults() {
 
 function renderHoldingRow(entry) {
   const tierClass = entry.tier === 'Strong' ? 'tier-strong' : 'tier-partial';
+  const rowClass = entry.tier === 'Strong' ? 'row-strong' : 'row-partial';
   return `
-    <tr>
-      <td>${escapeHtml(entry.company.ticker)}</td>
-      <td>${escapeHtml(entry.company.name)}</td>
-      <td>${escapeHtml(entry.company.sector)}</td>
-      <td>${entry.allocationPct.toFixed(2)}%</td>
-      <td><span class="tier-badge ${tierClass}">${entry.tier} Match</span></td>
-      <td>
+    <tr class="${rowClass}">
+      <td data-label="Ticker">${escapeHtml(entry.company.ticker)}</td>
+      <td data-label="Company">${escapeHtml(entry.company.name)}</td>
+      <td data-label="Sector">${escapeHtml(entry.company.sector)}</td>
+      <td data-label="Allocation">${entry.allocationPct.toFixed(2)}%</td>
+      <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${entry.tier} Match</span></td>
+      <td data-label="Rationale">
         <div>${escapeHtml(entry.rationale)}</div>
         ${entry.note ? `<div class="partial-note">${escapeHtml(entry.note)}</div>` : ''}
       </td>
     </tr>
   `;
+}
+
+function renderSectorChart(holdings) {
+  if (holdings.length === 0) return '';
+  const counts = {};
+  holdings.forEach((h) => {
+    counts[h.company.sector] = (counts[h.company.sector] || 0) + 1;
+  });
+  const maxCount = Math.max(...Object.values(counts));
+  const sectors = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+  return `
+    <div class="sector-chart">
+      <h3>Sector Diversification</h3>
+      <div class="sector-chart-rows">
+        ${sectors
+          .map(
+            (sector) => `
+          <div class="sector-chart-row">
+            <span class="sector-chart-label">${escapeHtml(sector)}</span>
+            <span class="sector-chart-track"><span class="sector-chart-fill" style="width:${(counts[sector] / maxCount) * 100}%"></span></span>
+            <span class="sector-chart-count">${counts[sector]}</span>
+          </div>
+        `
+          )
+          .join('')}
+      </div>
+    </div>
+  `;
+}
+
+const RISK_ICONS = {
+  Conservative:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3Z"/></svg>',
+  Balanced:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v17"/><path d="M5 8h14"/><path d="M5 8l-3 6h6l-3-6Z"/><path d="M19 8l-3 6h6l-3-6Z"/><path d="M8 20h8"/></svg>',
+  Growth:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-6 4 3 7-9"/><path d="M13 5h7v7"/></svg>',
+};
+
+function riskProfileIcon(riskProfile) {
+  return RISK_ICONS[riskProfile] || '';
 }
 
 function riskProfileBlurb(riskProfile) {

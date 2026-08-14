@@ -49,13 +49,30 @@ const QUESTIONS = [
   { id: 24, category: 'risk', type: 'risk', text: 'Preference for dividend-paying income stocks over growth-focused reinvestment', short: 'Dividend income over growth reinvestment' },
 ];
 
+// Minimal single-color line icons (24x24, stroke=currentColor) — one per
+// category, reused across the landing preview row, questionnaire headers,
+// and category chips for visual continuity.
+const CATEGORY_ICONS = {
+  environmental:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c8-1 13-6 15-15C10 6 5 11 4 20Z"/><path d="M4 20c3-3 6-6 9-9"/></svg>',
+  social_labor:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="16.5" cy="9.5" r="2.3"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6"/><path d="M14.5 20c0-3 1.4-4.8 3.8-5.3"/></svg>',
+  governance:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v17"/><path d="M5 8h14"/><path d="M5 8l-3 6h6l-3-6Z"/><path d="M19 8l-3 6h6l-3-6Z"/><path d="M8 20h8"/></svg>',
+  ethical:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4"/></svg>',
+  community:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>',
+  risk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-6 4 3 7-9"/><path d="M13 5h7v7"/></svg>',
+};
+
 const CATEGORIES = [
-  { key: 'environmental', label: 'Environmental' },
-  { key: 'social_labor', label: 'Social / Labor' },
-  { key: 'governance', label: 'Governance' },
-  { key: 'ethical', label: 'Ethical / "Sin Stock" Screens' },
-  { key: 'community', label: 'Community/Identity' },
-  { key: 'risk', label: 'Risk Philosophy' },
+  { key: 'environmental', label: 'Environmental', icon: CATEGORY_ICONS.environmental },
+  { key: 'social_labor', label: 'Social / Labor', icon: CATEGORY_ICONS.social_labor },
+  { key: 'governance', label: 'Governance', icon: CATEGORY_ICONS.governance },
+  { key: 'ethical', label: 'Ethical / "Sin Stock" Screens', icon: CATEGORY_ICONS.ethical },
+  { key: 'community', label: 'Community/Identity', icon: CATEGORY_ICONS.community },
+  { key: 'risk', label: 'Risk Philosophy', icon: CATEGORY_ICONS.risk },
 ];
 
 const SECTOR_OPTIONS = [
