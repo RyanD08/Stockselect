@@ -7,6 +7,8 @@ const state = {
   view: 'intro', // 'intro' | 'survey' | 'results'
   categoryIndex: 0,
   answers: {},
+  homeCountry: 'United States',
+  tiesSector: '',
   dataset: null,
   datasetError: null,
 };
@@ -30,7 +32,7 @@ function renderIntro() {
       <p class="lede">
         Answer a short questionnaire about what matters to you as an investor —
         environmental impact, labor practices, governance, ethical screens,
-        religious principles, and more — and we'll build an illustrative,
+        community ties, and risk philosophy — and we'll build an illustrative,
         equally-weighted portfolio from our sample company dataset that
         reflects your priorities.
       </p>
@@ -84,6 +86,20 @@ function renderSurvey() {
     });
   });
 
+  const homeCountryInput = document.getElementById('home-country-input');
+  if (homeCountryInput) {
+    homeCountryInput.addEventListener('input', () => {
+      state.homeCountry = homeCountryInput.value.trim() || 'United States';
+    });
+  }
+
+  const tiesSectorSelect = document.getElementById('ties-sector-select');
+  if (tiesSectorSelect) {
+    tiesSectorSelect.addEventListener('change', () => {
+      state.tiesSector = tiesSectorSelect.value;
+    });
+  }
+
   document.getElementById('back-btn').addEventListener('click', () => {
     if (state.categoryIndex > 0) {
       state.categoryIndex -= 1;
@@ -117,13 +133,41 @@ function renderQuestionRow(q) {
           .join('')}
       </div>
       <div class="scale-labels"><span>Not important</span><span>Very important</span></div>
+      ${q.needsHomeCountry ? renderHomeCountryInput() : ''}
+      ${q.needsTiesSector ? renderTiesSectorSelect() : ''}
+    </div>
+  `;
+}
+
+function renderHomeCountryInput() {
+  return `
+    <div class="sub-input">
+      <label for="home-country-input">Your home country (for the domestic-company match)</label>
+      <input id="home-country-input" type="text" value="${escapeHtml(state.homeCountry)}" />
+    </div>
+  `;
+}
+
+function renderTiesSectorSelect() {
+  return `
+    <div class="sub-input">
+      <label for="ties-sector-select">Sector you have personal/professional ties to (optional)</label>
+      <select id="ties-sector-select">
+        <option value="">None / prefer not to say</option>
+        ${SECTOR_OPTIONS.map(
+          (s) => `<option value="${escapeHtml(s)}" ${state.tiesSector === s ? 'selected' : ''}>${escapeHtml(s)}</option>`
+        ).join('')}
+      </select>
     </div>
   `;
 }
 
 function renderResults() {
-  const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers);
-  const topPriorities = QUESTIONS.filter((q) => q.id <= 26 && state.answers[q.id] === 5);
+  const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers, {
+    homeCountry: state.homeCountry,
+    tiesSector: state.tiesSector,
+  });
+  const topPriorities = QUESTIONS.filter((q) => q.id <= 20 && state.answers[q.id] === 5);
 
   appEl.innerHTML = `
     <section class="card results-card">
@@ -148,7 +192,8 @@ function renderResults() {
       <h2>Recommended Holdings</h2>
       <p class="muted">
         ${holdings.length} companies, equally weighted at ${holdings.length > 0 ? (100 / holdings.length).toFixed(2) : '0'}% each.
-        No more than 3 holdings are drawn from any single sector.
+        No more than 3 holdings are drawn from any single sector. Strong Matches are always listed ahead of Partial
+        Matches.
       </p>
       <div class="table-wrap">
         <table class="results-table">
@@ -177,11 +222,12 @@ function renderResults() {
 
       <div class="disclaimer">
         <strong>Important disclaimer:</strong> This tool is illustrative and educational only. It is built on a
-        limited, 40-company sample dataset containing estimated — not independently verified — values data for
-        many criteria (labor practices, executive compensation, board independence, religious compliance, political
-        donations, data privacy, and country-of-operation concerns in particular rely on rough, low-confidence
-        estimates). It is not licensed financial advice, and the results should not be relied upon for actual
-        investment decisions. Please consult a registered financial advisor before making any investment decisions.
+        limited, 40-company sample dataset with estimated — not independently verified — values and performance
+        data for many criteria (labor practices, governance details, financial leverage, market-cap tier, beta,
+        five-year returns, and revenue geography in particular rely on rough, illustrative estimates rather than a
+        live market-data feed). It is not licensed financial advice, and the results should not be relied upon for
+        actual investment decisions. Please consult a registered financial advisor before making any investment
+        decisions.
       </div>
 
       <button id="restart-btn" class="btn btn-secondary">Start Over</button>
@@ -192,6 +238,8 @@ function renderResults() {
     QUESTIONS.forEach((q) => {
       state.answers[q.id] = 3;
     });
+    state.homeCountry = 'United States';
+    state.tiesSector = '';
     state.categoryIndex = 0;
     state.view = 'intro';
     render();
@@ -217,16 +265,16 @@ function renderHoldingRow(entry) {
 
 function riskProfileBlurb(riskProfile) {
   if (riskProfile === 'Conservative') {
-    return 'You favor long-term stability and are less willing to trade returns for values alignment. We weighted ties toward higher-stability holdings.';
+    return 'You favor long-term stability, blue-chip/dividend-paying companies, and are less willing to trade returns for values alignment. We weighted ties toward lower-beta, larger-cap, higher-stability holdings.';
   }
   if (riskProfile === 'Growth') {
-    return 'You favor growth potential and are more willing to accept lower near-term stability in pursuit of values alignment. We weighted ties toward higher-growth-potential holdings.';
+    return 'You favor growth potential and smaller/emerging companies, and are more willing to accept lower stability in pursuit of values alignment. We weighted ties toward higher-return, higher-beta, growth-oriented holdings.';
   }
-  return 'You are comfortable balancing stability and growth potential. We weighted ties toward holdings matched to a balanced profile.';
+  return 'You are comfortable balancing stability and growth potential. We weighted ties toward holdings with the best risk-adjusted profile (five-year return relative to beta).';
 }
 
 function buildPortfolioRationale(answers, riskProfile, holdings) {
-  const topPriorities = QUESTIONS.filter((q) => q.id <= 26 && answers[q.id] === 5).map((q) => q.short);
+  const topPriorities = QUESTIONS.filter((q) => q.id <= 20 && answers[q.id] === 5).map((q) => q.short);
   const strongCount = holdings.filter((h) => h.tier === 'Strong').length;
   const partialCount = holdings.length - strongCount;
 
@@ -237,26 +285,29 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
 
   const p1 =
     `Based on your responses, we've built a ${holdings.length}-holding portfolio weighted around ${priorityPhrase}` +
-    `alongside a ${riskProfile.toLowerCase()} risk profile derived from your stability and returns preferences. ` +
-    `Each company in our sample dataset was scored from 0-100 on how well it aligns with your specific answers, ` +
-    `rather than being screened in or out with hard exclusions, so the portfolio reflects the full spectrum of ` +
-    `available companies ranked by fit.`;
+    `alongside a ${riskProfile.toLowerCase()} risk profile derived from your stability, blue-chip, and dividend ` +
+    `preferences. Each company in our sample dataset was scored on how well it aligns with your specific answers, ` +
+    `distinguishing criteria you asked us to screen out (like sin-stock exposure or high leverage) from criteria ` +
+    `you asked us to seek out (like renewable-energy focus or domestic revenue) — rather than applying hard ` +
+    `exclusions, so the portfolio reflects the full spectrum of available companies ranked by fit.`;
 
   const p2 =
-    `${strongCount} of the ${holdings.length} holdings are Strong Matches, meaning they don't conflict with any of ` +
-    `the criteria you rated as a top priority (a 4 or 5 out of 5). ${
+    `Strong Matches are always listed ahead of Partial Matches: ${strongCount} of the ${holdings.length} holdings ` +
+    `are Strong Matches, meaning none of the criteria you rated as a top priority (a 4 or 5 out of 5) produced a ` +
+    `meaningful conflict. ${
       partialCount > 0
         ? `The remaining ${partialCount} are Partial Matches — generally well-aligned with your values overall, but ` +
           `each carries a specific trade-off against one of your top priorities, which we've called out individually ` +
           `in the table above so you can decide whether that trade-off is acceptable to you.`
         : `No holdings required a trade-off against your top priorities.`
-    } Positions are equally weighted, and we capped exposure to any single sector at three holdings to keep the ` +
-    `portfolio reasonably diversified.`;
+    } Where companies were closely tied on fit, we broke ties using your derived risk profile and quantitative ` +
+    `data (beta, market-cap tier, and estimated five-year returns). Positions are equally weighted, and we capped ` +
+    `exposure to any single sector at three holdings to keep the portfolio reasonably diversified.`;
 
   const p3 =
     `As always, values-based investing involves judgment calls, and the data underlying some of these criteria — ` +
-    `particularly labor practices, governance details, religious compliance, and political or data-privacy ` +
-    `records — is far less standardized than objective facts like sector or headquarters location. We'd encourage ` +
+    `particularly labor practices, governance details, financial leverage, and the market/performance estimates ` +
+    `used for tie-breaking — is illustrative rather than pulled from a live, licensed data feed. We'd encourage ` +
     `you to treat this as a starting point for a conversation, not a finished recommendation.`;
 
   return [p1, p2, p3];

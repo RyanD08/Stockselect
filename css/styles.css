@@ -216,6 +216,35 @@ h3 {
   justify-content: flex-end;
 }
 
+.sub-input {
+  margin-top: 0.85rem;
+  max-width: 360px;
+}
+
+.sub-input label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.sub-input input,
+.sub-input select {
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.92rem;
+  color: var(--text);
+  background: #fff;
+}
+
+.sub-input input:focus,
+.sub-input select:focus {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 1px;
+}
+
 /* Results */
 
 .summary-grid {
