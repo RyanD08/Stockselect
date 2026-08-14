@@ -222,7 +222,7 @@ function renderResults() {
 
       <div class="disclaimer">
         <strong>Important disclaimer:</strong> This tool is illustrative and educational only. It is built on a
-        limited, 40-company sample dataset with estimated — not independently verified — values and performance
+        limited, 100-company sample dataset with estimated — not independently verified — values and performance
         data for many criteria (labor practices, governance details, financial leverage, market-cap tier, beta,
         five-year returns, and revenue geography in particular rely on rough, illustrative estimates rather than a
         live market-data feed). It is not licensed financial advice, and the results should not be relied upon for

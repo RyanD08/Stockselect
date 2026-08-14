@@ -68,6 +68,7 @@ const SECTOR_OPTIONS = [
   'Industrials',
   'Information Technology',
   'Materials',
+  'Real Estate',
   'Utilities',
 ];
 
