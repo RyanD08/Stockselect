@@ -193,7 +193,7 @@ function renderResults() {
       <p class="muted">
         ${holdings.length} companies, equally weighted at ${holdings.length > 0 ? (100 / holdings.length).toFixed(2) : '0'}% each.
         No more than 3 holdings are drawn from any single sector. Strong Matches are always listed ahead of Partial
-        Matches.
+        Matches. Domestic-company match is based on headquarters in <strong>${escapeHtml(state.homeCountry)}</strong>.
       </p>
       <div class="table-wrap">
         <table class="results-table">
