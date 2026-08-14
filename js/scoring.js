@@ -1,5 +1,5 @@
 /**
- * Values-fit scoring engine (v2).
+ * Values-fit scoring engine (v3).
  *
  * Every scored question (ids 1-20; ids 21-24 are Risk Philosophy and are
  * combined into a derived Risk Profile instead — see deriveRiskProfile) is
@@ -15,12 +15,24 @@
  *     (neutral, no bonus), up to +1 if it has the trait strongly. It never
  *     penalizes a company for lacking the trait.
  *
+ * For the three judgment-based ESG categories (environmental / social_labor
+ * / governance), a_i is additionally scaled by CONFIDENCE_WEIGHT so a
+ * well-documented, verifiably-earned score counts more than an unverified
+ * "generally well-regarded" placeholder of the same numeric value. Objective
+ * facts (sin-stock flags, leverage, dividends, etc.) are never dampened.
+ *
  * contribution_i = clientImportance_i (1-5) * a_i
- * score = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
+ * ValuesFitScore = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
  *
  * 50 is the neutral starting point; the score moves up or down only as far
  * as the client's own stated priorities and the company's real attributes
  * justify.
+ *
+ * The final ranking score blends ValuesFitScore with a risk-profile-aware
+ * FinancialScore, weighted by how much the client said they prioritize
+ * returns over values alignment (deriveProfitPriorityWeight) — see
+ * buildPortfolio. Strong Match always ranks above Partial Match regardless
+ * of either score.
  */
 
 const SCORED_QUESTION_IDS = Array.from({ length: 20 }, (_, i) => i + 1); // 1-20
@@ -28,6 +40,17 @@ const HIGH_PRIORITY_THRESHOLD = 4; // client ratings of 4-5 count as "highest pr
 const CONFLICT_ALIGNMENT_THRESHOLD = -0.5; // a_i at or below this counts as a strong conflict
 const MAX_PORTFOLIO_SIZE = 15;
 const MAX_PER_SECTOR = 3;
+
+// v3: judgment-based ESG scores are dampened by how well-documented they
+// are, so a Low-confidence "safe 4" no longer counts the same as a
+// High-confidence, verifiably-earned 4 or 5. Objective facts (sin-stock
+// flags, founder-led, financial leverage, dividend status, etc.) are never
+// dampened — the dataset already rates those "High confidence" by nature.
+const CONFIDENCE_WEIGHT = { High: 1.0, Medium: 0.7, Low: 0.4 };
+
+function confidenceWeight(level) {
+  return CONFIDENCE_WEIGHT[level] !== undefined ? CONFIDENCE_WEIGHT[level] : 1.0;
+}
 
 function noteMatches(note, regex) {
   return !!note && regex.test(note);
@@ -61,44 +84,65 @@ function leverageAlignment(level) {
 // client-supplied context that isn't a 1-5 rating: home country and the
 // sector the client has personal/professional ties to.
 const ALIGNMENT_FNS = {
-  // Environmental
-  1: (c) => exclusionaryGraded(c.esg_ratings.environmental.score),
-  2: (c) => {
-    const isCleanTech = noteMatches(c.esg_ratings.environmental.note, /renewable|solar|wind|clean energy|clean tech|EV|hydrogen/i);
-    return isCleanTech ? 1 : preferenceGraded(c.esg_ratings.environmental.score);
+  // Environmental (confidence-weighted — see CONFIDENCE_WEIGHT above)
+  1: (c) => {
+    const env = c.esg_ratings.environmental;
+    return exclusionaryGraded(env.score) * confidenceWeight(env.confidence);
   },
-  3: (c) => exclusionaryGraded(c.esg_ratings.environmental.score),
+  2: (c) => {
+    const env = c.esg_ratings.environmental;
+    const isCleanTech = noteMatches(env.note, /renewable|solar|wind|clean energy|clean tech|EV|hydrogen/i);
+    const raw = isCleanTech ? 1 : preferenceGraded(env.score);
+    return raw * confidenceWeight(env.confidence);
+  },
+  3: (c) => {
+    const env = c.esg_ratings.environmental;
+    return exclusionaryGraded(env.score) * confidenceWeight(env.confidence);
+  },
   4: (c) => {
-    const isSustainableResource = noteMatches(c.esg_ratings.environmental.note, /sustainab|resource|recycl|water|agricultur/i);
-    return isSustainableResource ? 1 : preferenceGraded(c.esg_ratings.environmental.score);
+    const env = c.esg_ratings.environmental;
+    const isSustainableResource = noteMatches(env.note, /sustainab|resource|recycl|water|agricultur/i);
+    const raw = isSustainableResource ? 1 : preferenceGraded(env.score);
+    return raw * confidenceWeight(env.confidence);
   },
 
-  // Social / Labor
+  // Social / Labor (confidence-weighted)
   5: (c) => {
-    const strongWages = noteMatches(c.esg_ratings.social_labor.note, /above-market|strong reported labor|well-regarded/i);
-    return strongWages ? 1 : preferenceGraded(c.esg_ratings.social_labor.score);
+    const social = c.esg_ratings.social_labor;
+    const strongWages = noteMatches(social.note, /above-market|strong reported labor|well-regarded/i);
+    const raw = strongWages ? 1 : preferenceGraded(social.score);
+    return raw * confidenceWeight(social.confidence);
   },
   6: (c) => {
-    const hasDispute = noteMatches(c.esg_ratings.social_labor.note, /dispute|union|strike|exploitation|controvers/i);
-    return hasDispute ? -1 : exclusionaryGraded(c.esg_ratings.social_labor.score);
+    const social = c.esg_ratings.social_labor;
+    const hasDispute = noteMatches(social.note, /dispute|union|strike|exploitation|controvers/i);
+    const raw = hasDispute ? -1 : exclusionaryGraded(social.score);
+    return raw * confidenceWeight(social.confidence);
   },
   7: (c) => {
-    const hasSafetyIssue = noteMatches(c.esg_ratings.social_labor.note, /safety/i);
-    return hasSafetyIssue ? 0 : preferenceGraded(c.esg_ratings.social_labor.score);
+    const social = c.esg_ratings.social_labor;
+    const hasSafetyIssue = noteMatches(social.note, /safety/i);
+    const raw = hasSafetyIssue ? 0 : preferenceGraded(social.score);
+    return raw * confidenceWeight(social.confidence);
   },
 
-  // Governance
+  // Governance (confidence-weighted)
   8: (c) => {
-    const hasScandal = noteMatches(c.esg_ratings.governance.note, /litigation|scandal|fraud|corruption|settlement|controvers|investigation/i);
-    return hasScandal ? -1 : exclusionaryGraded(c.esg_ratings.governance.score);
+    const gov = c.esg_ratings.governance;
+    const hasScandal = noteMatches(gov.note, /litigation|scandal|fraud|corruption|settlement|controvers|investigation/i);
+    const raw = hasScandal ? -1 : exclusionaryGraded(gov.score);
+    return raw * confidenceWeight(gov.confidence);
   },
   9: (c) => {
-    const concentratedVoting = noteMatches(c.esg_ratings.governance.note, /dual-class|voting power|majority control|majority voting|significant influence/i);
-    return concentratedVoting ? -1 : exclusionaryGraded(c.esg_ratings.governance.score);
+    const gov = c.esg_ratings.governance;
+    const concentratedVoting = noteMatches(gov.note, /dual-class|voting power|majority control|majority voting|significant influence/i);
+    const raw = concentratedVoting ? -1 : exclusionaryGraded(gov.score);
+    return raw * confidenceWeight(gov.confidence);
   },
+  // Objective/financial-statement fact — full weight, not confidence-dampened
   10: (c) => leverageAlignment(c.financial_leverage.level),
 
-  // Ethical / "Sin Stock" Screens
+  // Ethical / "Sin Stock" Screens — objective flags, full weight
   11: (c) => (c.sin_stock_flags.tobacco ? -1 : 0),
   12: (c) => (c.sin_stock_flags.alcohol ? -1 : 0),
   13: (c) => (c.sin_stock_flags.gambling ? -1 : 0),
@@ -223,12 +267,85 @@ function compareArrays(a, b) {
   return 0;
 }
 
+// v3: how much financial performance should influence the *primary*
+// ranking (not just tie-breaks), derived from the client's answer to Q22
+// ("willingness to accept lower returns for values alignment"). Capped at
+// 0.5 so this stays a values-based tool — financial data can shape at most
+// half of the final ranking, never fully override stated values.
+function deriveProfitPriorityWeight(answers) {
+  const q22 = answers[22] || 3;
+  return ((5 - q22) / 4) * 0.5;
+}
+
+const DIVIDEND_YIELD_RANK = { High: 4, Medium: 3, Low: 2, 'Very Low': 1, None: 0 };
+
+function dividendYieldRank(dividendPolicy) {
+  const tier = dividendPolicy && dividendPolicy.yield_tier;
+  if (!tier || tier === 'None') return 0;
+  return DIVIDEND_YIELD_RANK[tier] !== undefined ? DIVIDEND_YIELD_RANK[tier] : 0;
+}
+
+// Returns a function mapping a raw value to 0-1 via min-max normalization
+// over `values`. If every value in the pool is identical, there's nothing
+// to differentiate on, so everyone gets a neutral 0.5.
+function minMaxNormalize(values) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (max === min) return () => 0.5;
+  return (v) => (v - min) / (max - min);
+}
+
+// Computes a 0-100 Financial Score for each company in `companies`,
+// min-max normalized *within that pool* (not the full dataset) so the
+// scale stays meaningful for the client's actual candidate set. Which raw
+// attributes matter, and in which direction, depends on the client's
+// derived Risk Profile.
+function computeFinancialScores(companies, riskProfile) {
+  const betas = companies.map((c) => c.market_profile.beta_est);
+  const returns = companies.map((c) => c.performance_tier.five_year_annualized_return_pct_est);
+  const capRanks = companies.map((c) => MARKET_CAP_RANK[c.market_profile.market_cap_tier] || 0);
+  const yieldRanks = companies.map((c) => dividendYieldRank(c.dividend_policy));
+  const riskAdjustedReturns = companies.map((c, i) => (betas[i] > 0 ? returns[i] / betas[i] : returns[i]));
+
+  const normBeta = minMaxNormalize(betas);
+  const normReturn = minMaxNormalize(returns);
+  const normCap = minMaxNormalize(capRanks);
+  const normYield = minMaxNormalize(yieldRanks);
+  const normRiskAdjusted = minMaxNormalize(riskAdjustedReturns);
+
+  const financialScores = new Map();
+  companies.forEach((c, i) => {
+    let raw; // 0-1 composite before scaling to 0-100
+    if (riskProfile === 'Growth') {
+      // reward high return AND high beta (risk tolerance, not risk-adjusted)
+      raw = (normReturn(returns[i]) + normBeta(betas[i])) / 2;
+    } else if (riskProfile === 'Conservative') {
+      // reward large cap + high dividend yield, penalize high beta, lightly reward return
+      raw = 0.3 * normCap(capRanks[i]) + 0.3 * normYield(yieldRanks[i]) + 0.3 * (1 - normBeta(betas[i])) + 0.1 * normReturn(returns[i]);
+    } else {
+      // Balanced: reward risk-adjusted return (five-year return / beta)
+      raw = normRiskAdjusted(riskAdjustedReturns[i]);
+    }
+    financialScores.set(c.ticker, Math.round(raw * 100));
+  });
+  return financialScores;
+}
+
+// How large a pre-financial-blend candidate pool to draw from before
+// normalizing Financial Score. Wide enough to leave room for the
+// diversification pass to reshuffle, narrow enough that the 0-100
+// financial scale stays meaningful for companies actually in contention —
+// normalizing across the full company universe would let irrelevant
+// high-return/low-fit companies skew the scale (see v3 patch, Fix 2).
+const CANDIDATE_POOL_SIZE = 40;
+
 function buildPortfolio(dataset, answers, clientContext) {
   const ctx = {
     homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
     tiesSector: (clientContext && clientContext.tiesSector) || null,
   };
   const riskProfile = deriveRiskProfile(answers);
+  const profitPriorityWeight = deriveProfitPriorityWeight(answers);
   const tierRank = { Strong: 0, Partial: 1 };
 
   const scored = dataset.companies.map((company) => {
@@ -236,7 +353,7 @@ function buildPortfolio(dataset, answers, clientContext) {
     const { tier, conflicts } = classifyTier(alignments, answers);
     return {
       company,
-      score,
+      valuesFitScore: score,
       alignments,
       tier,
       conflicts,
@@ -248,19 +365,37 @@ function buildPortfolio(dataset, answers, clientContext) {
     };
   });
 
-  scored.sort((a, b) => {
+  // Shared tie-break chain: Strong before Partial as a hard rule, then the
+  // given primary score, then risk-profile fit / quantitative data /
+  // controversy count / ticker as successive tie-breakers (Section 3.3).
+  function compareEntries(a, b, primaryScoreKey) {
     if (tierRank[a.tier] !== tierRank[b.tier]) return tierRank[a.tier] - tierRank[b.tier];
-    if (b.score !== a.score) return b.score - a.score;
+    if (b[primaryScoreKey] !== a[primaryScoreKey]) return b[primaryScoreKey] - a[primaryScoreKey];
     if (a.riskMatchRank !== b.riskMatchRank) return a.riskMatchRank - b.riskMatchRank;
     const quantCompare = compareArrays(a.quantKey, b.quantKey);
     if (quantCompare !== 0) return quantCompare;
     if (a.controversyCount !== b.controversyCount) return a.controversyCount - b.controversyCount;
     return a.company.ticker.localeCompare(b.company.ticker);
+  }
+
+  // Provisional values-only sort, used only to pick the candidate pool that
+  // Financial Score gets normalized against (v3 Fix 2).
+  scored.sort((a, b) => compareEntries(a, b, 'valuesFitScore'));
+  const candidatePool = scored.slice(0, Math.min(CANDIDATE_POOL_SIZE, scored.length));
+
+  const financialScores = computeFinancialScores(candidatePool.map((entry) => entry.company), riskProfile);
+  candidatePool.forEach((entry) => {
+    entry.financialScore = financialScores.get(entry.company.ticker);
+    entry.finalScore = (1 - profitPriorityWeight) * entry.valuesFitScore + profitPriorityWeight * entry.financialScore;
   });
+
+  // Final ranking: Strong still sorts above Partial as a hard rule;
+  // FinalScore (values + financial blend) orders within each tier.
+  candidatePool.sort((a, b) => compareEntries(a, b, 'finalScore'));
 
   const sectorCounts = {};
   const selected = [];
-  for (const entry of scored) {
+  for (const entry of candidatePool) {
     if (selected.length >= MAX_PORTFOLIO_SIZE) break;
     const sector = entry.company.sector;
     const countInSector = sectorCounts[sector] || 0;
@@ -274,5 +409,5 @@ function buildPortfolio(dataset, answers, clientContext) {
     entry.allocationPct = allocationPct;
   });
 
-  return { riskProfile, holdings: selected };
+  return { riskProfile, profitPriorityWeight, holdings: selected };
 }
