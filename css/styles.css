@@ -132,19 +132,43 @@ h3 {
 
 /* Survey */
 
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: var(--border);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 0.75rem;
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
 }
 
-.progress-fill {
-  height: 100%;
-  background: var(--gold);
-  transition: width 0.2s ease;
+.category-chip {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.category-chip.visited {
+  color: var(--navy);
+  border-color: var(--gold-light);
+}
+
+.category-chip.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.category-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.category-chip:not(:disabled):hover {
+  border-color: var(--gold);
 }
 
 .step-label {
@@ -243,6 +267,71 @@ h3 {
 .sub-input select:focus {
   outline: 2px solid var(--gold-light);
   outline-offset: 1px;
+}
+
+/* Review */
+
+.review-category {
+  border-top: 1px solid var(--border);
+  padding: 1.1rem 0;
+}
+
+.review-category:first-of-type {
+  border-top: none;
+}
+
+.review-category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.review-category-header h3 {
+  margin: 0;
+}
+
+.review-edit-btn {
+  border: none;
+  background: none;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+}
+
+.review-edit-btn:hover {
+  text-decoration: underline;
+}
+
+.review-answer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.review-answer-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--bg);
+  font-size: 0.92rem;
+}
+
+.review-answer-list li:first-child {
+  border-top: none;
+}
+
+.review-q-text {
+  color: var(--text);
+}
+
+.review-q-answer {
+  color: var(--navy);
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* Results */

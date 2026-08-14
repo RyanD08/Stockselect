@@ -4,8 +4,10 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'results'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results'
   categoryIndex: 0,
+  furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
+  editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -22,6 +24,7 @@ const appEl = document.getElementById('app');
 function render() {
   if (state.view === 'intro') renderIntro();
   else if (state.view === 'survey') renderSurvey();
+  else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
 }
 
@@ -48,6 +51,8 @@ function renderIntro() {
     startBtn.addEventListener('click', () => {
       state.view = 'survey';
       state.categoryIndex = 0;
+      state.furthestCategoryIndex = 0;
+      state.editOrigin = null;
       render();
     });
   }
@@ -57,11 +62,13 @@ function renderSurvey() {
   const category = CATEGORIES[state.categoryIndex];
   const questions = questionsForCategory(category.key);
   const isLast = state.categoryIndex === CATEGORIES.length - 1;
-  const progressPct = Math.round(((state.categoryIndex + 1) / CATEGORIES.length) * 100);
+  const isEditing = state.editOrigin === 'review';
 
   appEl.innerHTML = `
     <section class="card survey-card">
-      <div class="progress-bar"><div class="progress-fill" style="width:${progressPct}%"></div></div>
+      <div class="category-chips">
+        ${CATEGORIES.map((cat, i) => renderCategoryChip(cat, i)).join('')}
+      </div>
       <p class="step-label">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
       <h2>${escapeHtml(category.label)}</h2>
       <p class="scale-hint">For each item, rate how important it is to you: 1 = not important, 5 = very important.</p>
@@ -69,8 +76,14 @@ function renderSurvey() {
         ${questions.map(renderQuestionRow).join('')}
       </div>
       <div class="nav-row">
-        <button id="back-btn" class="btn btn-secondary" ${state.categoryIndex === 0 ? 'disabled' : ''}>Back</button>
-        <button id="next-btn" class="btn btn-primary">${isLast ? 'See My Portfolio' : 'Next'}</button>
+        ${
+          isEditing
+            ? '<button id="back-to-review-btn" class="btn btn-primary">Back to Review</button>'
+            : `
+              <button id="back-btn" class="btn btn-secondary" ${state.categoryIndex === 0 ? 'disabled' : ''}>Back</button>
+              <button id="next-btn" class="btn btn-primary">${isLast ? 'Review My Answers' : 'Next'}</button>
+            `
+        }
       </div>
     </section>
   `;
@@ -100,22 +113,54 @@ function renderSurvey() {
     });
   }
 
-  document.getElementById('back-btn').addEventListener('click', () => {
-    if (state.categoryIndex > 0) {
-      state.categoryIndex -= 1;
+  document.querySelectorAll('.category-chip').forEach((btn) => {
+    if (btn.disabled) return;
+    btn.addEventListener('click', () => {
+      state.categoryIndex = Number(btn.dataset.index);
       render();
-    }
+    });
   });
 
-  document.getElementById('next-btn').addEventListener('click', () => {
-    if (isLast) {
-      state.view = 'results';
+  if (isEditing) {
+    document.getElementById('back-to-review-btn').addEventListener('click', () => {
+      state.editOrigin = null;
+      state.view = 'review';
       render();
-    } else {
-      state.categoryIndex += 1;
+    });
+  } else {
+    document.getElementById('back-btn').addEventListener('click', () => {
+      if (state.categoryIndex > 0) {
+        state.categoryIndex -= 1;
+        render();
+      }
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (isLast) {
+        state.furthestCategoryIndex = CATEGORIES.length - 1;
+        state.view = 'review';
+      } else {
+        state.categoryIndex += 1;
+        state.furthestCategoryIndex = Math.max(state.furthestCategoryIndex, state.categoryIndex);
+      }
       render();
-    }
-  });
+    });
+  }
+}
+
+// A previously-seen category is jumpable at any time (in normal flow or
+// while editing from Review); a category not yet reached in the forward
+// flow is shown but disabled, since its answers haven't been presented yet.
+function renderCategoryChip(category, index) {
+  const isJumpable = index <= state.furthestCategoryIndex;
+  const classes = ['category-chip'];
+  if (index === state.categoryIndex) classes.push('active');
+  if (isJumpable) classes.push('visited');
+  return `
+    <button type="button" class="${classes.join(' ')}" data-index="${index}" ${isJumpable ? '' : 'disabled'}>
+      ${index + 1}. ${escapeHtml(category.label)}
+    </button>
+  `;
 }
 
 function renderQuestionRow(q) {
@@ -158,6 +203,63 @@ function renderTiesSectorSelect() {
           (s) => `<option value="${escapeHtml(s)}" ${state.tiesSector === s ? 'selected' : ''}>${escapeHtml(s)}</option>`
         ).join('')}
       </select>
+    </div>
+  `;
+}
+
+function renderReview() {
+  appEl.innerHTML = `
+    <section class="card review-card">
+      <h1>Review Your Answers</h1>
+      <p class="lede">Check everything below and use Edit to revise anything before we build your portfolio.</p>
+      ${CATEGORIES.map((category, i) => renderReviewCategory(category, i)).join('')}
+      <div class="nav-row">
+        <button id="review-submit-btn" class="btn btn-primary">See My Portfolio</button>
+      </div>
+    </section>
+  `;
+
+  document.querySelectorAll('.review-edit-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.categoryIndex = Number(btn.dataset.categoryIndex);
+      state.editOrigin = 'review';
+      state.view = 'survey';
+      render();
+    });
+  });
+
+  document.getElementById('review-submit-btn').addEventListener('click', () => {
+    state.view = 'results';
+    render();
+  });
+}
+
+function renderReviewCategory(category, categoryIndex) {
+  const questions = questionsForCategory(category.key);
+  const isCommunity = category.key === 'community';
+  return `
+    <div class="review-category">
+      <div class="review-category-header">
+        <h3>${escapeHtml(category.label)}</h3>
+        <button type="button" class="review-edit-btn" data-category-index="${categoryIndex}">Edit</button>
+      </div>
+      <ul class="review-answer-list">
+        ${questions
+          .map(
+            (q) => `
+          <li><span class="review-q-text">${escapeHtml(q.text)}</span><span class="review-q-answer">${state.answers[q.id]}/5</span></li>
+        `
+          )
+          .join('')}
+        ${
+          isCommunity
+            ? `
+          <li><span class="review-q-text">Home country</span><span class="review-q-answer">${escapeHtml(state.homeCountry)}</span></li>
+          <li><span class="review-q-text">Industry ties</span><span class="review-q-answer">${state.tiesSector ? escapeHtml(state.tiesSector) : 'None'}</span></li>
+        `
+            : ''
+        }
+      </ul>
     </div>
   `;
 }
@@ -230,9 +332,18 @@ function renderResults() {
         decisions.
       </div>
 
-      <button id="restart-btn" class="btn btn-secondary">Start Over</button>
+      <div class="nav-row">
+        <button id="edit-answers-btn" class="btn btn-secondary">Edit My Answers</button>
+        <button id="restart-btn" class="btn btn-secondary">Start Over</button>
+      </div>
     </section>
   `;
+
+  document.getElementById('edit-answers-btn').addEventListener('click', () => {
+    state.editOrigin = null;
+    state.view = 'review';
+    render();
+  });
 
   document.getElementById('restart-btn').addEventListener('click', () => {
     QUESTIONS.forEach((q) => {
@@ -241,6 +352,8 @@ function renderResults() {
     state.homeCountry = 'United States';
     state.tiesSector = '';
     state.categoryIndex = 0;
+    state.furthestCategoryIndex = 0;
+    state.editOrigin = null;
     state.view = 'intro';
     render();
   });
