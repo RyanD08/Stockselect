@@ -14,6 +14,12 @@
   --warn-text: #8a5a12;
   --danger-bg: #fbeaea;
   --danger-text: #a3312c;
+  --score-above-bg: #cdead9;
+  --score-above-text: #145c37;
+  --score-average-bg: #e9f6ef;
+  --score-average-text: #4c9270;
+  --score-below-bg: #fdf3b8;
+  --score-below-text: #7a6300;
 }
 
 * {
@@ -889,15 +895,19 @@ h2 .category-icon {
   white-space: nowrap;
 }
 
-.financial-score-success {
-  background: var(--success-bg);
-  color: var(--success-text);
+.financial-score-above {
+  background: var(--score-above-bg);
+  color: var(--score-above-text);
 }
 
-.financial-score-neutral {
-  background: var(--bg);
-  color: var(--muted);
-  border: 1px solid var(--border);
+.financial-score-average {
+  background: var(--score-average-bg);
+  color: var(--score-average-text);
+}
+
+.financial-score-below {
+  background: var(--score-below-bg);
+  color: var(--score-below-text);
 }
 
 .partial-note {

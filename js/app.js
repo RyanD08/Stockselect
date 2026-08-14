@@ -524,19 +524,12 @@ function renderHoldingRow(entry) {
   `;
 }
 
-// v11: only "Above Average" gets a positive accent. "Average" and "Below
-// Average" both stay neutral/gray on purpose — this label is relative
-// positioning, not a warning, and reusing the warn/danger colors already
-// used for Partial Match and the Financial Caution badge would visually
-// contradict that framing (see the caution note in renderResults).
-const FINANCIAL_SCORE_LABEL_CLASS = { 'Above Average': 'success', Average: 'neutral', 'Below Average': 'neutral' };
+const FINANCIAL_SCORE_LABEL_CLASS = { 'Above Average': 'above', Average: 'average', 'Below Average': 'below' };
 
 function renderFinancialScoreBadge(company) {
-  const fm = company.financial_metrics;
-  const score = Math.round(fm.overall_financial_score);
-  const label = fm.overall_financial_score_label;
-  const colorClass = FINANCIAL_SCORE_LABEL_CLASS[label] || 'neutral';
-  return `<span class="financial-score-badge financial-score-${colorClass}">${score} (${escapeHtml(label)})</span>`;
+  const label = company.financial_metrics.overall_financial_score_label;
+  const colorClass = FINANCIAL_SCORE_LABEL_CLASS[label] || 'average';
+  return `<span class="financial-score-badge financial-score-${colorClass}">${escapeHtml(label)}</span>`;
 }
 
 function renderFinancialDetails(company) {
