@@ -426,6 +426,37 @@ function financialQualityAlignment(company, riskProfile, timeHorizon) {
   return components.reduce((sum, v) => sum + v, 0) / components.length;
 }
 
+// Financial Caution Flags: a soft signal for real financial red flags,
+// independent of values fit. Unlike everything else in this file, this is
+// evaluated on raw dataset fields rather than folded into the weighted
+// alignment sum — it never removes a company from results, but it (a) caps
+// its tier at Partial Match regardless of values alignment, (b) knocks a
+// flat penalty off its ranking score, and (c) surfaces a visible badge
+// naming the specific concern(s) so a client can tell a low ranking is
+// about financial health, values misalignment, or both.
+const CAUTION_PENALTY = 15;
+
+function detectCautionFlags(company) {
+  const fm = company.financial_metrics;
+  const flags = [];
+
+  if (fm.analyst_consensus === 'Sell' || fm.analyst_consensus === 'Strong Sell') {
+    flags.push('Currently rated Sell by analyst consensus');
+  }
+
+  const weakConsensus = fm.analyst_consensus === 'Hold' || fm.analyst_consensus === 'Sell' || fm.analyst_consensus === 'Strong Sell';
+  if (fm.profit_margin_pct < 0 && weakConsensus) {
+    flags.push('Currently unprofitable with limited analyst confidence in a turnaround');
+  }
+
+  const fiveYear = company.performance_tier.five_year_annualized_return_pct_est;
+  if (fiveYear < 0 && fm.one_year_return_pct < 0 && fm.six_month_return_pct < 0) {
+    flags.push('Negative returns over the past 6 months, 1 year, and 5 years');
+  }
+
+  return flags;
+}
+
 function buildPortfolio(dataset, answers, clientContext) {
   const ctx = {
     homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
@@ -437,15 +468,25 @@ function buildPortfolio(dataset, answers, clientContext) {
 
   const scored = dataset.companies.map((company) => {
     const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
-    const { tier, conflicts } = classifyTier(alignments, answers);
+    const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
+    const cautionFlags = detectCautionFlags(company);
+    // Tier cap: a caution flag overrides an otherwise-Strong values match —
+    // never silently disqualified, just never allowed to read as "Strong."
+    const tier = cautionFlags.length > 0 ? 'Partial' : valuesFitTier;
+    // Flat penalty applied to the already-blended score used for ranking —
+    // a company can still climb back into range on an exceptional values
+    // match, but a mediocre one combined with a caution flag typically
+    // falls out of the top 15 (see CAUTION_PENALTY comment above).
+    const penalizedScore = cautionFlags.length > 0 ? Math.max(0, score - CAUTION_PENALTY) : score;
     return {
       company,
-      score,
+      score: penalizedScore,
       alignments,
       tier,
       conflicts,
+      cautionFlags,
       rationale: buildRationale(alignments, answers, financialImportance, financialAlignment),
-      note: tier === 'Partial' ? buildPartialMatchNote(conflicts) : null,
+      note: conflicts.length > 0 ? buildPartialMatchNote(conflicts) : null,
       riskMatchRank: riskProfileMatchRank(company, riskProfile),
       quantKey: quantitativeTieBreakKey(company, riskProfile),
       controversyCount: controversyCount(company),

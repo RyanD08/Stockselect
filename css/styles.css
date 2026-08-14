@@ -876,6 +876,20 @@ h2 .category-icon {
   margin-top: 0.25rem;
 }
 
+/* Deliberately a bordered badge, not italic inline text like .partial-note,
+   so a financial concern reads as visually distinct from a values-fit
+   trade-off at a glance (they can both appear on the same holding). */
+.caution-note {
+  color: var(--danger-text);
+  background: var(--danger-bg);
+  border: 1px solid #eecfcd;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 0.4rem;
+}
+
 .financial-toggle-btn {
   display: inline-flex;
   align-items: center;

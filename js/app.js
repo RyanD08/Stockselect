@@ -501,6 +501,11 @@ function renderHoldingRow(entry) {
       <td data-label="Rationale">
         <div>${escapeHtml(entry.rationale)}</div>
         ${entry.note ? `<div class="partial-note">${escapeHtml(entry.note)}</div>` : ''}
+        ${
+          entry.cautionFlags && entry.cautionFlags.length > 0
+            ? `<div class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</div>`
+            : ''
+        }
         <button type="button" class="financial-toggle-btn" data-ticker="${escapeHtml(ticker)}">
           <span class="financial-toggle-chevron ${isFinDetailsOpen ? 'open' : ''}">${chevronIcon()}</span>
           Why this stock, financially
