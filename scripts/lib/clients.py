@@ -15,9 +15,15 @@ import requests
 CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cache")
 SEC_CACHE_DIR = os.path.join(CACHE_DIR, "sec")
 FINNHUB_CACHE_DIR = os.path.join(CACHE_DIR, "finnhub")
+EPA_ECHO_CACHE_DIR = os.path.join(CACHE_DIR, "epa_echo")
+OSHA_CACHE_DIR = os.path.join(CACHE_DIR, "osha")
+NLRB_CACHE_DIR = os.path.join(CACHE_DIR, "nlrb")
 
 os.makedirs(SEC_CACHE_DIR, exist_ok=True)
 os.makedirs(FINNHUB_CACHE_DIR, exist_ok=True)
+os.makedirs(EPA_ECHO_CACHE_DIR, exist_ok=True)
+os.makedirs(OSHA_CACHE_DIR, exist_ok=True)
+os.makedirs(NLRB_CACHE_DIR, exist_ok=True)
 
 
 class RateLimiter:
@@ -76,6 +82,44 @@ class CachedHttpClient:
 
         return body, resp.status_code, False, fetched_at
 
+    def post_text(self, url, cache_key, data=None, refresh=False, timeout=30):
+        """Like get_text but POSTs form data -- used for the NLRB case search,
+        which is a Drupal form that only returns filtered results on POST."""
+        path = self._cache_path(cache_key)
+        if not refresh and os.path.exists(path):
+            with open(path) as f:
+                cached = json.load(f)
+            return cached["body"], cached.get("status", 200), True, cached.get("fetched_at")
+
+        self.rate_limiter.wait()
+        resp = self.session.post(url, headers=self.base_headers, data=data, timeout=timeout)
+        body = resp.text
+
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        with open(path, "w") as f:
+            json.dump({"status": resp.status_code, "body": body, "url": resp.url, "fetched_at": fetched_at}, f)
+
+        return body, resp.status_code, False, fetched_at
+
+    def get_text(self, url, cache_key, params=None, refresh=False, timeout=30):
+        """Like get_json but for HTML endpoints (OSHA/NLRB scraping) --
+        caches raw response text instead of parsed JSON."""
+        path = self._cache_path(cache_key)
+        if not refresh and os.path.exists(path):
+            with open(path) as f:
+                cached = json.load(f)
+            return cached["body"], cached.get("status", 200), True, cached.get("fetched_at")
+
+        self.rate_limiter.wait()
+        resp = self.session.get(url, headers=self.base_headers, params=params, timeout=timeout)
+        body = resp.text
+
+        fetched_at = datetime.now(timezone.utc).isoformat()
+        with open(path, "w") as f:
+            json.dump({"status": resp.status_code, "body": body, "url": resp.url, "fetched_at": fetched_at}, f)
+
+        return body, resp.status_code, False, fetched_at
+
 
 def make_sec_client(user_agent):
     limiter = RateLimiter(max_per_window=8, window_seconds=1)  # SEC allows 10/s; stay under
@@ -104,3 +148,39 @@ def finnhub_get(client, endpoint, params, cache_key, refresh=False):
     params["token"] = client.api_key
     url = f"https://finnhub.io/api/v1/{endpoint}"
     return client.get_json(url, cache_key, params=params, refresh=refresh)
+
+
+# --- Free ESG data source clients -------------------------------------------
+# No API keys required for any of these (confirmed). All are ~1 req/sec,
+# government/nonprofit sites with no documented rate limit, so we self-impose
+# a conservative limiter and a descriptive contact string in the User-Agent,
+# the same courtesy this project already extends to SEC EDGAR.
+
+def make_epa_echo_client(contact):
+    limiter = RateLimiter(max_per_window=1, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={"User-Agent": f"Stockselect ESG Research ({contact})"},
+        rate_limiter=limiter,
+        cache_dir=EPA_ECHO_CACHE_DIR,
+        name="epa_echo",
+    )
+
+
+def make_osha_client(contact):
+    limiter = RateLimiter(max_per_window=1, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={"User-Agent": f"Stockselect ESG Research ({contact})"},
+        rate_limiter=limiter,
+        cache_dir=OSHA_CACHE_DIR,
+        name="osha",
+    )
+
+
+def make_nlrb_client(contact):
+    limiter = RateLimiter(max_per_window=1, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={"User-Agent": f"Stockselect ESG Research ({contact})"},
+        rate_limiter=limiter,
+        cache_dir=NLRB_CACHE_DIR,
+        name="nlrb",
+    )
