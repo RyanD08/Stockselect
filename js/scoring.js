@@ -248,6 +248,26 @@ function buildRationale(alignments, answers, financialImportance, financialAlign
 
 const MARKET_CAP_RANK = { Mega: 3, Large: 2, Mid: 1, Small: 0 };
 
+// Patch v15 §1: size preference so small/micro-cap companies don't dominate
+// results in the full-market dataset just by outnumbering large/mega caps —
+// waived when a company's values fit is already excellent, so the point of
+// having 5,000+ companies (catching a strong match a curated 100 would have
+// missed) isn't defeated by a blanket "large caps only" rule. This dataset's
+// market_cap_tier only has 4 tiers (Mega/Large/Mid/Small) -- there's no
+// "Micro" tier below Small, since the pipeline's $300M market-cap floor
+// already excludes true micro-cap/penny-stock territory.
+const SIZE_PENALTY = { Mega: 0, Large: 0, Mid: 8, Small: 15 };
+const STRONG_VALUES_THRESHOLD = 80; // on the 0-100 ValuesFitScore_norm scale (scoreCompany's pre-caution score)
+
+// Values are stored as positive magnitudes and subtracted here (rather than
+// stored pre-negated and subtracted, as in the original spec) -- storing a
+// penalty as a negative number and then subtracting it adds it back,
+// silently cancelling the penalty it's meant to apply.
+function sizePenalty(marketCapTier, valuesFitScoreNorm) {
+  if (valuesFitScoreNorm >= STRONG_VALUES_THRESHOLD) return 0; // waived — a genuinely strong values match earns its spot regardless of size
+  return SIZE_PENALTY[marketCapTier] || 0;
+}
+
 function controversyCount(company) {
   const regex = /dispute|controvers|scandal|fraud|corruption|litigation|settlement|safety|dual-class|voting power|majority control|majority voting/i;
   return ['environmental', 'social_labor', 'governance']
@@ -456,6 +476,15 @@ function detectCautionFlags(company) {
     flags.push('Negative returns over the past 6 months, 1 year, and 5 years');
   }
 
+  // Patch v15 §2b: a severe single-year decline is a real red flag on its
+  // own, even when it doesn't trip the "negative across all three horizons"
+  // rule above (e.g. still up over 5 years, or 6-month return not yet
+  // negative) and even when 8 other decent-to-strong metrics would
+  // otherwise average it up to "Above Average" in the composite score.
+  if (fm.one_year_return_pct <= -25) {
+    flags.push('Down 25% or more over the past year');
+  }
+
   return flags;
 }
 
@@ -480,9 +509,15 @@ function buildPortfolio(dataset, answers, clientContext) {
     // match, but a mediocre one combined with a caution flag typically
     // falls out of the top 15 (see CAUTION_PENALTY comment above).
     const penalizedScore = cautionFlags.length > 0 ? Math.max(0, score - CAUTION_PENALTY) : score;
+    // Size preference (Patch v15 §1), applied after the values/financial
+    // blend and the caution penalty, same as those — waived using the raw
+    // pre-caution values score, so a strong values match earns its spot
+    // regardless of size even if a caution flag also knocked its ranking
+    // score down for an unrelated reason.
+    const finalScore = Math.max(0, penalizedScore - sizePenalty(company.market_profile.market_cap_tier, score));
     return {
       company,
-      score: penalizedScore,
+      score: finalScore,
       alignments,
       tier,
       conflicts,

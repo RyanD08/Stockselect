@@ -9,6 +9,7 @@ import os
 import time
 import threading
 import urllib.parse
+from datetime import datetime, timezone
 import requests
 
 CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cache")
@@ -58,7 +59,9 @@ class CachedHttpClient:
         if not refresh and os.path.exists(path):
             with open(path) as f:
                 cached = json.load(f)
-            return cached["body"], cached.get("status", 200), True
+            # fetched_at is missing on cache entries written before this field
+            # existed; None signals "unknown freshness" rather than a fabricated time.
+            return cached["body"], cached.get("status", 200), True, cached.get("fetched_at")
 
         self.rate_limiter.wait()
         resp = self.session.get(url, headers=self.base_headers, params=params, timeout=timeout)
@@ -67,10 +70,11 @@ class CachedHttpClient:
         except ValueError:
             body = {"_non_json_text": resp.text[:2000]}
 
+        fetched_at = datetime.now(timezone.utc).isoformat()
         with open(path, "w") as f:
-            json.dump({"status": resp.status_code, "body": body, "url": resp.url}, f)
+            json.dump({"status": resp.status_code, "body": body, "url": resp.url, "fetched_at": fetched_at}, f)
 
-        return body, resp.status_code, False
+        return body, resp.status_code, False, fetched_at
 
 
 def make_sec_client(user_agent):
@@ -99,5 +103,4 @@ def finnhub_get(client, endpoint, params, cache_key, refresh=False):
     params = dict(params)
     params["token"] = client.api_key
     url = f"https://finnhub.io/api/v1/{endpoint}"
-    body, status, from_cache = client.get_json(url, cache_key, params=params, refresh=refresh)
-    return body, status, from_cache
+    return client.get_json(url, cache_key, params=params, refresh=refresh)
