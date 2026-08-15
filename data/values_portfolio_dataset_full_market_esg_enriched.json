@@ -1325,9 +1325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 8 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -10846,8 +10846,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 3 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -12526,8 +12526,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -14446,8 +14446,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -23565,9 +23565,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 5 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -29165,9 +29165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 5 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -43726,8 +43726,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -44280,14 +44280,14 @@
       "animal_testing_exposure": "Low (sector-level estimate) - sector does not typically require animal testing; no verified per-company data source available at this scale",
       "esg_ratings": {
         "environmental": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 307 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 6 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -50600,14 +50600,14 @@
       "animal_testing_exposure": "Low (sector-level estimate) - sector does not typically require animal testing; no verified per-company data source available at this scale",
       "esg_ratings": {
         "environmental": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "High",
+          "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 6 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 9 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -77885,9 +77885,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 6 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -83646,8 +83646,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -84766,8 +84766,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -89965,9 +89965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -101805,9 +101805,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -117726,8 +117726,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -119960,14 +119960,14 @@
       "animal_testing_exposure": "Low (sector-level estimate) - sector does not typically require animal testing; no verified per-company data source available at this scale",
       "esg_ratings": {
         "environmental": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 30 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -143165,9 +143165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "NLRB case search: 8 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -163806,8 +163806,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -201406,8 +201406,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -204046,8 +204046,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -205806,8 +205806,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -215566,8 +215566,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -221005,9 +221005,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "NLRB case search: 10 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -221566,8 +221566,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 3 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,

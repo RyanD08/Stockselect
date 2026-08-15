@@ -129,6 +129,15 @@
       "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "ABM",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 8 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "ABNB",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -417,6 +426,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 45 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "AMAT",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 3 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "AME",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -507,6 +525,15 @@
       "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "AMT",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "AMZN",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -568,6 +595,15 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 5 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "APH",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "APO",
@@ -984,6 +1020,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 66 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "BAC",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 5 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "BAH",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -1207,6 +1252,15 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "BKH",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 5 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "BKR",
@@ -1848,6 +1902,15 @@
       "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "CHH",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "CHRD",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -1855,6 +1918,24 @@
       "old_score": 3,
       "new_score": 2,
       "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CHTR",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 307 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CHTR",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 6 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "CHWY",
@@ -2188,6 +2269,24 @@
       "old_score": 3,
       "new_score": 3,
       "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "COST",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 6 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "COST",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 9 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "COTY",
@@ -3639,6 +3738,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 22 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "FERG",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 6 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "FET",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -3846,6 +3954,15 @@
       "note": "OSHA establishment search: 4 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "FSS",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "FUL",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -3862,6 +3979,15 @@
       "old_score": 3,
       "new_score": 3,
       "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 2 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "FUN",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "FWRD",
@@ -4132,6 +4258,15 @@
       "old_score": 3,
       "new_score": 4,
       "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "GLW",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "GM",
@@ -4654,6 +4789,15 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 7 violation(s) across 16 matched inspection(s) in the past 5 years; NLRB case search: 8 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "HXL",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "IBM",
@@ -5493,6 +5637,15 @@
       "note": "OSHA establishment search: 6 violation(s) across 8 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "LAMR",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "LBRT",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -5608,6 +5761,24 @@
       "old_score": 3,
       "new_score": 3,
       "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "LHX",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 30 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "LHX",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "LII",
@@ -6825,6 +6996,15 @@
       "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "NOC",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 8 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "NOV",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -7597,6 +7777,15 @@
       "old_score": 3,
       "new_score": 4,
       "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "POR",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "POST",
@@ -9282,6 +9471,15 @@
       "note": "OSHA establishment search: 10 violation(s) across 4 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "TJX",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "TKR",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -9399,6 +9597,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 10 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "TRI",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "TRLV",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -9442,6 +9649,15 @@
       "old_score": 3,
       "new_score": 4,
       "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 5 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "TSCO",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "TSEM",
@@ -10065,6 +10281,15 @@
       "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "VLO",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "VMC",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -10317,6 +10542,15 @@
       "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "WFC",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 1,
+      "note": "NLRB case search: 10 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "WFG",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -10342,6 +10576,15 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 4 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "WHR",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 3 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "WIT",
@@ -10758,7 +11001,6 @@
     "ABCB",
     "ABCL",
     "ABEV",
-    "ABM",
     "ABR",
     "ABSI",
     "ABTC",
@@ -10848,7 +11090,6 @@
     "ALVO",
     "ALX",
     "AMAL",
-    "AMAT",
     "AMBA",
     "AMBP",
     "AMBQ",
@@ -10863,7 +11104,6 @@
     "AMRZ",
     "AMSC",
     "AMSF",
-    "AMT",
     "AMTB",
     "AMTD",
     "AMTM",
@@ -10882,7 +11122,6 @@
     "APAM",
     "APEI",
     "APG",
-    "APH",
     "API",
     "APLE",
     "APOG",
@@ -10963,7 +11202,6 @@
     "AZUL",
     "AZZ",
     "BABA",
-    "BAC",
     "BAK",
     "BAM",
     "BANC",
@@ -11012,7 +11250,6 @@
     "BIPC",
     "BIRK",
     "BJ",
-    "BKH",
     "BKNG",
     "BKSY",
     "BKU",
@@ -11141,13 +11378,11 @@
     "CHA",
     "CHCT",
     "CHD",
-    "CHH",
     "CHKP",
     "CHMG",
     "CHRN",
     "CHRW",
     "CHT",
-    "CHTR",
     "CHYM",
     "CI",
     "CIFR",
@@ -11199,7 +11434,6 @@
     "CORT",
     "CORZ",
     "COSO",
-    "COST",
     "COUR",
     "CP",
     "CPA",
@@ -11425,7 +11659,6 @@
     "FDUS",
     "FENC",
     "FER",
-    "FERG",
     "FFBC",
     "FFIN",
     "FG",
@@ -11480,7 +11713,6 @@
     "FSBW",
     "FSLY",
     "FSM",
-    "FSS",
     "FSTR",
     "FSUN",
     "FSV",
@@ -11492,7 +11724,6 @@
     "FTS",
     "FTV",
     "FUBO",
-    "FUN",
     "FUTU",
     "FVCB",
     "FVR",
@@ -11536,7 +11767,6 @@
     "GLPI",
     "GLRE",
     "GLUE",
-    "GLW",
     "GLXY",
     "GMAB",
     "GNK",
@@ -11642,7 +11872,6 @@
     "HUT",
     "HUYA",
     "HWC",
-    "HXL",
     "HY",
     "HYLN",
     "HYMC",
@@ -11776,7 +12005,6 @@
     "KYMR",
     "L",
     "LADR",
-    "LAMR",
     "LAND",
     "LAR",
     "LASR",
@@ -11794,7 +12022,6 @@
     "LGN",
     "LGND",
     "LH",
-    "LHX",
     "LI",
     "LIF",
     "LIFE",
@@ -11982,7 +12209,6 @@
     "NNNN",
     "NOA",
     "NOAH",
-    "NOC",
     "NODK",
     "NOG",
     "NOVT",
@@ -12175,7 +12401,6 @@
     "POET",
     "PONY",
     "POOL",
-    "POR",
     "PPLI",
     "PRAA",
     "PRAX",
@@ -12499,7 +12724,6 @@
     "TII",
     "TIMB",
     "TIPT",
-    "TJX",
     "TK",
     "TKC",
     "TKNO",
@@ -12521,7 +12745,6 @@
     "TPL",
     "TREE",
     "TRGP",
-    "TRI",
     "TRIN",
     "TRIP",
     "TRMB",
@@ -12539,7 +12762,6 @@
     "TRVG",
     "TSAT",
     "TSBK",
-    "TSCO",
     "TSHA",
     "TSNDF",
     "TTAM",
@@ -12609,7 +12831,6 @@
     "VISN",
     "VIST",
     "VKTX",
-    "VLO",
     "VLTO",
     "VLY",
     "VMD",
@@ -12654,12 +12875,10 @@
     "WES",
     "WEST",
     "WF",
-    "WFC",
     "WFRD",
     "WGS",
     "WH",
     "WHD",
-    "WHR",
     "WILC",
     "WINA",
     "WING",
@@ -12785,7 +13004,7 @@
       "error": "Company name too short/generic for EPA ECHO's search (\"Queryset Limit would be exceeded\") -- persistent across 2 attempts"
     }
   ],
-  "retry_note": "52 companies hit a transient www.nlrb.gov connection error on the first full pass and were re-run cleanly. 11 more hit an EPA ECHO error (10 persistent HTTP 500 / 1 query-too-generic; 2 of the 11 were actually a second transient connection reset and succeeded on a third pass). The 9 tickers below are the only ones where EPA ECHO could not be reached after 2 attempts -- their social_labor field was still checked normally via OSHA/NLRB.",
+  "retry_note": "52 companies hit a transient www.nlrb.gov connection error on the first full pass and were re-run cleanly. 11 more hit an EPA ECHO error (10 persistent HTTP 500 / 1 query-too-generic; 2 of the 11 were a second transient connection reset that succeeded on retry). Separately, a real matching bug was found and fixed after the first full run: SEC EDGAR's trailing state/country-of-incorporation suffix (e.g. \"/DE/\", \"/MO/\", \"/NEW\") was being treated as required literal text, guaranteeing zero matches for 129 companies regardless of real data -- including Bank of America, Wells Fargo, Costco, Charter Communications, L3Harris, and others. All 129 were re-run after the fix (one more transient www.osha.gov error, retried cleanly). The 9 tickers in source_errors below are the only ones where EPA ECHO could not be reached after 2 attempts; their social_labor field was still checked normally via OSHA/NLRB.",
   "as_you_sow_sin_stock_cross_check": "As You Sow sin-stock cross-check (fossilfreefunds.org/gunfreefunds.org) was not run: their company data is served from api.fossilfreefunds.org / api.gunfreefunds.org, both blocked by this environment's egress policy (403 at the proxy gateway; confirmed via the proxy's own diagnostic log, not a transient failure). sin_stock_flags are unchanged from the existing SIC-derived classification for every company.",
   "governance": "Out of scope for this pass; esg_ratings.governance is unchanged for every company."
 }
