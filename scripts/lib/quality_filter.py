@@ -10,7 +10,7 @@ percentile labels are computed on the final, filtered population.
 """
 
 BLANK_CHECK_SIC = 6770  # SPACs / shell companies with no real operating business
-MIN_MARKET_CAP_USD_MILLIONS = 50  # excludes nano-cap/penny-stock territory
+MIN_MARKET_CAP_USD_MILLIONS = 300  # excludes nano/micro-cap and penny-stock territory
 MAX_PLAUSIBLE_BETA = 5  # beyond this, it's almost always a thin-trading data artifact, not a real risk signal
 
 
