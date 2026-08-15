@@ -568,58 +568,45 @@ function detectCautionFlags(company) {
   return flags;
 }
 
-function buildPortfolio(dataset, answers, clientContext) {
-  const ctx = {
-    homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
-    tiesSector: (clientContext && clientContext.tiesSector) || null,
-    timeHorizon: (clientContext && clientContext.timeHorizon) || 'long',
+const BELOW_VALUES_THRESHOLD_NOTE =
+  "This company's overall values alignment does not meet the tool's minimum bar for a genuine match. " +
+  'Shown only to fill out your 15-company portfolio because not enough companies met that bar within your other preferences.';
+
+function buildScoredEntry(company, answers, ctx, riskProfile) {
+  const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
+  const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
+  const cautionFlags = detectCautionFlags(company);
+  // Tier cap: a caution flag overrides an otherwise-Strong values match —
+  // never silently disqualified, just never allowed to read as "Strong."
+  const tier = cautionFlags.length > 0 ? 'Partial' : valuesFitTier;
+  // Flat penalty applied to the already-blended score used for ranking —
+  // a company can still climb back into range on an exceptional values
+  // match, but a mediocre one combined with a caution flag typically
+  // falls out of the top 15 (see CAUTION_PENALTY comment above).
+  const penalizedScore = cautionFlags.length > 0 ? Math.max(0, score - CAUTION_PENALTY) : score;
+  return {
+    company,
+    score: penalizedScore,
+    alignments,
+    tier,
+    conflicts,
+    cautionFlags,
+    rationale: buildRationale(alignments, answers, financialImportance, financialAlignment),
+    note: conflicts.length > 0 ? buildPartialMatchNote(conflicts) : null,
+    riskMatchRank: riskProfileMatchRank(company, riskProfile),
+    quantKey: quantitativeTieBreakKey(company, riskProfile),
+    controversyCount: controversyCount(company),
   };
-  const riskProfile = deriveRiskProfile(answers);
-  const tierRank = { Strong: 0, Partial: 1 };
+}
 
-  // Patch v16 §1 + Patch v17: two independent hard pre-filters on the
-  // candidate pool, both applied before values scoring — a company outside
-  // the client's Q23-derived eligible tier range, or whose values-only score
-  // falls below MINIMUM_VALUES_MATCH, never enters scoring/tiering at all.
-  // Applies to every client (not scoped to blue-chip-preference clients
-  // only) — a net-negative values match is disqualifying regardless of what
-  // a client said about company size.
-  const eligibleCompanies = dataset.companies.filter(
-    (company) => isBlueChipEligible(company, answers) && meetsValuesFloor(company, answers, ctx)
-  );
+// Strong before Partial before Below Values Threshold as a hard rule; score
+// orders within a tier; then risk-profile fit / quantitative data /
+// controversy count / ticker as successive tie-breakers (Section 3.3).
+const TIER_RANK = { Strong: 0, Partial: 1, 'Below Values Threshold': 2 };
 
-  const scored = eligibleCompanies.map((company) => {
-    const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
-    const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
-    const cautionFlags = detectCautionFlags(company);
-    // Tier cap: a caution flag overrides an otherwise-Strong values match —
-    // never silently disqualified, just never allowed to read as "Strong."
-    const tier = cautionFlags.length > 0 ? 'Partial' : valuesFitTier;
-    // Flat penalty applied to the already-blended score used for ranking —
-    // a company can still climb back into range on an exceptional values
-    // match, but a mediocre one combined with a caution flag typically
-    // falls out of the top 15 (see CAUTION_PENALTY comment above).
-    const penalizedScore = cautionFlags.length > 0 ? Math.max(0, score - CAUTION_PENALTY) : score;
-    return {
-      company,
-      score: penalizedScore,
-      alignments,
-      tier,
-      conflicts,
-      cautionFlags,
-      rationale: buildRationale(alignments, answers, financialImportance, financialAlignment),
-      note: conflicts.length > 0 ? buildPartialMatchNote(conflicts) : null,
-      riskMatchRank: riskProfileMatchRank(company, riskProfile),
-      quantKey: quantitativeTieBreakKey(company, riskProfile),
-      controversyCount: controversyCount(company),
-    };
-  });
-
-  // Strong before Partial as a hard rule; score orders within a tier; then
-  // risk-profile fit / quantitative data / controversy count / ticker as
-  // successive tie-breakers (Section 3.3).
-  scored.sort((a, b) => {
-    if (tierRank[a.tier] !== tierRank[b.tier]) return tierRank[a.tier] - tierRank[b.tier];
+function sortScoredEntries(entries) {
+  entries.sort((a, b) => {
+    if (TIER_RANK[a.tier] !== TIER_RANK[b.tier]) return TIER_RANK[a.tier] - TIER_RANK[b.tier];
     if (b.score !== a.score) return b.score - a.score;
     if (a.riskMatchRank !== b.riskMatchRank) return a.riskMatchRank - b.riskMatchRank;
     const quantCompare = compareArrays(a.quantKey, b.quantKey);
@@ -627,10 +614,14 @@ function buildPortfolio(dataset, answers, clientContext) {
     if (a.controversyCount !== b.controversyCount) return a.controversyCount - b.controversyCount;
     return a.company.ticker.localeCompare(b.company.ticker);
   });
+  return entries;
+}
 
-  const sectorCounts = {};
-  const selected = [];
-  for (const entry of scored) {
+// Fills `selected` (respecting MAX_PORTFOLIO_SIZE and the shared, running
+// sectorCounts so diversification holds across both the primary and
+// backfill passes) from a sorted list of candidates.
+function fillFromCandidates(candidates, selected, sectorCounts) {
+  for (const entry of candidates) {
     if (selected.length >= MAX_PORTFOLIO_SIZE) break;
     const sector = entry.company.sector;
     const countInSector = sectorCounts[sector] || 0;
@@ -638,6 +629,47 @@ function buildPortfolio(dataset, answers, clientContext) {
     sectorCounts[sector] = countInSector + 1;
     selected.push(entry);
   }
+}
+
+function buildPortfolio(dataset, answers, clientContext) {
+  const ctx = {
+    homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
+    tiesSector: (clientContext && clientContext.tiesSector) || null,
+    timeHorizon: (clientContext && clientContext.timeHorizon) || 'long',
+  };
+  const riskProfile = deriveRiskProfile(answers);
+
+  // Patch v16 §1: blue-chip preference is a hard, non-negotiable pre-filter
+  // — when a client says they want blue-chip companies, "only suggest"
+  // means literally that, so this is never backfilled/relaxed.
+  const blueChipEligible = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
+
+  // Patch v17 + follow-up: the minimum values-match floor IS backfillable —
+  // if requiring a genuine values match (not just "not disqualified") means
+  // fewer than 15 companies clear it, the next-best companies by score are
+  // still shown rather than returning a short list, but relabeled "Below
+  // Values Threshold" rather than Strong/Partial so it's honest about why
+  // they're there. They only ever fill remaining slots after every
+  // genuinely-matching company has already been placed.
+  const meetsFloor = (c) => meetsValuesFloor(c, answers, ctx);
+  const primaryCandidates = sortScoredEntries(
+    blueChipEligible.filter(meetsFloor).map((c) => buildScoredEntry(c, answers, ctx, riskProfile))
+  );
+  const backfillCandidates = sortScoredEntries(
+    blueChipEligible
+      .filter((c) => !meetsFloor(c))
+      .map((c) => {
+        const entry = buildScoredEntry(c, answers, ctx, riskProfile);
+        entry.tier = 'Below Values Threshold';
+        entry.note = BELOW_VALUES_THRESHOLD_NOTE;
+        return entry;
+      })
+  );
+
+  const sectorCounts = {};
+  const selected = [];
+  fillFromCandidates(primaryCandidates, selected, sectorCounts);
+  fillFromCandidates(backfillCandidates, selected, sectorCounts);
 
   const allocationPct = selected.length > 0 ? 100 / selected.length : 0;
   selected.forEach((entry) => {

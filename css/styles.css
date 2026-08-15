@@ -18,6 +18,8 @@
   --warn-text: #8a5a12;
   --danger-bg: #fbeaea;
   --danger-text: #a3312c;
+  --neutral-bg: #ececea;
+  --neutral-text: #5c6773;
   --score-above-bg: #cdead9;
   --score-above-text: #145c37;
   --score-average-bg: #e9f6ef;
@@ -881,6 +883,10 @@ h2 .category-icon {
   border-left: 3px solid var(--warn-text);
 }
 
+.results-table tbody tr.row-below-threshold td:first-child {
+  border-left: 3px solid var(--neutral-text);
+}
+
 /* Below this width, the table reflows into a stack of cards — one per
    holding — instead of forcing horizontal scroll. Ticker + Company act as
    the card header, Sector/Match Tier as labeled metadata rows (label
@@ -922,8 +928,13 @@ h2 .category-icon {
     border-left: 4px solid var(--warn-text);
   }
 
+  .results-table tr.row-below-threshold {
+    border-left: 4px solid var(--neutral-text);
+  }
+
   .results-table tbody tr.row-strong td:first-child,
-  .results-table tbody tr.row-partial td:first-child {
+  .results-table tbody tr.row-partial td:first-child,
+  .results-table tbody tr.row-below-threshold td:first-child {
     border-left: none;
   }
 
@@ -996,6 +1007,11 @@ h2 .category-icon {
 .tier-partial {
   background: var(--warn-bg);
   color: var(--warn-text);
+}
+
+.tier-below-threshold {
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
 }
 
 .financial-score-badge {
