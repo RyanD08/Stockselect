@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib.clients import make_sec_client, make_finnhub_client, finnhub_get
 from lib.build_record import build_company_record, MissingDataError
 from lib.composite_score import apply_composite_scores
+from lib.quality_filter import filter_unreasonable_companies
 from lib import sec_financials as secfin
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -140,6 +141,9 @@ def run(tickers, output_path, refresh=False, sleep_between=0.0, log_every=10):
         if sleep_between:
             time.sleep(sleep_between)
 
+    companies, quality_excluded = filter_unreasonable_companies(companies, debug_by_ticker)
+    print(f"Quality filter: excluded {len(quality_excluded)} companies unreasonable to recommend (SPACs, nano-cap, implausible data)")
+
     print(f"Applying composite financial scores across {len(companies)} companies...")
     apply_composite_scores(companies)
 
@@ -164,6 +168,7 @@ def run(tickers, output_path, refresh=False, sleep_between=0.0, log_every=10):
                 "sector is derived from the company's SEC SIC industry classification code via an approximate SIC-to-GICS-style mapping table (scripts/lib/mapping.py); it will occasionally differ from a company's true GICS sector since SIC is a coarser, older classification. Known systematic gap: internet/media companies filed under a generic 'software/data processing' SIC (7370-7379) map to Information Technology even where GICS classifies them as Communication Services (e.g. Alphabet); payment-network and similar financial-services companies filed under the generic 'business services NEC' SIC (7389) map by industry bucket rather than as Financials (e.g. Visa). These SIC codes are shared by hundreds of otherwise-unrelated companies, so no single-company override was applied.",
                 "sin_stock_flags are derived from SIC codes (tobacco/alcohol/gambling/weapons-defense) plus narrow name-keyword matching (gambling/adult_entertainment) as documented in scripts/lib/mapping.py -- not a paid ESG vendor screen, and may miss companies whose primary SIC code doesn't reflect a secondary sin-stock business line.",
                 "performance_tier.growth_potential/stability/risk_profile_fit are heuristically derived from beta and revenue growth, not analyst judgment.",
+                f"A quality filter (scripts/lib/quality_filter.py) excluded {len(quality_excluded)} otherwise-valid SEC filers before this dataset was built: blank-check/SPAC companies (SIC 6770, no real operating business), companies under a $50M market-cap floor, and companies with an implausible beta (|beta|>5, almost always a thin-trading data artifact rather than a real risk signal). See the accompanying _debug.json's quality_excluded list for exactly which tickers and why.",
                 "Not investment advice. For prototype/demo purposes only.",
             ],
             "schema_version": "2.4",
@@ -185,8 +190,8 @@ def run(tickers, output_path, refresh=False, sleep_between=0.0, log_every=10):
 
     debug_path = output_path.replace(".json", "_debug.json")
     with open(debug_path, "w") as f:
-        json.dump({"skipped": skipped, "sic_by_ticker": debug_by_ticker}, f, indent=2)
-    print(f"Debug info (SIC codes, skip reasons) written to {debug_path}")
+        json.dump({"skipped": skipped, "quality_excluded": quality_excluded, "sic_by_ticker": debug_by_ticker}, f, indent=2)
+    print(f"Debug info (SIC codes, skip reasons, quality-filter exclusions) written to {debug_path}")
 
     return output
 
