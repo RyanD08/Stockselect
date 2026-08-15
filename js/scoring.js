@@ -248,24 +248,26 @@ function buildRationale(alignments, answers, financialImportance, financialAlign
 
 const MARKET_CAP_RANK = { Mega: 3, Large: 2, Mid: 1, Small: 0 };
 
-// Patch v15 §1: size preference so small/micro-cap companies don't dominate
-// results in the full-market dataset just by outnumbering large/mega caps —
-// waived when a company's values fit is already excellent, so the point of
-// having 5,000+ companies (catching a strong match a curated 100 would have
-// missed) isn't defeated by a blanket "large caps only" rule. This dataset's
-// market_cap_tier only has 4 tiers (Mega/Large/Mid/Small) -- there's no
-// "Micro" tier below Small, since the pipeline's $300M market-cap floor
-// already excludes true micro-cap/penny-stock territory.
-const SIZE_PENALTY = { Mega: 0, Large: 0, Mid: 8, Small: 15 };
-const STRONG_VALUES_THRESHOLD = 80; // on the 0-100 ValuesFitScore_norm scale (scoreCompany's pre-caution score)
+// Patch v16 §1: blue-chip preference as a hard, graduated pre-filter tied
+// directly to the client's own Q23 answer ("preference for large,
+// established blue-chip companies over smaller, emerging companies"),
+// replacing Patch v15 §1's blanket default size penalty applied to every
+// client regardless of what they said. "Micro" is listed for parity with
+// the spec but never matches anything in this dataset -- the pipeline's
+// $300M market-cap floor already excludes that tier entirely, so it's a
+// no-op inclusion, not a real 5th tier.
+const BLUE_CHIP_ELIGIBLE_TIERS = {
+  5: new Set(['Mega']),
+  4: new Set(['Mega', 'Large']),
+  3: new Set(['Mega', 'Large', 'Mid']),
+  2: new Set(['Mega', 'Large', 'Mid', 'Small']),
+  1: new Set(['Mega', 'Large', 'Mid', 'Small', 'Micro']),
+};
 
-// Values are stored as positive magnitudes and subtracted here (rather than
-// stored pre-negated and subtracted, as in the original spec) -- storing a
-// penalty as a negative number and then subtracting it adds it back,
-// silently cancelling the penalty it's meant to apply.
-function sizePenalty(marketCapTier, valuesFitScoreNorm) {
-  if (valuesFitScoreNorm >= STRONG_VALUES_THRESHOLD) return 0; // waived — a genuinely strong values match earns its spot regardless of size
-  return SIZE_PENALTY[marketCapTier] || 0;
+function isBlueChipEligible(company, answers) {
+  const q23 = answers[23] || 3;
+  const eligibleTiers = BLUE_CHIP_ELIGIBLE_TIERS[q23] || BLUE_CHIP_ELIGIBLE_TIERS[3];
+  return eligibleTiers.has(company.market_profile.market_cap_tier);
 }
 
 function controversyCount(company) {
@@ -427,11 +429,32 @@ function timeHorizonReturnAlignment(company, riskProfile, timeHorizon) {
   return clamp01((riskAdjusted - min) / (max * 1.25 - min));
 }
 
+// Patch v16 §2: for a Growth risk profile on a Long-term horizon, equal
+// weighting treats a client optimizing for long-term growth the same as one
+// optimizing for income or stability — a cheap, low-growth "value" stock
+// could outscore a genuine growth company on metrics that don't actually
+// matter to this client. Order matches the `components` array in
+// financialQualityAlignment below exactly. Everyone else keeps equal
+// weighting.
+const GROWTH_PROFILE_WEIGHTS = {
+  inv_pe: 0.5, // de-emphasized — growth investors reasonably accept higher P/E
+  inv_peg: 1.5, // emphasized — PEG already adjusts valuation for growth rate
+  growth: 2.0, // emphasized — revenue growth is the core signal for this client
+  margin: 1.0,
+  roe: 1.0,
+  fcf: 1.0,
+  consensus: 1.0,
+  upside: 1.5, // emphasized — forward-looking signal matters more for growth
+  ret: 2.0, // emphasized — long-horizon return (already selected via time horizon)
+};
+const GROWTH_PROFILE_WEIGHT_ORDER = ['inv_pe', 'inv_peg', 'growth', 'margin', 'roe', 'fcf', 'consensus', 'upside', 'ret'];
+
 // Financial quality, folded into scoreCompany as one more preference-type
-// criterion (reward-only, 0-1, never penalizes) — the average of 9
-// normalized sub-metrics: 8 fundamentals/analyst signals plus the
-// risk-profile-aware, time-horizon-selected return above. Equal weight
-// across all 9; no sub-metric is privileged over the others.
+// criterion (reward-only, 0-1, never penalizes) — 9 normalized sub-metrics:
+// 8 fundamentals/analyst signals plus the risk-profile-aware,
+// time-horizon-selected return above. Equal weight for everyone except a
+// Growth risk profile on a Long-term horizon, which uses GROWTH_PROFILE_WEIGHTS
+// instead (Patch v16 §2).
 function financialQualityAlignment(company, riskProfile, timeHorizon) {
   const fm = company.financial_metrics;
   const components = [
@@ -445,6 +468,14 @@ function financialQualityAlignment(company, riskProfile, timeHorizon) {
     analystUpsideAlignment(fm.analyst_price_target_upside_pct),
     timeHorizonReturnAlignment(company, riskProfile, timeHorizon),
   ];
+
+  if (riskProfile === 'Growth' && timeHorizon === 'long') {
+    const weights = GROWTH_PROFILE_WEIGHT_ORDER.map((key) => GROWTH_PROFILE_WEIGHTS[key]);
+    const weightedSum = components.reduce((sum, v, i) => sum + v * weights[i], 0);
+    const weightTotal = weights.reduce((sum, w) => sum + w, 0);
+    return weightedSum / weightTotal;
+  }
+
   return components.reduce((sum, v) => sum + v, 0) / components.length;
 }
 
@@ -497,7 +528,14 @@ function buildPortfolio(dataset, answers, clientContext) {
   const riskProfile = deriveRiskProfile(answers);
   const tierRank = { Strong: 0, Partial: 1 };
 
-  const scored = dataset.companies.map((company) => {
+  // Patch v16 §1: blue-chip preference is a hard pre-filter on the candidate
+  // pool, applied before values scoring — a company outside the client's
+  // Q23-derived eligible tier range never enters scoring/tiering at all,
+  // the same as a disqualified company, just for a size reason rather than
+  // a financial-caution one.
+  const eligibleCompanies = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
+
+  const scored = eligibleCompanies.map((company) => {
     const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
     const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
     const cautionFlags = detectCautionFlags(company);
@@ -509,15 +547,9 @@ function buildPortfolio(dataset, answers, clientContext) {
     // match, but a mediocre one combined with a caution flag typically
     // falls out of the top 15 (see CAUTION_PENALTY comment above).
     const penalizedScore = cautionFlags.length > 0 ? Math.max(0, score - CAUTION_PENALTY) : score;
-    // Size preference (Patch v15 §1), applied after the values/financial
-    // blend and the caution penalty, same as those — waived using the raw
-    // pre-caution values score, so a strong values match earns its spot
-    // regardless of size even if a caution flag also knocked its ranking
-    // score down for an unrelated reason.
-    const finalScore = Math.max(0, penalizedScore - sizePenalty(company.market_profile.market_cap_tier, score));
     return {
       company,
-      score: finalScore,
+      score: penalizedScore,
       alignments,
       tier,
       conflicts,
