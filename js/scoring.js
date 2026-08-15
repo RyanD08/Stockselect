@@ -207,21 +207,30 @@ function valuesFitScore(company, answers, ctx) {
   return Math.round(Math.min(100, Math.max(0, raw)));
 }
 
-// Recalibrated from the originally-proposed 45 to 48 after checking against
-// this dataset directly: every company's esg_ratings are currently a
-// uniform neutral placeholder (score 3, confidence Low -- no live
-// per-company ESG source on this API tier, see financial_metrics notes),
-// so roughly half of the 20 scored questions contribute zero
-// differentiation for every company. A single maximally-weighted, genuine
-// conflict (e.g. a client who rates "avoid weapons manufacturers" 5/5,
-// scored against an actual weapons company) only pulls the blended score
-// down to ~46-47, not the much larger drop a floor of 45 assumed was
-// possible -- 45 would have been dead code, never excluding anything in
-// practice. 48 catches that case while a spot-check of 200 companies with
-// no sin-stock flags at all showed zero false positives. This ratio will
-// shift once real per-company ESG data replaces the uniform placeholder,
-// and should be revisited then.
-const MINIMUM_VALUES_MATCH = 48;
+// Recalibrated twice from the originally-proposed 45:
+//   45 -> 48: every company's esg_ratings are currently a uniform neutral
+//   placeholder (score 3, confidence Low -- no live per-company ESG source
+//   on this API tier), so roughly half of the 20 scored questions
+//   contribute zero differentiation for every company. A single
+//   maximally-weighted, genuine conflict (e.g. a client who rates "avoid
+//   weapons manufacturers" 5/5, scored against an actual weapons company)
+//   only pulled the blended score down to ~46-47 -- 45 would have been
+//   dead code, never excluding anything in practice.
+//   48 -> 54: 48 only screened out net-negative matches (a disqualification
+//   floor), not a requirement for genuine positive alignment -- a company
+//   with only incidental/neutral values alignment (e.g. just "headquartered
+//   domestically") but strong financials could still rank as a Strong
+//   Match. The same placeholder-uniformity issue caps how high any
+//   company's score can realistically go (the observed ceiling across
+//   realistic client profiles is ~54), so a threshold meant to require
+//   genuine positive alignment has to sit close to that ceiling or it
+//   isn't actually requiring anything. Calibrated directly against the
+//   dataset to keep roughly 100 Mega/Large-cap ($10B+) companies eligible
+//   for a typical client profile (101 at 54) -- smaller-cap eligibility
+//   count was explicitly not a calibration target. This ceiling, and this
+//   threshold, will both shift once real per-company ESG data replaces the
+//   uniform placeholder.
+const MINIMUM_VALUES_MATCH = 54;
 
 function meetsValuesFloor(company, answers, ctx) {
   return valuesFitScore(company, answers, ctx) >= MINIMUM_VALUES_MATCH;
