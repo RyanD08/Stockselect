@@ -40,13 +40,17 @@ function renderInPlace() {
 // top so each new screen or survey step is read from the beginning.
 function render() {
   renderInPlace();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
 function renderIntro() {
+  const hasProgress = state.touchedQuestionIds.size > 0;
+
   appEl.innerHTML = `
-    <section class="card intro-card">
-      <h1>Values-Based Portfolio Builder</h1>
+    <section class="card intro-card intro-hero">
+      <p class="eyebrow">Values-Guided Investing</p>
+      <h1>Find Your True North</h1>
       <p class="lede">
         Answer a short questionnaire about what matters to you as an investor —
         environmental impact, labor practices, governance, ethical screens,
@@ -73,8 +77,9 @@ function renderIntro() {
 
       <p class="lede">Nothing you enter is saved or sent anywhere.</p>
       <button id="start-btn" class="btn btn-primary" ${state.dataset ? '' : 'disabled'}>
-        ${state.dataset ? 'Start the Questionnaire' : 'Loading data...'}
+        ${!state.dataset ? 'Loading data...' : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
       </button>
+      ${hasProgress ? '<button id="restart-fresh-btn" class="btn-link-inline">Start over instead</button>' : ''}
       ${state.datasetError ? `<p class="error-text">Could not load company data: ${escapeHtml(state.datasetError)}</p>` : ''}
     </section>
   `;
@@ -82,9 +87,24 @@ function renderIntro() {
   if (startBtn) {
     startBtn.addEventListener('click', () => {
       state.view = 'survey';
-      state.categoryIndex = 0;
-      state.furthestCategoryIndex = 0;
-      state.editOrigin = null;
+      if (hasProgress) {
+        // Resume where they left off rather than restarting from category 0.
+        state.categoryIndex = state.furthestCategoryIndex;
+        state.editOrigin = null;
+      } else {
+        state.categoryIndex = 0;
+        state.furthestCategoryIndex = 0;
+        state.editOrigin = null;
+      }
+      render();
+    });
+  }
+
+  const restartFreshBtn = document.getElementById('restart-fresh-btn');
+  if (restartFreshBtn) {
+    restartFreshBtn.addEventListener('click', () => {
+      resetSurveyState();
+      state.view = 'survey';
       render();
     });
   }
@@ -265,6 +285,12 @@ function checkmarkIcon() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 }
 
+// Simplified compass mark echoing the logo (ring + crosshair ticks +
+// needle) — used sparingly as a brand signature beyond the header logo.
+function compassMotifIcon() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 2.3v2.4M12 19.3v2.4M2.3 12h2.4M19.3 12h2.4"/><path d="M12 7.5l1.9 5.3-1.9 4-1.9-4Z" fill="currentColor" stroke="none"/></svg>';
+}
+
 function renderHomeCountryInput() {
   return `
     <div class="sub-input">
@@ -387,7 +413,7 @@ function renderResults() {
 
   appEl.innerHTML = `
     <section class="card results-card">
-      <h1>Your Values-Based Portfolio</h1>
+      <h1>Your TrueNorth Portfolio</h1>
 
       <div class="summary-grid">
         <div class="summary-box">
@@ -399,7 +425,7 @@ function renderResults() {
           }
         </div>
         <div class="summary-box">
-          <h3>Your Risk Profile</h3>
+          <h3><span class="compass-motif">${compassMotifIcon()}</span>Your Risk Profile</h3>
           <p class="risk-badge risk-${riskProfile.toLowerCase()}"><span class="risk-icon">${riskProfileIcon(riskProfile)}</span>${riskProfile}</p>
           <p class="muted">${riskProfileBlurb(riskProfile)}</p>
         </div>
@@ -438,6 +464,8 @@ function renderResults() {
         </table>
       </div>
 
+      <div class="section-divider">${compassMotifIcon()}</div>
+
       <h2>Portfolio Rationale</h2>
       <div class="rationale">
         ${buildPortfolioRationale(state.answers, riskProfile, holdings)
@@ -446,7 +474,7 @@ function renderResults() {
       </div>
 
       <div class="disclaimer">
-        <strong>Important disclaimer:</strong> This tool is illustrative and educational only. It is built on a
+        <strong>Important disclaimer:</strong> This TrueNorth tool is illustrative and educational only. It is built on a
         limited, 100-company sample dataset with estimated — not independently verified — values and performance
         data for many criteria (labor practices, governance details, financial leverage, market-cap tier, beta,
         returns, revenue geography, and fundamentals such as P/E, revenue growth, margins, ROE, and analyst
@@ -478,20 +506,30 @@ function renderResults() {
   });
 
   document.getElementById('restart-btn').addEventListener('click', () => {
-    QUESTIONS.forEach((q) => {
-      if (q.type === 'horizon') return;
-      state.answers[q.id] = 3;
-    });
-    state.homeCountry = 'United States';
-    state.tiesSector = '';
-    state.timeHorizon = 'long';
-    state.expandedFinancialDetails.clear();
-    state.categoryIndex = 0;
-    state.furthestCategoryIndex = 0;
-    state.editOrigin = null;
+    resetSurveyState();
     state.view = 'intro';
     render();
   });
+}
+
+// Shared full reset, used by both the results "Start Over" button and the
+// intro "Start over instead" link (shown when there's in-progress state to
+// discard). Clears everything init() seeds, including touched/expanded UI
+// state that a plain answer reset previously missed.
+function resetSurveyState() {
+  QUESTIONS.forEach((q) => {
+    if (q.type === 'horizon') return;
+    state.answers[q.id] = 3;
+  });
+  state.homeCountry = 'United States';
+  state.tiesSector = '';
+  state.timeHorizon = 'long';
+  state.expandedFinancialDetails.clear();
+  state.touchedQuestionIds.clear();
+  state.reviewExpanded.clear();
+  state.categoryIndex = 0;
+  state.furthestCategoryIndex = 0;
+  state.editOrigin = null;
 }
 
 function renderHoldingRow(entry) {
@@ -654,7 +692,24 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+// The header logo is static markup (outside the #app render cycle), so its
+// listener is wired once here rather than re-attached on every render().
+// Navigating home never resets answers/progress — Patch v5's state object
+// is reused as-is, so the survey resumes from where the client left off if
+// they click back into it (see renderIntro's hasProgress handling).
+function initLogoHomeLink() {
+  const logoLink = document.getElementById('logo-home-link');
+  if (!logoLink) return;
+  logoLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    state.view = 'intro';
+    state.editOrigin = null;
+    render();
+  });
+}
+
 async function init() {
+  initLogoHomeLink();
   render();
   try {
     state.dataset = await loadDataset();
