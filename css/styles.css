@@ -32,6 +32,11 @@
   box-sizing: border-box;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -60,7 +65,14 @@ body {
   display: block;
   height: 48px;
   width: auto;
+  max-width: 100%;
   border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+  .logo-img {
+    height: 36px;
+  }
 }
 
 main {
