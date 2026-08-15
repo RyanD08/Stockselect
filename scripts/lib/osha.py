@@ -60,8 +60,17 @@ def _parse_rows(html):
 
 
 def _search(client, company_legal_name, start_date, end_date, violations_exist, cache_key_prefix, refresh=False):
+    # OSHA's search does an AND-of-every-word match against establishment
+    # names, so a query built from the full legal name fails whenever the
+    # real registration doesn't literally carry the corporate suffix as a
+    # separate word -- "Union Pacific Corp" and "International Business
+    # Machines Corp" both return zero rows outright, real matches included,
+    # while "Union Pacific" and "International Business Machines" don't.
+    # The strict company-name check below still runs against the untouched
+    # company_legal_name, so this only widens what's searched for.
+    search_term = esg_matching.core_search_name(company_legal_name)
     params = {
-        "establishment": company_legal_name,
+        "establishment": search_term,
         "state": "all",
         "officetype": "all",
         "office": "all",

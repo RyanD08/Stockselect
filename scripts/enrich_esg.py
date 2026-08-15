@@ -139,17 +139,32 @@ def run(input_path, output_path, tickers=None, refresh=False, report_path=None, 
         name = company["name"]
         cache_prefix = ticker.replace("/", "_")
         try:
-            epa_result = build_epa_result(epa_client, name, f"{cache_prefix}_epa", as_of, refresh=refresh)
-            if epa_result.get("error"):
-                source_errors.append({"ticker": ticker, "source": "EPA ECHO", "error": epa_result["error"]})
+            # Skip re-fetching a field that's already real (non-placeholder)
+            # data. Re-fetching it anyway -- e.g. after a matching-precision
+            # fix -- can turn up a *more complete* match from the exact same
+            # source and get logged as a spurious "disagreement" against our
+            # own earlier, less-complete pass, rather than a genuine
+            # conflict between two independent sources.
+            env_is_placeholder = esg_scoring.is_placeholder(company["esg_ratings"]["environmental"])
+            social_is_placeholder = esg_scoring.is_placeholder(company["esg_ratings"]["social_labor"])
 
-            osha_result, osha_err = build_osha_result(osha_client, name, f"{cache_prefix}_osha", as_of, refresh=refresh)
-            if osha_err:
-                source_errors.append({"ticker": ticker, "source": "OSHA", "error": osha_err})
+            if env_is_placeholder:
+                epa_result = build_epa_result(epa_client, name, f"{cache_prefix}_epa", as_of, refresh=refresh)
+                if epa_result.get("error"):
+                    source_errors.append({"ticker": ticker, "source": "EPA ECHO", "error": epa_result["error"]})
+            else:
+                epa_result = {"score": None, "error": None}
 
-            nlrb_result, nlrb_err = build_nlrb_result(nlrb_client, form_build_id, name, f"{cache_prefix}_nlrb", as_of, refresh=refresh)
-            if nlrb_err:
-                source_errors.append({"ticker": ticker, "source": "NLRB", "error": nlrb_err})
+            if social_is_placeholder:
+                osha_result, osha_err = build_osha_result(osha_client, name, f"{cache_prefix}_osha", as_of, refresh=refresh)
+                if osha_err:
+                    source_errors.append({"ticker": ticker, "source": "OSHA", "error": osha_err})
+
+                nlrb_result, nlrb_err = build_nlrb_result(nlrb_client, form_build_id, name, f"{cache_prefix}_nlrb", as_of, refresh=refresh)
+                if nlrb_err:
+                    source_errors.append({"ticker": ticker, "source": "NLRB", "error": nlrb_err})
+            else:
+                osha_result, nlrb_result = None, None
 
             env_change = esg_scoring.apply_environmental(company, epa_result)
             social_change = esg_scoring.apply_social_labor(company, osha_result, nlrb_result)

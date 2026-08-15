@@ -17,7 +17,7 @@ EPA_NOTE_TEMPLATE = (
 OSHA_NLRB_NOTE_TEMPLATE = "{sources}. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
 
 
-def _is_placeholder(block):
+def is_placeholder(block):
     return (
         block.get("score") == 3
         and block.get("confidence") == "Low"
@@ -59,7 +59,7 @@ def apply_environmental(company, epa_result):
     n = epa_result["matched_count"]
     note = EPA_NOTE_TEMPLATE.format(detail=detail, n=n, y="y" if n == 1 else "ies")
 
-    if _is_placeholder(block):
+    if is_placeholder(block):
         old = dict(block)
         block["score"] = score
         block["confidence"] = "High"
@@ -105,7 +105,7 @@ def apply_social_labor(company, osha_result, nlrb_result):
     confidence = "High" if (osha_score is not None and nlrb_score is not None) else "Medium"
     note = OSHA_NLRB_NOTE_TEMPLATE.format(sources="; ".join(source_notes))
 
-    if _is_placeholder(block):
+    if is_placeholder(block):
         old = dict(block)
         block["score"] = combined_score
         block["confidence"] = confidence
