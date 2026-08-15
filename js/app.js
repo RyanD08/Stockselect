@@ -441,9 +441,10 @@ function renderResults() {
       ${renderSectorChart(holdings)}
 
       <p class="financial-score-framing-note">
-        The Financial Score column compares each company's financial profile to others in this tool's ~100-company
-        universe of established public companies. A below-average score does not mean the company is a bad
-        investment — it means it ranks lower on these specific metrics relative to a strong peer group.
+        The Financial Score column compares each company's financial profile to others in this tool's
+        ${state.dataset.companies.length.toLocaleString()}-company universe of US-listed public companies. A
+        below-average score does not mean the company is a bad investment — it means it ranks lower on these
+        specific metrics relative to a strong peer group.
       </p>
 
       <div class="table-wrap">
@@ -474,13 +475,15 @@ function renderResults() {
       </div>
 
       <div class="disclaimer">
-        <strong>Important disclaimer:</strong> This TrueNorth tool is illustrative and educational only. It is built on a
-        limited, 100-company sample dataset with estimated — not independently verified — values and performance
-        data for many criteria (labor practices, governance details, financial leverage, market-cap tier, beta,
-        returns, revenue geography, and fundamentals such as P/E, revenue growth, margins, ROE, and analyst
-        consensus all rely on rough, illustrative estimates rather than a live market-data feed). It is not
-        licensed financial advice, and the results should not be relied upon for actual investment decisions.
-        Please consult a registered financial advisor before making any investment decisions.
+        <strong>Important disclaimer:</strong> This TrueNorth tool is illustrative and educational only. Most
+        financial data (P/E, revenue growth, margins, ROE, leverage, market cap, beta, dividend policy, analyst
+        consensus, 6-month/1-year returns) is pulled from SEC EDGAR filings and live Finnhub market data. Some
+        fields have no live per-company data source available and remain rough, illustrative estimates rather than
+        verified facts: ESG category ratings, founder/family-ownership status, 5-year returns, and analyst
+        price-target upside. Sector and values-screen flags are derived from SEC industry classification codes
+        rather than a licensed ESG vendor and will occasionally be imprecise. It is not licensed financial advice,
+        and the results should not be relied upon for actual investment decisions. Please consult a registered
+        financial advisor before making any investment decisions.
       </div>
 
       <div class="nav-row">
