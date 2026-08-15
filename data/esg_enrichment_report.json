@@ -156,6 +156,15 @@
       "note": "OSHA establishment search: 5 violation(s) across 7 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "ACCO",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 17 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "ACEL",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -660,6 +669,15 @@
       "note": "OSHA establishment search: 65 violation(s) across 20 matched inspection(s) in the past 5 years; NLRB case search: 3 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "ARRY",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "ARW",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -1137,6 +1155,15 @@
       "note": "NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "BFST",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "BHE",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -1324,6 +1351,15 @@
       "old_score": 3,
       "new_score": 4,
       "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "BRK-B",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 9 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "BRO",
@@ -1659,6 +1695,24 @@
       "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "CCI",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 84 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CCI",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA+NLRB",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "OSHA establishment search: 0 violation(s) across 3 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "CCK",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -1794,6 +1848,15 @@
       "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "CHRD",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "CHWY",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -1873,6 +1936,24 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CLW",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 20 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CLW",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "NLRB case search: 7 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "CMCO",
@@ -1957,6 +2038,24 @@
     },
     {
       "ticker": "CNK",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CNM",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 99 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CNM",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
       "source": "OSHA",
@@ -2224,6 +2323,15 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years; NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "CSWC",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 2 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "CSX",
@@ -3234,6 +3342,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 21 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "ERII",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 11 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "ES",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -3376,6 +3493,15 @@
       "old_score": 3,
       "new_score": 4,
       "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "EXEL",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 9 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "EXP",
@@ -3523,6 +3649,15 @@
     },
     {
       "ticker": "FFIV",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "FIS",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
       "source": "NLRB",
@@ -4395,6 +4530,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 19 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "HSY",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 6 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "HTLD",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -4564,6 +4708,15 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years; NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "IIIN",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "ILMN",
@@ -5338,6 +5491,24 @@
       "old_score": 3,
       "new_score": 2,
       "note": "OSHA establishment search: 6 violation(s) across 8 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "LBRT",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "LBRT",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA",
+      "old_score": 3,
+      "new_score": 1,
+      "note": "OSHA establishment search: 4 violation(s) across 4 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "LCID",
@@ -6636,6 +6807,15 @@
       "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 9 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "NNBR",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "OSHA establishment search: 4 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "NNI",
       "field": "esg_ratings.social_labor",
       "type": "upgrade",
@@ -6751,6 +6931,15 @@
       "old_score": 3,
       "new_score": 4,
       "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 26 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "NVR",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "OSHA establishment search: 10 violation(s) across 19 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "NWE",
@@ -7383,6 +7572,24 @@
       "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 15 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
     },
     {
+      "ticker": "PMTS",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 12 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "PMTS",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "OSHA",
+      "old_score": 3,
+      "new_score": 2,
+      "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
       "ticker": "PNFP",
       "field": "esg_ratings.environmental",
       "type": "upgrade",
@@ -7813,6 +8020,24 @@
       "old_score": 3,
       "new_score": 2,
       "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "RGLD",
+      "field": "esg_ratings.environmental",
+      "type": "upgrade",
+      "source": "EPA ECHO",
+      "old_score": 3,
+      "new_score": 4,
+      "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "RGLD",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 3 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "RGNX",
@@ -8605,6 +8830,15 @@
       "old_score": 3,
       "new_score": 3,
       "note": "OSHA establishment search: 2 violation(s) across 4 matched inspection(s) in the past 5 years; NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
+    },
+    {
+      "ticker": "SPB",
+      "field": "esg_ratings.social_labor",
+      "type": "upgrade",
+      "source": "NLRB",
+      "old_score": 3,
+      "new_score": 3,
+      "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
     },
     {
       "ticker": "SPGI",
@@ -10517,6 +10751,7 @@
   ],
   "disagreements": [],
   "no_data_found_tickers": [
+    "AA",
     "AAMI",
     "AAPG",
     "AAUC",
@@ -10552,8 +10787,10 @@
     "ADSE",
     "ADSK",
     "ADT",
+    "ADTN",
     "ADUR",
     "AEBI",
+    "AEE",
     "AEG",
     "AEHR",
     "AEM",
@@ -10646,6 +10883,7 @@
     "APEI",
     "APG",
     "APH",
+    "API",
     "APLE",
     "APOG",
     "APP",
@@ -10672,10 +10910,12 @@
     "ARVN",
     "ARWR",
     "ARX",
+    "ASAN",
     "ASB",
     "ASC",
     "ASMB",
     "ASML",
+    "ASND",
     "ASO",
     "ASPI",
     "ASTH",
@@ -10772,6 +11012,7 @@
     "BIPC",
     "BIRK",
     "BJ",
+    "BKH",
     "BKNG",
     "BKSY",
     "BKU",
@@ -10807,6 +11048,7 @@
     "BRSL",
     "BRSP",
     "BRX",
+    "BRZE",
     "BSM",
     "BSRR",
     "BSVN",
@@ -10841,6 +11083,7 @@
     "CAE",
     "CALX",
     "CAMT",
+    "CAPL",
     "CAPR",
     "CARE",
     "CARG",
@@ -10873,6 +11116,7 @@
     "CCNE",
     "CCOI",
     "CCSI",
+    "CDE",
     "CDLR",
     "CDNA",
     "CDNL",
@@ -11014,6 +11258,7 @@
     "CVSA",
     "CWBC",
     "CWCO",
+    "CWEN",
     "CXT",
     "CYRX",
     "CZFS",
@@ -11057,6 +11302,7 @@
     "DOCU",
     "DOLE",
     "DOO",
+    "DOW",
     "DQ",
     "DRH",
     "DSGN",
@@ -11199,6 +11445,7 @@
     "FLGT",
     "FLNC",
     "FLNG",
+    "FLOC",
     "FLUT",
     "FLYW",
     "FMAO",
@@ -11206,6 +11453,7 @@
     "FMCB",
     "FMNB",
     "FMS",
+    "FMX",
     "FNB",
     "FNF",
     "FNKO",
@@ -11456,6 +11704,7 @@
     "IRTC",
     "IRWD",
     "ISBA",
+    "ISTR",
     "IT",
     "ITGR",
     "ITIC",
@@ -11756,6 +12005,7 @@
     "NTGR",
     "NTNX",
     "NTR",
+    "NTRS",
     "NTSK",
     "NTST",
     "NU",
@@ -11766,6 +12016,7 @@
     "NVEC",
     "NVGS",
     "NVMI",
+    "NVO",
     "NVS",
     "NVST",
     "NVT",
@@ -11909,6 +12160,7 @@
     "PLBC",
     "PLBL",
     "PLGO",
+    "PLMR",
     "PLSE",
     "PLTK",
     "PLTR",
@@ -11922,6 +12174,7 @@
     "PODD",
     "POET",
     "PONY",
+    "POOL",
     "POR",
     "PPLI",
     "PRAA",
@@ -11990,6 +12243,7 @@
     "RCAT",
     "RCI",
     "RCKY",
+    "RDDT",
     "RDNT",
     "RDVT",
     "RDW",
@@ -12077,6 +12331,7 @@
     "SCSC",
     "SD",
     "SDGR",
+    "SDHC",
     "SDRL",
     "SEB",
     "SEG",
@@ -12099,6 +12354,7 @@
     "SHG",
     "SHIP",
     "SHLS",
+    "SHMD",
     "SHO",
     "SHOE",
     "SHOO",
@@ -12152,6 +12408,7 @@
     "SPCE",
     "SPFI",
     "SPH",
+    "SPIR",
     "SPNT",
     "SPOT",
     "SPRY",
@@ -12183,6 +12440,7 @@
     "STTK",
     "STUB",
     "STVN",
+    "STWD",
     "STX",
     "SUI",
     "SUNC",
@@ -12197,6 +12455,7 @@
     "SYM",
     "SYNA",
     "SYRE",
+    "TAC",
     "TAK",
     "TALK",
     "TARS",
@@ -12305,6 +12564,7 @@
     "UE",
     "UFPI",
     "UHAL",
+    "UHT",
     "UI",
     "UL",
     "ULCC",
@@ -12317,6 +12577,8 @@
     "UPST",
     "UPWK",
     "URGN",
+    "USAC",
+    "USAR",
     "USAS",
     "USB",
     "USCB",
@@ -12388,6 +12650,7 @@
     "WCC",
     "WDAY",
     "WDH",
+    "WEAV",
     "WES",
     "WEST",
     "WF",
@@ -12399,6 +12662,7 @@
     "WHR",
     "WILC",
     "WINA",
+    "WING",
     "WIX",
     "WK",
     "WLFC",
@@ -12419,6 +12683,7 @@
     "WSBC",
     "WSBF",
     "WSC",
+    "WSE",
     "WSFS",
     "WSO",
     "WT",
@@ -12457,6 +12722,7 @@
     "YUMC",
     "ZD",
     "ZETA",
+    "ZG",
     "ZGN",
     "ZH",
     "ZIM",
@@ -12474,321 +12740,52 @@
   ],
   "source_errors": [
     {
-      "ticker": "AA",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ACCO",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ADTN",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "AEE",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
       "ticker": "AJG",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "API",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ARRY",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ASAN",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ASND",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "BFST",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "BKH",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "BRK-B",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "BRZE",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CAPL",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CCI",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CDE",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CHRD",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CLW",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CNM",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "CRD-A",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "CSWC",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "CWEN",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "DE",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "DOW",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ERII",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ESTA",
-      "source": "EPA ECHO",
-      "error": "HTTP 429"
-    },
-    {
-      "ticker": "EXEL",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "FIS",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "FLOC",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.osha.gov', port=443): Max retries exceeded with url: /ords/imis/establishment.search?establishment=Flowco+Holdings+Inc.&state=all&officetype=all&office=all&sitezip=100000&startmonth=08&startday=15&startyear=2021&endmonth=08&endday=15&endyear=2026&p_case=all&p_violations_exist=both (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "FMX",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.osha.gov', port=443): Max retries exceeded with url: /ords/imis/establishment.search?establishment=MEXICAN+ECONOMIC+DEVELOPMENT+INC&state=all&officetype=all&office=all&sitezip=100000&startmonth=08&startday=15&startyear=2021&endmonth=08&endday=15&endyear=2026&p_case=all&p_violations_exist=yes (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "HSY",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "IIIN",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ISTR",
-      "source": "pipeline",
-      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "KKR",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "LBRT",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "LEVI",
-      "source": "EPA ECHO",
-      "error": "HTTP 500"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "MKC",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "NNBR",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "NTRS",
-      "source": "pipeline",
-      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-    },
-    {
-      "ticker": "NVO",
-      "source": "pipeline",
-      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
-    },
-    {
-      "ticker": "NVR",
-      "source": "pipeline",
-      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "OGN",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "PLMR",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "PMTS",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "POOL",
-      "source": "pipeline",
-      "error": "ReadTimeout: HTTPSConnectionPool(host='echodata.epa.gov', port=443): Read timed out. (read timeout=30)"
-    },
-    {
-      "ticker": "RDDT",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "RGLD",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "RGR",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
-    },
-    {
-      "ticker": "RH",
-      "source": "EPA ECHO",
-      "error": "Rows Returned would be 5661185. Queryset Limit would be exceeded - please make search parameters more selective."
-    },
-    {
-      "ticker": "SDHC",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "SHMD",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "SPB",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "SPIR",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "STWD",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "TAC",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "UHT",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "USAC",
-      "source": "pipeline",
-      "error": "ReadTimeout: HTTPSConnectionPool(host='echodata.epa.gov', port=443): Read timed out. (read timeout=30)"
-    },
-    {
-      "ticker": "USAR",
-      "source": "pipeline",
-      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
       "ticker": "VSXY",
       "source": "EPA ECHO",
-      "error": "HTTP 500"
+      "error": "HTTP 500 (persistent across 2 attempts, not a rate-limit/transient code)"
     },
     {
-      "ticker": "WEAV",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "WING",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "WSE",
-      "source": "pipeline",
-      "error": "ProxyError: HTTPSConnectionPool(host='www.nlrb.gov', port=443): Max retries exceeded with url: /search/case (Caused by ProxyError('Unable to connect to proxy', RemoteDisconnected('Remote end closed connection without response')))"
-    },
-    {
-      "ticker": "ZG",
-      "source": "pipeline",
-      "error": "ConnectionError: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))"
+      "ticker": "RH",
+      "source": "EPA ECHO",
+      "error": "Company name too short/generic for EPA ECHO's search (\"Queryset Limit would be exceeded\") -- persistent across 2 attempts"
     }
   ],
-  "as_you_sow_sin_stock_cross_check": "As You Sow sin-stock cross-check (fossilfreefunds.org/gunfreefunds.org) was not run: their company data is served from api.fossilfreefunds.org / api.gunfreefunds.org, both blocked by this environment's egress policy (403 at the proxy gateway; confirmed via the proxy's own diagnostic log, not a transient failure). The public-facing site domains resolve fine but only serve a JS app shell with no server-rendered data. sin_stock_flags are unchanged from the existing SIC-derived classification.",
+  "retry_note": "52 companies hit a transient www.nlrb.gov connection error on the first full pass and were re-run cleanly. 11 more hit an EPA ECHO error (10 persistent HTTP 500 / 1 query-too-generic; 2 of the 11 were actually a second transient connection reset and succeeded on a third pass). The 9 tickers below are the only ones where EPA ECHO could not be reached after 2 attempts -- their social_labor field was still checked normally via OSHA/NLRB.",
+  "as_you_sow_sin_stock_cross_check": "As You Sow sin-stock cross-check (fossilfreefunds.org/gunfreefunds.org) was not run: their company data is served from api.fossilfreefunds.org / api.gunfreefunds.org, both blocked by this environment's egress policy (403 at the proxy gateway; confirmed via the proxy's own diagnostic log, not a transient failure). sin_stock_flags are unchanged from the existing SIC-derived classification for every company.",
   "governance": "Out of scope for this pass; esg_ratings.governance is unchanged for every company."
 }
