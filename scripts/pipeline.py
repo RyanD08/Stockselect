@@ -50,7 +50,7 @@ def load_env():
 
 
 def load_ticker_cik_map(sec_client, refresh=False):
-    body, status, _ = sec_client.get_json(
+    body, status, _from_cache, _fetched_at = sec_client.get_json(
         "https://www.sec.gov/files/company_tickers.json",
         cache_key="company_tickers",
         refresh=refresh,
@@ -66,7 +66,7 @@ def load_ticker_cik_map(sec_client, refresh=False):
 def fetch_one(ticker, cik, sec_client, fh_client, refresh=False):
     cik10 = str(cik).zfill(10)
 
-    sub_body, sub_status, _ = sec_client.get_json(
+    sub_body, sub_status, _from_cache, _fetched_at = sec_client.get_json(
         f"https://data.sec.gov/submissions/CIK{cik10}.json",
         cache_key=f"submission_{cik10}",
         refresh=refresh,
@@ -74,7 +74,7 @@ def fetch_one(ticker, cik, sec_client, fh_client, refresh=False):
     if sub_status != 200:
         raise RuntimeError(f"SEC submissions HTTP {sub_status} for {ticker} (CIK {cik10})")
 
-    facts_body, facts_status, _ = sec_client.get_json(
+    facts_body, facts_status, _from_cache, _fetched_at = sec_client.get_json(
         f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik10}.json",
         cache_key=f"companyfacts_{cik10}",
         refresh=refresh,
@@ -91,12 +91,15 @@ def fetch_one(ticker, cik, sec_client, fh_client, refresh=False):
     if fundamentals["revenue"] is None or fundamentals["net_income"] is None:
         raise MissingDataError(f"{ticker}: no annual revenue/net income in SEC XBRL data")
 
-    profile_body, _, _ = finnhub_get(fh_client, "stock/profile2", {"symbol": ticker}, f"{ticker}_profile2", refresh=refresh)
-    metric_body, _, _ = finnhub_get(fh_client, "stock/metric", {"symbol": ticker, "metric": "all"}, f"{ticker}_metric", refresh=refresh)
-    quote_body, _, _ = finnhub_get(fh_client, "quote", {"symbol": ticker}, f"{ticker}_quote", refresh=refresh)
-    reco_body, _, _ = finnhub_get(fh_client, "stock/recommendation", {"symbol": ticker}, f"{ticker}_recommendation", refresh=refresh)
+    profile_body, _, _, _ = finnhub_get(fh_client, "stock/profile2", {"symbol": ticker}, f"{ticker}_profile2", refresh=refresh)
+    # metric's fetch time is what "last_refreshed" reports -- it's the source
+    # of six_month_return_pct/one_year_return_pct, the fields most likely to
+    # go stale and mislead (see Patch v15 §2a / the WDH case).
+    metric_body, _, _, metric_fetched_at = finnhub_get(fh_client, "stock/metric", {"symbol": ticker, "metric": "all"}, f"{ticker}_metric", refresh=refresh)
+    quote_body, _, _, _ = finnhub_get(fh_client, "quote", {"symbol": ticker}, f"{ticker}_quote", refresh=refresh)
+    reco_body, _, _, _ = finnhub_get(fh_client, "stock/recommendation", {"symbol": ticker}, f"{ticker}_recommendation", refresh=refresh)
 
-    return sub_body, facts_body, profile_body, metric_body, quote_body, reco_body
+    return sub_body, facts_body, profile_body, metric_body, quote_body, reco_body, metric_fetched_at
 
 
 def run(tickers, output_path, refresh=False, sleep_between=0.0, log_every=10):
@@ -127,8 +130,8 @@ def run(tickers, output_path, refresh=False, sleep_between=0.0, log_every=10):
             skipped.append((ticker, "not found in SEC company_tickers.json"))
             continue
         try:
-            sub, facts, profile, metric, quote, reco = fetch_one(ticker, entry["cik"], sec_client, fh_client, refresh=refresh)
-            record, debug_info = build_company_record(ticker, sub, facts, profile, metric, quote, reco)
+            sub, facts, profile, metric, quote, reco, metric_fetched_at = fetch_one(ticker, entry["cik"], sec_client, fh_client, refresh=refresh)
+            record, debug_info = build_company_record(ticker, sub, facts, profile, metric, quote, reco, metric_fetched_at)
             companies.append(record)
             debug_by_ticker[ticker] = debug_info
         except MissingDataError as e:

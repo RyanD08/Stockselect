@@ -89,7 +89,7 @@ class MissingDataError(Exception):
     """Raised when a company lacks enough real data to build a valid record."""
 
 
-def build_company_record(ticker, sec_submission, sec_facts, fh_profile, fh_metric, fh_quote, fh_recommendation):
+def build_company_record(ticker, sec_submission, sec_facts, fh_profile, fh_metric, fh_quote, fh_recommendation, metric_fetched_at=None):
     name = sec_submission.get("name") or fh_profile.get("name") or ticker
     sic_raw = sec_submission.get("sic")
     sic = int(sic_raw) if sic_raw not in (None, "") else None
@@ -192,6 +192,7 @@ def build_company_record(ticker, sec_submission, sec_facts, fh_profile, fh_metri
             "analyst_price_target_upside_pct": None,
             "six_month_return_pct": six_month_return if six_month_return is not None else 0.0,
             "one_year_return_pct": one_year_return if one_year_return is not None else 0.0,
+            "last_refreshed": metric_fetched_at,  # UTC ISO timestamp of the Finnhub metric pull this return data came from; null for cache entries written before this field existed
             "confidence": "Low" if fundamentals["revenue_is_partial_proxy"] else "Medium",
             "note": (
                 "P/E, PEG, revenue growth, margins, ROE, FCF margin from SEC EDGAR XBRL "
