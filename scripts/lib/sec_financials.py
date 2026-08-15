@@ -12,7 +12,13 @@ Absolute dollar figures are never exposed in the output schema.
 """
 import datetime
 
-ANNUAL_FORMS = {"10-K", "10-K/A", "20-F", "20-F/A", "40-F", "40-F/A"}
+ANNUAL_FORMS = {"10-K", "10-K/A", "20-F", "20-F/A", "40-F", "40-F/A", "6-K"}
+# 6-K is normally a "current report" (used for interim/quarterly furnishings
+# too), but some Canadian MJDS filers (e.g. Canadian National Railway) only
+# tag their annual financial statements via 6-K exhibits rather than 40-F
+# itself. Accepting it is safe here because the 330-400 day duration check
+# below -- not the form tag -- is what actually distinguishes annual from
+# quarterly periods.
 
 # (taxonomy, tag) pairs, checked in order; first taxonomy+tag with usable
 # annual records wins. us-gaap variants cover different filer conventions
@@ -30,7 +36,21 @@ REVENUE_TAGS = [
     ("ifrs-full", "Revenue"),
     ("ifrs-full", "RevenueFromContractsWithCustomers"),
     ("ifrs-full", "RevenueFromSaleOfGoods"),  # some IFRS filers only tag this sub-component (e.g. Novartis)
+    # Last resort for banks with no full-revenue tag at all (e.g. Truist,
+    # Synchrony): interest income alone, which understates true revenue
+    # (excludes fee/noninterest income) and will overstate margin ratios
+    # computed against it. Flagged in the output dataset's metadata.
+    ("us-gaap", "InterestAndDividendIncomeOperating"),
+    ("us-gaap", "InterestIncomeOperating"),
 ]
+# Tags that, if used as the revenue source, make margin/ROE/leverage ratios
+# an approximation rather than a true revenue-based ratio -- used to flag
+# affected companies in the output rather than silently treating them the
+# same as a full revenue figure.
+PARTIAL_REVENUE_PROXY_TAGS = {
+    ("us-gaap", "InterestAndDividendIncomeOperating"),
+    ("us-gaap", "InterestIncomeOperating"),
+}
 NET_INCOME_TAGS = [
     ("us-gaap", "NetIncomeLoss"),
     ("us-gaap", "ProfitLoss"),
@@ -82,41 +102,54 @@ def _usable_unit_keys(units_dict):
     return monetary_keys
 
 
-def _annual_series(facts, tag_pairs, instant=False):
-    """Return annual records across all matching (taxonomy, tag) pairs,
-    sorted by end date descending."""
+def _single_tag_series(facts, taxonomy, tag, instant=False):
+    """Annual records for exactly one (taxonomy, tag), sorted by end date descending."""
+    taxonomy_facts = facts.get(taxonomy, {})
+    if tag not in taxonomy_facts:
+        return []
     records = []
-    for taxonomy, tag in tag_pairs:
-        taxonomy_facts = facts.get(taxonomy, {})
-        if tag not in taxonomy_facts:
-            continue
-        units = taxonomy_facts[tag]["units"]
-        for unit_key in _usable_unit_keys(units):
-            for r in units[unit_key]:
-                if r.get("form") not in ANNUAL_FORMS:
+    units = taxonomy_facts[tag]["units"]
+    for unit_key in _usable_unit_keys(units):
+        for r in units[unit_key]:
+            if r.get("form") not in ANNUAL_FORMS:
+                continue
+            if instant:
+                if "start" in r:
+                    continue  # instant facts have no start
+            else:
+                days = _duration_days(r)
+                if days is None or not (330 <= days <= 400):
                     continue
-                if instant:
-                    if "start" in r:
-                        continue  # instant facts have no start
-                else:
-                    days = _duration_days(r)
-                    if days is None or not (330 <= days <= 400):
-                        continue
-                records.append(r)
+            records.append(r)
     records.sort(key=lambda r: (r["end"], r.get("filed", "")), reverse=True)
     return records
 
 
-def _latest(facts, tag_pairs, instant=False):
-    series = _annual_series(facts, tag_pairs, instant=instant)
-    return series[0] if series else None
+def _best_tag_series(facts, tag_pairs, instant=False):
+    """Try each (taxonomy, tag) in priority order; return the series for the
+    FIRST one with any usable annual record, along with which tag it was.
+    Deliberately does not merge records across tags -- a company's revenue
+    growth must compare the same concept year-over-year, not one tag's
+    current year against a different tag's prior year."""
+    for taxonomy, tag in tag_pairs:
+        series = _single_tag_series(facts, taxonomy, tag, instant=instant)
+        if series:
+            return series, taxonomy, tag
+    return [], None, None
 
 
-def _prior_year(facts, tag_pairs, latest_rec, instant=False):
-    """Find the annual record for the period ending ~1 year before latest_rec's end."""
+def _latest_with_tag(facts, tag_pairs, instant=False):
+    series, taxonomy, tag = _best_tag_series(facts, tag_pairs, instant=instant)
+    if not series:
+        return None, None, None
+    return series[0], taxonomy, tag
+
+
+def _prior_year(series, latest_rec):
+    """Find the record (from the same single-tag series as latest_rec) for
+    the period ending ~1 year before latest_rec's end."""
     if latest_rec is None:
         return None
-    series = _annual_series(facts, tag_pairs, instant=instant)
     latest_end = datetime.date.fromisoformat(latest_rec["end"])
     target = latest_end.replace(year=latest_end.year - 1)
     best = None
@@ -142,6 +175,7 @@ def extract_fundamentals(company_facts):
     out = {
         "revenue": None,
         "revenue_prior_year": None,
+        "revenue_is_partial_proxy": False,
         "net_income": None,
         "assets": None,
         "liabilities": None,
@@ -153,40 +187,42 @@ def extract_fundamentals(company_facts):
         "filed_date": None,
     }
 
-    rev = _latest(facts, REVENUE_TAGS)
+    rev, rev_taxonomy, rev_tag = _latest_with_tag(facts, REVENUE_TAGS)
     if rev:
         out["revenue"] = rev["val"]
+        out["revenue_is_partial_proxy"] = (rev_taxonomy, rev_tag) in PARTIAL_REVENUE_PROXY_TAGS
         out["fiscal_year_end"] = rev["end"]
         out["filed_date"] = rev.get("filed")
-        prior = _prior_year(facts, REVENUE_TAGS, rev)
+        rev_series = _single_tag_series(facts, rev_taxonomy, rev_tag)
+        prior = _prior_year(rev_series, rev)
         if prior:
             out["revenue_prior_year"] = prior["val"]
 
-    ni = _latest(facts, NET_INCOME_TAGS)
+    ni, _, _ = _latest_with_tag(facts, NET_INCOME_TAGS)
     if ni:
         out["net_income"] = ni["val"]
 
-    assets = _latest(facts, ASSETS_TAGS, instant=True)
+    assets, _, _ = _latest_with_tag(facts, ASSETS_TAGS, instant=True)
     if assets:
         out["assets"] = assets["val"]
 
-    liab = _latest(facts, LIABILITIES_TAGS, instant=True)
+    liab, _, _ = _latest_with_tag(facts, LIABILITIES_TAGS, instant=True)
     if liab:
         out["liabilities"] = liab["val"]
 
-    eq = _latest(facts, EQUITY_TAGS, instant=True)
+    eq, _, _ = _latest_with_tag(facts, EQUITY_TAGS, instant=True)
     if eq:
         out["equity"] = eq["val"]
 
-    ocf = _latest(facts, OP_CASH_FLOW_TAGS)
+    ocf, _, _ = _latest_with_tag(facts, OP_CASH_FLOW_TAGS)
     if ocf:
         out["operating_cash_flow"] = ocf["val"]
 
-    capex = _latest(facts, CAPEX_TAGS)
+    capex, _, _ = _latest_with_tag(facts, CAPEX_TAGS)
     if capex:
         out["capex"] = capex["val"]
 
-    eps = _latest(facts, EPS_DILUTED_TAGS)
+    eps, _, _ = _latest_with_tag(facts, EPS_DILUTED_TAGS)
     if eps:
         out["eps_diluted"] = eps["val"]
 

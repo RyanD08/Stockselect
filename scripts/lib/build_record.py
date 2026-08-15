@@ -37,6 +37,14 @@ PRICE_TARGET_NOTE = (
     "upside as neutral for this metric."
 )
 
+PARTIAL_REVENUE_PROXY_NOTE = (
+    "This company has no full-revenue XBRL tag available (common for some bank holding "
+    "companies); revenue_growth_yoy_pct, profit_margin_pct, and free_cash_flow_margin_pct "
+    "are computed against interest income alone as the closest available proxy, which "
+    "understates true revenue and will overstate margin ratios. Confidence lowered to Low "
+    "for this reason."
+)
+
 PERFORMANCE_TIER_NOTE = (
     "growth_potential/stability/risk_profile_fit are heuristically derived from beta and "
     "revenue growth (not a qualitative analyst judgment); five_year_annualized_return_pct_est "
@@ -184,11 +192,12 @@ def build_company_record(ticker, sec_submission, sec_facts, fh_profile, fh_metri
             "analyst_price_target_upside_pct": None,
             "six_month_return_pct": six_month_return if six_month_return is not None else 0.0,
             "one_year_return_pct": one_year_return if one_year_return is not None else 0.0,
-            "confidence": "Medium",
+            "confidence": "Low" if fundamentals["revenue_is_partial_proxy"] else "Medium",
             "note": (
                 "P/E, PEG, revenue growth, margins, ROE, FCF margin from SEC EDGAR XBRL "
-                "(most recent 10-K) and Finnhub live TTM metrics. analyst_consensus from "
+                "(most recent annual filing) and Finnhub live TTM metrics. analyst_consensus from "
                 "Finnhub analyst recommendation trend. " + PRICE_TARGET_NOTE
+                + (" " + PARTIAL_REVENUE_PROXY_NOTE if fundamentals["revenue_is_partial_proxy"] else "")
             ),
             "overall_financial_score": None,  # filled in by a post-process pass (percentile-based label needs the full batch)
             "overall_financial_score_label": None,
