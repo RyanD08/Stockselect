@@ -354,6 +354,7 @@ function analystConsensusAlignment(consensus) {
   return ANALYST_CONSENSUS_SCORE[consensus] !== undefined ? ANALYST_CONSENSUS_SCORE[consensus] : NEUTRAL_ALIGNMENT;
 }
 function analystUpsideAlignment(upsidePct) {
+  if (upsidePct === null || upsidePct === undefined) return NEUTRAL_ALIGNMENT;
   return clamp01((upsidePct - -5) / (15 - -5));
 }
 
@@ -379,9 +380,10 @@ function horizonReturnValue(company, timeHorizon) {
 // reward instead of an ordinal comparator. This is one of the 9 metrics
 // averaged into financialQualityAlignment below, not a separate score.
 function timeHorizonReturnAlignment(company, riskProfile, timeHorizon) {
-  const bounds = HORIZON_RETURN_BOUNDS[timeHorizon] || HORIZON_RETURN_BOUNDS.long;
   const beta = company.market_profile.beta_est;
   const ret = horizonReturnValue(company, timeHorizon);
+  if (ret === null || ret === undefined) return NEUTRAL_ALIGNMENT;
+  const bounds = HORIZON_RETURN_BOUNDS[timeHorizon] || HORIZON_RETURN_BOUNDS.long;
   const [min, max] = bounds;
   const retAlign = clamp01((ret - min) / (max - min));
 
