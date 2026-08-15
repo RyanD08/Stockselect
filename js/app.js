@@ -494,9 +494,16 @@ function renderResults() {
   });
 }
 
+const TIER_DISPLAY = {
+  Strong: { cssKey: 'strong', badgeText: 'Strong Match' },
+  Partial: { cssKey: 'partial', badgeText: 'Partial Match' },
+  'Below Values Threshold': { cssKey: 'below-threshold', badgeText: 'Below Values Threshold' },
+};
+
 function renderHoldingRow(entry) {
-  const tierClass = entry.tier === 'Strong' ? 'tier-strong' : 'tier-partial';
-  const rowClass = entry.tier === 'Strong' ? 'row-strong' : 'row-partial';
+  const display = TIER_DISPLAY[entry.tier] || TIER_DISPLAY.Partial;
+  const tierClass = `tier-${display.cssKey}`;
+  const rowClass = `row-${display.cssKey}`;
   const ticker = entry.company.ticker;
   const isFinDetailsOpen = state.expandedFinancialDetails.has(ticker);
   return `
@@ -504,7 +511,7 @@ function renderHoldingRow(entry) {
       <td data-label="Ticker">${escapeHtml(ticker)}</td>
       <td data-label="Company">${escapeHtml(entry.company.name)}</td>
       <td data-label="Sector">${escapeHtml(entry.company.sector)}</td>
-      <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${entry.tier} Match</span></td>
+      <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${display.badgeText}</span></td>
       <td data-label="Financial Score">${renderFinancialScoreBadge(entry.company)}</td>
       <td data-label="Rationale">
         <div>${escapeHtml(entry.rationale)}</div>
@@ -608,7 +615,8 @@ function riskProfileBlurb(riskProfile) {
 function buildPortfolioRationale(answers, riskProfile, holdings) {
   const topPriorities = QUESTIONS.filter((q) => q.id <= 20 && answers[q.id] === 5).map((q) => q.short);
   const strongCount = holdings.filter((h) => h.tier === 'Strong').length;
-  const partialCount = holdings.length - strongCount;
+  const belowThresholdCount = holdings.filter((h) => h.tier === 'Below Values Threshold').length;
+  const partialCount = holdings.length - strongCount - belowThresholdCount;
 
   const priorityPhrase =
     topPriorities.length > 0
@@ -620,21 +628,29 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
     `alongside a ${riskProfile.toLowerCase()} risk profile derived from your stability, blue-chip, and dividend ` +
     `preferences. Each company in our sample dataset was scored on how well it aligns with your specific answers, ` +
     `distinguishing criteria you asked us to screen out (like sin-stock exposure or high leverage) from criteria ` +
-    `you asked us to seek out (like renewable-energy focus or domestic revenue) — rather than applying hard ` +
-    `exclusions, so the portfolio reflects the full spectrum of available companies ranked by fit.`;
+    `you asked us to seek out (like renewable-energy focus or domestic revenue). A company must clear a minimum ` +
+    `overall values-alignment bar to be considered a genuine match at all — good financials alone can't carry a ` +
+    `company that doesn't meaningfully align with what you told us you care about.`;
 
   const p2 =
     `Strong Matches are always listed ahead of Partial Matches: ${strongCount} of the ${holdings.length} holdings ` +
     `are Strong Matches, meaning none of the criteria you rated as a top priority (a 4 or 5 out of 5) produced a ` +
     `meaningful conflict. ${
       partialCount > 0
-        ? `The remaining ${partialCount} are Partial Matches — generally well-aligned with your values overall, but ` +
+        ? `${partialCount} are Partial Matches — generally well-aligned with your values overall, but ` +
           `each carries a specific trade-off against one of your top priorities, which we've called out individually ` +
           `in the table above so you can decide whether that trade-off is acceptable to you.`
         : `No holdings required a trade-off against your top priorities.`
     } Where companies were closely tied on fit, we broke ties using your derived risk profile and quantitative ` +
     `data (beta, market-cap tier, and estimated five-year returns). Positions are equally weighted, and we capped ` +
-    `exposure to any single sector at three holdings to keep the portfolio reasonably diversified.`;
+    `exposure to any single sector at three holdings to keep the portfolio reasonably diversified.${
+      belowThresholdCount > 0
+        ? ` Not enough companies met the minimum values-match bar within your other preferences to fill all ` +
+          `${MAX_PORTFOLIO_SIZE} slots, so the remaining ${belowThresholdCount} are shown as Below Values ` +
+          `Threshold — included to complete the portfolio, but flagged individually so you know they didn't clear ` +
+          `that bar.`
+        : ''
+    }`;
 
   const p3 =
     `As always, values-based investing involves judgment calls, and the data underlying some of these criteria — ` +
