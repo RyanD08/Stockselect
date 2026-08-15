@@ -21,6 +21,18 @@ import re
 # listings. Strip a leading "<code> - " segment before matching.
 _LEADING_CODE_RE = re.compile(r"^[A-Za-z0-9]{4,}\s*-\s*")
 
+# SEC EDGAR appends a trailing state/country-of-incorporation disambiguator
+# to registrant names -- "BANK OF AMERICA CORP /DE/", "COSTCO WHOLESALE CORP
+# /NEW", "CHARTER COMMUNICATIONS, INC. /MO/" -- to tell apart re-incorporated
+# or successor entities sharing a base name. It's a pure SEC-filing artifact:
+# no other data source would ever include it, so left in place it makes the
+# matcher require a suffix real records will never have, guaranteeing zero
+# matches (confirmed on 126+ companies in the dataset, including some very
+# large ones -- BAC, WFC, COST, AMAT, CHTR, AMT, ANF). Must run on the raw
+# string, before general punctuation stripping turns "/DE/" into "DE" and
+# loses the slash markers that identify it as this specific pattern.
+_SEC_STATE_SUFFIX_RE = re.compile(r"\s*/[A-Za-z]{2,3}/?$")
+
 _PUNCT_RE = re.compile(r"[.,'\"()\[\]/&]")
 _WS_RE = re.compile(r"\s+")
 
@@ -45,6 +57,7 @@ def normalize_name(name):
     if not name:
         return ""
     name = _LEADING_CODE_RE.sub("", name)
+    name = _SEC_STATE_SUFFIX_RE.sub("", name)
     name = _PUNCT_RE.sub(" ", name)
     name = _WS_RE.sub(" ", name).strip().upper()
     words = [_SUFFIX_CANONICAL.get(w, w) for w in name.split(" ")]
