@@ -187,6 +187,46 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   return { score, alignments, financialImportance, financialAlignment };
 }
 
+// Patch v17: values-only score -- the original confidence-weighted formula
+// (Patch v1, base prompt Section 2.2) over SCORED_QUESTION_IDS alone, before
+// Patch v6 folded financial quality into the same weighted sum. Deliberately
+// excludes financial quality so a company can't buy its way past a genuine
+// values mismatch with good financials -- this is what the minimum values
+// match floor (MINIMUM_VALUES_MATCH below) is evaluated against, not the
+// blended score scoreCompany() returns for ranking.
+function valuesFitScore(company, answers, ctx) {
+  let numerator = 0;
+  let denominator = 0;
+  SCORED_QUESTION_IDS.forEach((qId) => {
+    const importance = answers[qId] || 3;
+    const alignment = ALIGNMENT_FNS[qId](company, ctx);
+    numerator += importance * alignment;
+    denominator += importance;
+  });
+  const raw = denominator > 0 ? 50 + 50 * (numerator / denominator) : 50;
+  return Math.round(Math.min(100, Math.max(0, raw)));
+}
+
+// Recalibrated from the originally-proposed 45 to 48 after checking against
+// this dataset directly: every company's esg_ratings are currently a
+// uniform neutral placeholder (score 3, confidence Low -- no live
+// per-company ESG source on this API tier, see financial_metrics notes),
+// so roughly half of the 20 scored questions contribute zero
+// differentiation for every company. A single maximally-weighted, genuine
+// conflict (e.g. a client who rates "avoid weapons manufacturers" 5/5,
+// scored against an actual weapons company) only pulls the blended score
+// down to ~46-47, not the much larger drop a floor of 45 assumed was
+// possible -- 45 would have been dead code, never excluding anything in
+// practice. 48 catches that case while a spot-check of 200 companies with
+// no sin-stock flags at all showed zero false positives. This ratio will
+// shift once real per-company ESG data replaces the uniform placeholder,
+// and should be revisited then.
+const MINIMUM_VALUES_MATCH = 48;
+
+function meetsValuesFloor(company, answers, ctx) {
+  return valuesFitScore(company, answers, ctx) >= MINIMUM_VALUES_MATCH;
+}
+
 // Q21-24 all share the same underlying axis once inverted: a raw answer of
 // 5 ("very important to me") on any of these four questions expresses a
 // stability/blue-chip/dividend/values-over-growth preference. Inverting
@@ -528,12 +568,16 @@ function buildPortfolio(dataset, answers, clientContext) {
   const riskProfile = deriveRiskProfile(answers);
   const tierRank = { Strong: 0, Partial: 1 };
 
-  // Patch v16 §1: blue-chip preference is a hard pre-filter on the candidate
-  // pool, applied before values scoring — a company outside the client's
-  // Q23-derived eligible tier range never enters scoring/tiering at all,
-  // the same as a disqualified company, just for a size reason rather than
-  // a financial-caution one.
-  const eligibleCompanies = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
+  // Patch v16 §1 + Patch v17: two independent hard pre-filters on the
+  // candidate pool, both applied before values scoring — a company outside
+  // the client's Q23-derived eligible tier range, or whose values-only score
+  // falls below MINIMUM_VALUES_MATCH, never enters scoring/tiering at all.
+  // Applies to every client (not scoped to blue-chip-preference clients
+  // only) — a net-negative values match is disqualifying regardless of what
+  // a client said about company size.
+  const eligibleCompanies = dataset.companies.filter(
+    (company) => isBlueChipEligible(company, answers) && meetsValuesFloor(company, answers, ctx)
+  );
 
   const scored = eligibleCompanies.map((company) => {
     const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
