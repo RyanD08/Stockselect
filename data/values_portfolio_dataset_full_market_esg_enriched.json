@@ -765,9 +765,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 5 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -2925,9 +2925,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -6046,8 +6046,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -7325,9 +7325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -8125,9 +8125,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 19 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -9085,9 +9085,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -13165,9 +13165,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 5 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 12 violation(s) across 8 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -13405,9 +13405,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -15566,8 +15566,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 20 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -17085,9 +17085,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -18366,8 +18366,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -20765,9 +20765,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 9 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -21405,9 +21405,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 16 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 7 violation(s) across 9 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -23325,9 +23325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -23405,9 +23405,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 66 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "OSHA establishment search: 27 violation(s) across 14 matched inspection(s) in the past 5 years; NLRB case search: 2 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -23885,9 +23885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -25565,9 +25565,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 19 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -26045,9 +26045,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 11 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -26446,8 +26446,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -27085,9 +27085,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -29005,9 +29005,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 12 violation(s) across 20 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -29805,9 +29805,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 28 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -31085,9 +31085,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 69 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -32046,8 +32046,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 4 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -37005,9 +37005,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 10 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -39565,9 +39565,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -41805,9 +41805,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 11 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 6 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -41885,9 +41885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 16 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -42285,9 +42285,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -43405,9 +43405,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -45165,9 +45165,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 25 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -45965,9 +45965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 4 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -48125,9 +48125,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -49165,9 +49165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -50445,9 +50445,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -51885,9 +51885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 353 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 10 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -52365,9 +52365,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 5 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -53965,9 +53965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -54525,9 +54525,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 9 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -55165,9 +55165,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 17 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 4 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -55245,9 +55245,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -55485,9 +55485,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 9 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 4 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -57245,9 +57245,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -57406,8 +57406,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 7 violation(s) across 10 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -58365,9 +58365,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -60206,8 +60206,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 19 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -62045,9 +62045,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 22 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -63485,9 +63485,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 50 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 8 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -67485,9 +67485,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 78 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 14 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -71245,9 +71245,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 21 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -72925,9 +72925,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -73965,9 +73965,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 22 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -75405,9 +75405,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 34 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 20 violation(s) across 20 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -75805,9 +75805,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -75885,9 +75885,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -77645,9 +77645,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 22 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -79965,9 +79965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -81485,9 +81485,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -82045,9 +82045,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 10 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -82125,9 +82125,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -85326,8 +85326,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 6 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -86126,8 +86126,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 8 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -91565,9 +91565,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 22 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -94205,9 +94205,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -98285,9 +98285,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -98845,9 +98845,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -99245,9 +99245,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -100045,9 +100045,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 6 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "OSHA establishment search: 14 violation(s) across 8 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -101565,9 +101565,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -102205,9 +102205,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -102606,8 +102606,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "High",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years; NLRB case search: 9 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -103245,9 +103245,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 4 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -103565,9 +103565,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -103965,9 +103965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -104125,9 +104125,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -107165,9 +107165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -107805,9 +107805,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 12 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -108525,9 +108525,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -111085,9 +111085,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -113085,9 +113085,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -113485,9 +113485,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -114205,9 +114205,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -115645,9 +115645,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 51 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -118925,9 +118925,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 55 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 18 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -119085,9 +119085,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 26 violation(s) across 6 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -119165,9 +119165,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 6 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -119646,8 +119646,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 20 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -123245,9 +123245,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -123965,9 +123965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 7 violation(s) across 4 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -126285,9 +126285,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -126365,9 +126365,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -126685,9 +126685,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 23 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -126925,9 +126925,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -127965,9 +127965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -128365,9 +128365,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "OSHA establishment search: 4 violation(s) across 1 matched inspection(s) in the past 5 years; NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -130525,9 +130525,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -131326,8 +131326,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -131885,9 +131885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 3 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 4 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -132605,9 +132605,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 5 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -133646,8 +133646,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "NLRB case search: 1 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -135325,9 +135325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -136285,9 +136285,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -136605,9 +136605,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 3 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -136685,9 +136685,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 9 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 8 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -136920,14 +136920,14 @@
       "animal_testing_exposure": "Low (sector-level estimate) - sector does not typically require animal testing; no verified per-company data source available at this scale",
       "esg_ratings": {
         "environmental": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "High",
+          "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -137245,9 +137245,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 609 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -141085,9 +141085,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 3 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -141165,9 +141165,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 4 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -143006,8 +143006,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 4 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -146445,9 +146445,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 26 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -147885,9 +147885,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -149725,9 +149725,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 14 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -149965,9 +149965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -150045,9 +150045,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -150285,9 +150285,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 34 violation(s) across 20 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -151725,9 +151725,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -152365,9 +152365,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -154365,9 +154365,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 15 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -154765,9 +154765,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -155485,9 +155485,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 11 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -157005,9 +157005,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 12 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -158205,9 +158205,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 40 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -159965,9 +159965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -162285,9 +162285,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 10 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -162845,9 +162845,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -164365,9 +164365,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 16 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 4 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -165005,9 +165005,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -165645,9 +165645,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -167645,9 +167645,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -168845,9 +168845,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -170685,9 +170685,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 4 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -171325,9 +171325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 6 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -173245,9 +173245,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -173485,9 +173485,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -175725,9 +175725,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 10 violation(s) across 7 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -176205,9 +176205,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 37 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -177165,9 +177165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -178045,9 +178045,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -178125,9 +178125,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -180365,9 +180365,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "NLRB case search: 0 unfair-labor-practice charge(s) filed against this employer in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -180525,9 +180525,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 46 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 16 violation(s) across 5 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -182525,9 +182525,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -182765,9 +182765,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -183165,9 +183165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -184685,9 +184685,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -187725,9 +187725,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -189485,9 +189485,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -190205,9 +190205,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -192525,9 +192525,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -193885,9 +193885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 3 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -194365,9 +194365,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -194525,9 +194525,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -195965,9 +195965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -196605,9 +196605,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance on record. Based on 4 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 5 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -196845,9 +196845,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -197325,9 +197325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -199085,9 +199085,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 13 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -200285,9 +200285,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 8 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -201805,9 +201805,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 14 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 6 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -202765,9 +202765,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 21 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 7 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -203165,9 +203165,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -203885,9 +203885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 10 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 16 violation(s) across 13 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -203965,9 +203965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -205085,9 +205085,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -205485,9 +205485,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -205885,9 +205885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 1 EPA-regulated facility matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -207885,9 +207885,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 100 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -209325,9 +209325,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -210845,9 +210845,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 1775 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 12 violation(s) across 19 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -214365,9 +214365,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: a recent formal enforcement action. Based on 21 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -214766,8 +214766,8 @@
         },
         "social_labor": {
           "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 1 violation(s) across 3 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -216845,9 +216845,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: no violations or enforcement actions found. Based on 7 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 3 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -217965,9 +217965,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 2 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -223085,9 +223085,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: significant noncompliance with a recent formal enforcement action. Based on 36 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 1,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 9 violation(s) across 9 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -223645,9 +223645,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 2,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 2 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -224125,9 +224125,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -225245,9 +225245,9 @@
           "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
@@ -228605,9 +228605,9 @@
           "note": "EPA ECHO enforcement history, past 5 years: some quarters of noncompliance on record. Based on 19 EPA-regulated facilities matched to this company's SEC-registered legal name (echodata.epa.gov); facilities registered under a differently-named subsidiary are not captured."
         },
         "social_labor": {
-          "score": 3,
-          "confidence": "Low",
-          "note": "No live per-company ESG data source is available on this Finnhub API tier (the /stock/esg endpoint requires a premium plan) and no paid ESG vendor is in use. Neutral placeholder pending a licensed ESG data feed -- not a verified rating."
+          "score": 4,
+          "confidence": "Medium",
+          "note": "OSHA establishment search: 0 violation(s) across 1 matched inspection(s) in the past 5 years. Based on records matched to this company's SEC-registered legal name; records filed under a differently-named subsidiary are not captured."
         },
         "governance": {
           "score": 3,
