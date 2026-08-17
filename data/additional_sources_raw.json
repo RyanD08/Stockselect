@@ -1,0 +1,1854 @@
+{
+  "meta": {
+    "snapshot_date": "2026-08-17",
+    "companies_processed": 20,
+    "total_requested": 497,
+    "errors": []
+  },
+  "additional_data": {
+    "A": {
+      "ticker": "A",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 56.44
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 44.8
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 35.82
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 30.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='A', company_id=C_BriMJ43T, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Agilent Technologies",
+        "url": "https://en.wikipedia.org/wiki/Agilent_Technologies",
+        "summary_extract": "Agilent Technologies, Inc. is an American global company headquartered in Santa Clara, California, that provides instruments, software, services, and consumables for laboratories. Agilent was established in 1999 as a spin-off from Hewlett-Packard. The resulting initial public offering of Agilent stock was the largest in the history of Silicon Valley at the time.",
+        "infobox_fields": {
+          "type": "Public",
+          "hq_location": "Santa Clara, California, U.S.",
+          "key_people": "Padraig McDonnell (CEO), Koh Boon Hwee (chairman)",
+          "num_employees": "18,100",
+          "num_employees_year": "2025"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 25,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 2
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 8
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 4
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 4
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 24
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AAPL": {
+      "ticker": "AAPL",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 52.35
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 25.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 44.78
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AAPL', company_id=C_R73pwziC, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Apple Inc.",
+        "url": "https://en.wikipedia.org/wiki/Apple_Inc.",
+        "summary_extract": "Apple Inc. is an American multinational technology company headquartered in Cupertino, California, in Silicon Valley, and known for consumer electronics, software and online services. Founded in 1976 as the Apple Computer Company by Steve Jobs, Steve Wozniak and Ronald Wayne, the company was incorporated by Jobs and Wozniak as Apple Computer, Inc. the following year. Its current name was adopted in 2007 as the company expanded its focus from computers to consumer electronics. Apple is one of the Big Tech companies.",
+        "infobox_fields": {
+          "type": "Public",
+          "traded_as": "Nasdaq-100 component , DJIA component , S&P 100 component , S&P 500 component",
+          "founded": "1976-04-01, in Los Altos, California, US",
+          "founders": "Steve Jobs , Steve Wozniak , Ronald Wayne",
+          "hq_location": "Apple Park",
+          "hq_location_city": "Cupertino, California",
+          "hq_location_country": "US",
+          "key_people": "Arthur Levinson (chairman) , Tim Cook (CEO) , John Ternus (CEO-designate, starting September 2026)",
+          "num_employees": "166,000",
+          "num_employees_year": "2025",
+          "subsidiaries": "Apple Studios , Beats Electronics , Beddit , Braeburn Capital , Claris , Globalstar (20%)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "533 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 533,
+        "median_employee_total_comp_usd": 139483,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/320193/000130817926000008/aapl014016-def14a.htm",
+        "filing_date": "2026-01-08",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-01-08, https://www.sec.gov/Archives/edgar/data/320193/000130817926000008/aapl014016-def14a.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 20,
+        "item_counts": {
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 7
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 1
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 11
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ABBV": {
+      "ticker": "ABBV",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 62.91
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 25.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 26.87
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ABBV', company_id=C_jlb4YCFP, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "AbbVie",
+        "url": "https://en.wikipedia.org/wiki/AbbVie",
+        "summary_extract": "AbbVie Inc., also known as AbbVie, is an American pharmaceutical company headquartered in North Chicago, Illinois. AbbVie produces drugs to treat a wide range of medical issues.",
+        "infobox_fields": {
+          "type": "Public",
+          "hq_location": "North Chicago, Illinois, United States",
+          "num_employees": "57,000 (2025)",
+          "parent": "divisions ="
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 30,
+        "item_counts": {
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 16
+          },
+          "2.06": {
+            "label": "Material Impairments",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 3
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 6
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 25
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": true,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ABNB": {
+      "ticker": "ABNB",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 57.68
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 15.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 31.34
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ABNB', company_id=C_uuK5RHzY, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Airbnb",
+        "url": "https://en.wikipedia.org/wiki/Airbnb",
+        "summary_extract": "Airbnb, Inc. is an American company operating an online marketplace for short-and-long-term homestays, experiences and services in various countries and regions. It acts as a broker and charges a commission from each booking. Airbnb was founded in 2008 by Brian Chesky, Nathan Blecharczyk, and Joe Gebbia.",
+        "infobox_fields": {
+          "type": "Public",
+          "founded": "in San Francisco, California, U.S.",
+          "key_people": "Brian Chesky (CEO), Nathan Blecharczyk (CSO)",
+          "subsidiaries": "Plain list, * Luxury Retreats International Inc. * Tilt.com * Accomable * Aibiying * Trooly, Inc. * Deco Software Inc. * Trip4real Experiences, S.L. * Larson8, Inc. * MarketLog, Randorphire Inc. * HotelTonight",
+          "num_employees": "8,200 (2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 12,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 1
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 1
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 9
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ABT": {
+      "ticker": "ABT",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 57.52
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 35.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 22.39
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ABT', company_id=C_6anF7Rs8, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Abbott Laboratories",
+        "url": "https://en.wikipedia.org/wiki/Abbott_Laboratories",
+        "summary_extract": "Abbott Laboratories, commonly known as Abbott, is an American multinational medical devices and health care company founded in Chicago with headquarters in Abbott Park, Illinois. The company produces pharmaceuticals for sale outside the United States, diagnostic products, nutritional products, and medical devices.",
+        "infobox_fields": {
+          "type": "Public",
+          "founded": "(as Abbott Alkaloidal Company) in Ravenswood, Chicago",
+          "founder": "Wallace Calvin Abbott",
+          "hq_location": "Abbott Park, Illinois, U.S.",
+          "num_employees": "(2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "166 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 166,
+        "median_employee_total_comp_usd": 145528,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/1800/000130817926000064/abt-20260311.htm",
+        "filing_date": "2026-03-13",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-03-13, https://www.sec.gov/Archives/edgar/data/1800/000130817926000064/abt-20260311.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 20,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 3
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 4
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "5.04": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 3
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 17
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ACGL": {
+      "ticker": "ACGL",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 60.18
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 7.5
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 17.91
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ACGL', company_id=C_ZSYwGfnU, dataset version 209, last updated 2026-07-22T01:49:26.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "status": "No verifiable data found",
+        "reason": "HTTP 429"
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 30,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 4
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 7
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 4
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 15
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 24
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ACN": {
+      "ticker": "ACN",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 66.83
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 41.9
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 34.33
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ACN', company_id=C_CjDSBVAT, dataset version 209, last updated 2026-07-22T01:49:29.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Accenture",
+        "url": "https://en.wikipedia.org/wiki/Accenture",
+        "summary_extract": "Accenture plc is an Irish domiciled technology consulting company headquartered in Dublin, Ireland for tax purposes. Founded in 1989 in the United States, Accenture provides information technology and management consulting services across 120 countries globally.",
+        "infobox_fields": {
+          "type": "Public limited company",
+          "founder": "former_name = Andersen Consulting (1989\u20132000)",
+          "hq_location_city": "Dublin",
+          "hq_location_country": "Ireland",
+          "key_people": "Julie Sweet (chair and CEO)",
+          "subsidiaries": "Avanade, Droga5, Udacity, TalentSprint, Faculty, Ookla"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "1304 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 1304,
+        "median_employee_total_comp_usd": 64379,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/1467373/000130817925000651/acn-20251210.htm",
+        "filing_date": "2025-12-12",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2025-12-12, https://www.sec.gov/Archives/edgar/data/1467373/000130817925000651/acn-20251210.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 18,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 1
+          },
+          "1.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 2
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 6
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 17
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ADBE": {
+      "ticker": "ADBE",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 59.0
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 44.4
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 32.84
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ADBE', company_id=C_PGvPMRhC, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Adobe Inc.",
+        "url": "https://en.wikipedia.org/wiki/Adobe_Inc.",
+        "summary_extract": "Adobe Inc., formerly Adobe Systems Incorporated, is an American multinational computer software company based in San Jose, California. It offers a wide range of programs from web design tools, photo manipulation, and vector creation to video and audio editing, mobile app development, print layout and animation software.",
+        "infobox_fields": {
+          "type": "Public",
+          "traded_as": "Nasdaq-100 component, S&P 100 component, S&P 500 component",
+          "key_people": "Shantanu Narayen(chairman & CEO)",
+          "founders": "John Warnock, Charles Geschke",
+          "hq_location": "Adobe World Headquarters",
+          "hq_location_city": "San Jose, California",
+          "hq_location_country": "U.S.",
+          "num_employees": "31,360 (November 2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "217 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 217,
+        "median_employee_total_comp_usd": 235989,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/796343/000079634326000043/adbe-20260227.htm",
+        "filing_date": "2026-02-27",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-02-27, https://www.sec.gov/Archives/edgar/data/796343/000079634326000043/adbe-20260227.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 14,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 1
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 7
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 1
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 13
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ADI": {
+      "ticker": "ADI",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 50.94
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 25.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 16.42
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 95.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ADI', company_id=C_HxugKyeI, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Analog Devices",
+        "url": "https://en.wikipedia.org/wiki/Analog_Devices",
+        "summary_extract": "Analog Devices, Inc. (ADI), also known simply as Analog, is an American multinational semiconductor company specializing in data conversion, signal processing, and power management technology, headquartered in Wilmington, Massachusetts.",
+        "infobox_fields": {
+          "type": "Public",
+          "founded": "in Cambridge, Massachusetts, U.S.",
+          "key_people": "Vincent Roche (chairman and CEO)",
+          "num_employees": "24,500 (2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 23,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 3
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 6
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 6
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 3
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 18
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ADM": {
+      "ticker": "ADM",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 52.06
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 35.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 17.91
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 55.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ADM', company_id=C_K3chBb5g, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Archer Daniels Midland",
+        "url": "https://en.wikipedia.org/wiki/Archer_Daniels_Midland",
+        "summary_extract": "The Archer-Daniels-Midland Company, commonly known as ADM, is an American multinational food processing and commodities trading corporation founded in 1902 and headquartered in Chicago, Illinois. The company operates more than 270 plants and 420 crop procurement facilities worldwide, where cereal grains and oilseeds are processed into products used in food, beverage, nutraceutical, industrial, and animal feed markets worldwide.",
+        "infobox_fields": {},
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "280 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 280,
+        "median_employee_total_comp_usd": 85460,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/7084/000119312526126218/d911479ddef14a.htm",
+        "filing_date": "2026-03-26",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-03-26, https://www.sec.gov/Archives/edgar/data/7084/000119312526126218/d911479ddef14a.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 21,
+        "item_counts": {
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 9
+          },
+          "4.02": {
+            "label": "Non-Reliance on Previously Issued Financial Statements (Restatement)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 6
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 6
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 1
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 17
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": true,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ADP": {
+      "ticker": "ADP",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 57.58
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 25.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 32.84
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 80.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ADP', company_id=C_buOGs36p, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "ADP (company)",
+        "url": "https://en.wikipedia.org/wiki/ADP_(company)",
+        "summary_extract": "Automatic Data Processing, Inc. (ADP) is an American multinational provider of cloud-based human resources management, payroll processing, and professional employer organization (PEO) services, headquartered in Roseland, New Jersey.",
+        "infobox_fields": {
+          "type": "Public",
+          "founded": "(as Automatic Payrolls, Inc.) Paterson, New Jersey, U.S.",
+          "founder": "Henry Taub",
+          "hq_location": "Roseland, New Jersey, U.S.",
+          "key_people": "Maria Black (CEO) , Joe DeSilva (COO) , Samantha Orihuela (CMO) , Peter Hadley (CFO)",
+          "num_employees": "(2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "284 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 284,
+        "median_employee_total_comp_usd": null,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/8670/000130817925000607/adp014341-def14a.htm",
+        "filing_date": "2025-09-25",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2025-09-25, https://www.sec.gov/Archives/edgar/data/8670/000130817925000607/adp014341-def14a.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 18,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 5
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 2
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 3
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 15
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "ADSK": {
+      "ticker": "ADSK",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 65.58
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 54.8
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 44.78
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='ADSK', company_id=C_1QOSAETf, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Autodesk",
+        "url": "https://en.wikipedia.org/wiki/Autodesk",
+        "summary_extract": "Autodesk, Inc. is an American multinational software corporation that provides software products and services for the architecture, engineering, construction, manufacturing, media, education, and entertainment industries. Autodesk is headquartered in San Francisco, California, and has offices worldwide. Its U.S. offices are located in the states of California, Oregon, Colorado, Texas, Michigan, New Hampshire and Massachusetts. Its Canadian offices are located in the provinces of Ontario, Quebec, Alberta, and British Columbia.",
+        "infobox_fields": {
+          "type": "Public",
+          "founded": "1982-1-30, in Mill Valley, California, U.S.",
+          "founders": "John Walker, Dan Drake",
+          "hq_location": "One Market Plaza",
+          "num_employees": "14,300 (2026)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 23,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 5
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "2.05": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 9
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 12
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 4
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 20
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AEE": {
+      "ticker": "AEE",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [
+          "Oil/gas industry",
+          "Fossil-fired utility"
+        ],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": -1000.0
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": -1000.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": -1000.0
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": -1000.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AEE', company_id=C_fYiwszqO, dataset version 209, last updated 2026-07-22T01:49:36.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Ameren",
+        "url": "https://en.wikipedia.org/wiki/Ameren",
+        "summary_extract": "Ameren Corporation is an American power company created December 31, 1997, by the merger of Union Electric Company of St. Louis, Missouri and the neighboring Central Illinois Public Service Company of Springfield, Illinois. It is now a holding company for several power companies and energy companies. The company is based in St. Louis, with 2.4 million electric, and 900,000 natural gas customers across 64,000 square miles in central and eastern Missouri and the southern four-fifths of Illinois by area.",
+        "infobox_fields": {
+          "type": "Public",
+          "hq_location": "St. Louis, Missouri, U.S.",
+          "key_people": "ubl , Martin J. Lyons, Jr. (chairman, president & CEO) , Mark C. Birk (Ameren Missouri chairman & president) , Leonard \"Lenny\" Singh (Ameren Illinois chairman & president) , Michael L. Moehn (Ameren Services chairman & president) , Shawn E. Schukar (Ameren Transmission chairman & president)",
+          "num_employees": "8,913",
+          "num_employees_year": "2025"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 34,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 2
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 8
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 23
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 24
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AEP": {
+      "ticker": "AEP",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [
+          "Coal industry",
+          "Oil/gas industry",
+          "Macroclimate 50",
+          "Fossil-fired utility"
+        ],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 62.91
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 49.2
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 32.84
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 90.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AEP', company_id=C_HGUpCCMe, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "status": "No verifiable data found",
+        "reason": "HTTP 429"
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "No CIK found in SEC company_tickers.json for this ticker"
+      },
+      "recent_8k_activity": {
+        "status": "No verifiable data found",
+        "reason": "No CIK found in SEC company_tickers.json for this ticker"
+      }
+    },
+    "AES": {
+      "ticker": "AES",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [
+          "Coal industry",
+          "Oil/gas industry",
+          "Fossil-fired utility"
+        ],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 49.62
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 27.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 1.49
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AES', company_id=C_UbDNKIYg, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "AES Corporation",
+        "url": "https://en.wikipedia.org/wiki/AES_Corporation",
+        "summary_extract": "The AES Corporation is an American utility and power generation company. It owns and operates power plants, which it uses to generate and sell electricity to end users and intermediaries like utilities and industrial facilities. AES, headquartered in Arlington, Virginia, is one of the world's leading power companies, generating and distributing electric power in 15 countries and employing 10,500 people worldwide. AES Corporation is a global Fortune 500 power company.",
+        "infobox_fields": {
+          "type": "Public",
+          "hq_location": "Arlington, Virginia, U.S.",
+          "key_people": "Jay Morse (chairman)Andres Gluski (president & CEO)",
+          "num_employees": "8,336 (2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "120 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 120,
+        "median_employee_total_comp_usd": 76082,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/874761/000087476126000070/aes-20260320.htm",
+        "filing_date": "2026-03-20",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-03-20, https://www.sec.gov/Archives/edgar/data/874761/000087476126000070/aes-20260320.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 23,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 7
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 5
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "2.06": {
+            "label": "Material Impairments",
+            "count": 1
+          },
+          "4.01": {
+            "label": "Changes in Registrant's Certifying Accountant",
+            "count": 1
+          },
+          "4.02": {
+            "label": "Non-Reliance on Previously Issued Financial Statements (Restatement)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 3
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 3
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 4
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 16
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": true,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AFL": {
+      "ticker": "AFL",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 48.03
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 22.85
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 19.4
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 50.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AFL', company_id=C_SSny0KC0, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Aflac",
+        "url": "https://en.wikipedia.org/wiki/Aflac",
+        "summary_extract": "Aflac Incorporated is an American insurance company and is the largest provider of supplemental insurance in the United States. It was founded in 1955 and is based in Columbus, Georgia. In the U.S., it underwrites a wide range of insurance policies, but is perhaps more known for its payroll deduction insurance coverage, which pays cash benefits when a policyholder has a covered accident or illness. The company states it \"provides financial protection to more than 50 million people worldwide\".",
+        "infobox_fields": {
+          "type": "Public",
+          "key_people": "Dan Amos (chairman, CEO), Max Broden (CFO)",
+          "num_employees": "12,694 (2024)",
+          "founded": "(as American Family Life Insurance Company of Columbus)",
+          "hq_location": "Columbus, Georgia, U.S."
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 16,
+        "item_counts": {
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 4
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 5
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 11
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AIG": {
+      "ticker": "AIG",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 57.52
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 33.8
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 17.91
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 90.0
+          },
+          "fossil_insure_score": {
+            "label": "Fossil insurance score",
+            "value": 8.4
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AIG', company_id=C_HFdkaXlU, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "American International Group",
+        "url": "https://en.wikipedia.org/wiki/American_International_Group",
+        "summary_extract": "American International Group, Inc. (AIG) is an American multinational finance and insurance corporation with operations in more than 200 countries and jurisdictions. As of 2023, AIG employed 25,200 people. The company primarily provides commercial and personal insurance products, including property and casualty insurance, liability coverage, accident and health insurance, and specialty insurance products. The company also provides risk management, multinational, and related insurance services to businesses and individuals. AIG is the title sponsor of the AIG Women's Open golf tournament. In 2023, for the sixth consecutive year, DiversityInc named AIG among the Top 50 Companies for Diversity list.",
+        "infobox_fields": {
+          "type": "Public",
+          "founded": "in Shanghai, China",
+          "founder": "Cornelius Vander Starr",
+          "hq_location_city": "New York City, New York",
+          "hq_location_country": "U.S.",
+          "key_people": "Eric Andersen (President and CEO) , Peter Zaffino (executive chair)",
+          "num_employees": "22,100 (2025)",
+          "subsidiaries": "TATA AIG"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 33,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 1
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 11
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 19
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 26
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AIZ": {
+      "ticker": "AIZ",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 54.91
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 29.4
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 26.87
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AIZ', company_id=C_mmpIbygj, dataset version 209, last updated 2026-07-22T01:49:32.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Assurant",
+        "url": "https://en.wikipedia.org/wiki/Assurant",
+        "summary_extract": "Assurant, Inc. is a global provider of risk management products and services with headquarters in Atlanta. Its businesses provide a diverse set of specialty, niche-market insurance products in the property, casualty, extended device protection, and preneed insurance sectors. The company's main operating segments are Global Housing and Global Lifestyle.",
+        "infobox_fields": {},
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "268 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 268,
+        "median_employee_total_comp_usd": 56767,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/1267238/000126723826000018/aiz-20260406.htm",
+        "filing_date": "2026-04-06",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-04-06, https://www.sec.gov/Archives/edgar/data/1267238/000126723826000018/aiz-20260406.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 18,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 2
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 10
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 5
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 1
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 18
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AJG": {
+      "ticker": "AJG",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 46.85
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 25.0
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 23.88
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 100.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AJG', company_id=C_TWpPeboR, dataset version 209, last updated 2026-07-22T01:49:33.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Arthur J. Gallagher & Co.",
+        "url": "https://en.wikipedia.org/wiki/Arthur_J._Gallagher_%26_Co.",
+        "summary_extract": "Arthur J. Gallagher & Co. (Gallagher) is an American insurance brokerage and risk management services company based in Rolling Meadows, Illinois, a suburb of Chicago. The company provides insurance brokerage services and risk management services, the latter of which primarily includes the processing of workers compensation and automobile insurance claims through the company's adjusters.",
+        "infobox_fields": {
+          "type": "Public",
+          "traded_as": "class=nowrap, , S&P 500 component",
+          "founded": "in Itasca, Illinois, U.S.",
+          "founder": "Arthur J. Gallagher",
+          "hq_location_city": "Rolling Meadows, Illinois",
+          "hq_location_country": "U.S.",
+          "key_people": "J. Patrick Gallagher, Jr. (Chairman & CEO), Thomas J. Gallagher (President), Patrick M. Gallagher (COO)",
+          "num_employees": "72,000",
+          "num_employees_year": "2025"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "status": "No verifiable data found",
+        "reason": "no CEO pay ratio disclosure found in this filing's text (may be an image/table, non-standard phrasing, or a smaller reporting company exempt from the rule)"
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 24,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 2
+          },
+          "2.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 1
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 1
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 17
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 4
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 12
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    },
+    "AKAM": {
+      "ticker": "AKAM",
+      "as_of": "2026-08-17",
+      "fossil_fuel_screen": {
+        "involved": true,
+        "matched_categories": [],
+        "diversity_equity_scores": {
+          "gef_score": {
+            "label": "Gender equality score",
+            "value": 54.97
+          },
+          "dei_score": {
+            "label": "Diversity disclosures score",
+            "value": 51.4
+          },
+          "rji_score": {
+            "label": "Racial justice score",
+            "value": 37.31
+          },
+          "hrc_score": {
+            "label": "LGBTQ+ equity score",
+            "value": 80.0
+          }
+        },
+        "confidence": "High",
+        "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, matched primary_symbol='AKAM', company_id=C_nmKqwtJu, dataset version 209, last updated 2026-07-22T01:49:31.000Z",
+        "note": "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag (fails their fossil-free screen). matched_categories lists which of their specific coal/oil-gas/utility/reserve-holder lists this company appears on, if any -- an empty list with involved=true means it fails the overall screen via a category not itemized on the public site. diversity_equity_scores are separate As You Sow-published scores (0-100 scale, higher = better) bundled in the same API response; not fossil-fuel-related but collected here since they're attributable to this same verified source and could inform new criteria."
+      },
+      "wikipedia_profile": {
+        "wikipedia_title": "Akamai Technologies",
+        "url": "https://en.wikipedia.org/wiki/Akamai_Technologies",
+        "summary_extract": "Akamai Technologies, Inc. is an American company specializing in content delivery network (CDN), cybersecurity, DDoS mitigation, and cloud services. It is headquartered in Cambridge, Massachusetts.",
+        "infobox_fields": {
+          "type": "Public",
+          "num_employees": "11,000 (2025)"
+        },
+        "confidence": "Low",
+        "note": "Raw Wikipedia infobox/summary data, cited to the exact article title and URL above (fetched via en.wikipedia.org). Per this project's sourcing rules, Wikipedia is treated as a lead requiring verification against a primary source (SEC filing, company site), not a final source -- especially for founder/family-ownership and controversy claims. No boolean (e.g. founder_led) is auto-derived from this text; a human reviewer should read infobox_fields.founders/key_people/type against the current SEC-registered leadership before treating anything here as verified."
+      },
+      "ceo_pay_ratio": {
+        "ceo_to_median_employee_pay_ratio": "124 to 1",
+        "ceo_to_median_employee_pay_ratio_numeric": 124,
+        "median_employee_total_comp_usd": 129052,
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/1086222/000108622226000042/akam-20260330.htm",
+        "filing_date": "2026-03-31",
+        "confidence": "High",
+        "source": "SEC EDGAR DEF 14A proxy statement filed 2026-03-31, https://www.sec.gov/Archives/edgar/data/1086222/000108622226000042/akam-20260330.htm (Item 402(u) CEO pay ratio disclosure)",
+        "note": "Extracted by regex from the filing's Item 402(u) pay-ratio narrative text. Companies may use different, SEC-permitted methodologies/estimates/exclusions when computing the median employee, so this figure is not directly comparable year-over-year or company-to-company without reading each filing's stated methodology."
+      },
+      "recent_8k_activity": {
+        "lookback_years": 2,
+        "total_8k_filings": 25,
+        "item_counts": {
+          "1.01": {
+            "label": "Entry into a Material Definitive Agreement",
+            "count": 5
+          },
+          "2.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 8
+          },
+          "2.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 5
+          },
+          "3.02": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.02": {
+            "label": "Departure/Election of Directors or Officers",
+            "count": 5
+          },
+          "5.03": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "5.07": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 2
+          },
+          "7.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 5
+          },
+          "8.01": {
+            "label": "Other Events",
+            "count": 7
+          },
+          "9.01": {
+            "label": "(see SEC Form 8-K item taxonomy)",
+            "count": 22
+          }
+        },
+        "bankruptcy_restatement_impairment_flag": false,
+        "confidence": "High",
+        "source": "SEC EDGAR submissions API (data.sec.gov/submissions/CIK...json), form=8-K entries' standardized Item numbers",
+        "note": "item_counts is an objective tally of standardized SEC 8-K item numbers filed in the trailing lookback window, not a text/sentiment analysis of filing content. bankruptcy_restatement_impairment_flag is true only for the three items with an unambiguous negative meaning (1.03 bankruptcy, 2.06 material impairment, 4.02 restatement); a high Item 8.01 ('Other Events') count is NOT flagged since that item is a routine catch-all and reading the underlying filings would be required to say whether any of them relate to litigation."
+      }
+    }
+  }
+}
