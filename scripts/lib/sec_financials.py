@@ -126,16 +126,25 @@ def _single_tag_series(facts, taxonomy, tag, instant=False):
 
 
 def _best_tag_series(facts, tag_pairs, instant=False):
-    """Try each (taxonomy, tag) in priority order; return the series for the
-    FIRST one with any usable annual record, along with which tag it was.
-    Deliberately does not merge records across tags -- a company's revenue
-    growth must compare the same concept year-over-year, not one tag's
-    current year against a different tag's prior year."""
+    """Try every (taxonomy, tag), and return whichever usable series has the
+    most recent annual record. Filers change which XBRL tag they report
+    revenue under over time (e.g. Exxon Mobil tagged annual revenue under
+    RevenueFromContractWithCustomerExcludingAssessedTax through FY2021, then
+    switched to the plain Revenues tag from FY2023 on) -- picking the first
+    tag_pairs entry with *any* usable record, as this used to, gets
+    permanently stuck on a filer's old, discontinued tag once they migrate,
+    silently returning years-stale figures instead of current ones.
+    Deliberately does not merge records *within* a single company's growth
+    calculation across tags -- a company's revenue growth still compares the
+    same concept year-over-year (see _prior_year, which searches only the
+    winning tag's own series), just chosen by recency across tags rather
+    than by tag_pairs priority order."""
+    best_series, best_taxonomy, best_tag = [], None, None
     for taxonomy, tag in tag_pairs:
         series = _single_tag_series(facts, taxonomy, tag, instant=instant)
-        if series:
-            return series, taxonomy, tag
-    return [], None, None
+        if series and (not best_series or series[0]["end"] > best_series[0]["end"]):
+            best_series, best_taxonomy, best_tag = series, taxonomy, tag
+    return best_series, best_taxonomy, best_tag
 
 
 def _latest_with_tag(facts, tag_pairs, instant=False):
