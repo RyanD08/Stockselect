@@ -442,7 +442,7 @@ function renderResults() {
 
       <p class="financial-score-framing-note">
         The Financial Score column compares each company's financial profile to others in this tool's
-        S&P 500 universe of ${state.dataset.companies.length.toLocaleString()} US-listed public companies. A
+        S&P 500 universe. A
         below-average score does not mean the company is a bad investment — it means it ranks lower on these
         specific metrics relative to a strong peer group.
       </p>
