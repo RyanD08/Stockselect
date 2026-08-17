@@ -11,6 +11,7 @@ const state = {
   touchedQuestionIds: new Set(), // questions the client has explicitly tapped an answer for — drives the "answered" highlight
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
   expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
+  simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -440,6 +441,8 @@ function renderResults() {
 
       ${renderSectorChart(holdings)}
 
+      ${renderHistoricalSimulationSection(holdings)}
+
       <p class="financial-score-framing-note">
         The Financial Score column compares each company's financial profile to others in this tool's
         ${state.dataset.companies.length.toLocaleString()}-company universe of US-listed public companies. A
@@ -502,6 +505,14 @@ function renderResults() {
     });
   });
 
+  const simulationToggleBtn = document.getElementById('simulation-toggle-btn');
+  if (simulationToggleBtn) {
+    simulationToggleBtn.addEventListener('click', () => {
+      state.simulationBreakdownExpanded = !state.simulationBreakdownExpanded;
+      renderInPlace();
+    });
+  }
+
   document.getElementById('edit-answers-btn').addEventListener('click', () => {
     state.editOrigin = null;
     state.view = 'review';
@@ -528,6 +539,7 @@ function resetSurveyState() {
   state.tiesSector = '';
   state.timeHorizon = 'long';
   state.expandedFinancialDetails.clear();
+  state.simulationBreakdownExpanded = false;
   state.touchedQuestionIds.clear();
   state.reviewExpanded.clear();
   state.categoryIndex = 0;
@@ -627,6 +639,108 @@ function renderSectorChart(holdings) {
           .join('')}
       </div>
     </div>
+  `;
+}
+
+const SIMULATION_DISCLAIMER_TEXT =
+  "This is a hypothetical, backward-looking simulation only. It applies today's recommended portfolio to last " +
+  "year's actual price history and does not reflect a real investment, future performance, fees, taxes, or the " +
+  'fact that this exact portfolio did not exist a year ago. This is not financial advice.';
+
+function formatUsd(amount) {
+  return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatSignedPct(pct) {
+  const sign = pct >= 0 ? '+' : '';
+  return `${sign}${pct.toFixed(1)}%`;
+}
+
+// Downstream display-only feature: computeHistoricalSimulation() (js/simulation.js)
+// consumes the already-finalized `holdings` list and never feeds back into
+// buildPortfolio()/scoring.js. The disclaimer always renders alongside the hero
+// total, in the same block, regardless of the breakdown table's expand state.
+function renderHistoricalSimulationSection(holdings) {
+  if (holdings.length === 0) return '';
+
+  const sim = computeHistoricalSimulation(holdings);
+  const isGain = sim.totalDollarChange >= 0;
+  const isExpanded = state.simulationBreakdownExpanded;
+  const allIncluded = sim.includedCount === sim.totalCount;
+
+  return `
+    <div class="simulation-section">
+      <h2>$15,000 Historical Simulation</h2>
+      <p class="simulation-hero ${isGain ? 'positive' : 'negative'}">
+        Your $15,000 would be worth ${formatUsd(sim.totalValueToday)} today
+        (${formatSignedPct(sim.totalPctChange * 100)})
+      </p>
+      ${
+        !allIncluded
+          ? `<p class="simulation-coverage-note">Based on ${sim.includedCount} of ${sim.totalCount} companies with complete 12-month pricing data.</p>`
+          : ''
+      }
+      <p class="simulation-disclaimer">${escapeHtml(SIMULATION_DISCLAIMER_TEXT)}</p>
+
+      <button type="button" id="simulation-toggle-btn" class="simulation-toggle-btn" aria-expanded="${isExpanded}">
+        <span class="financial-toggle-chevron ${isExpanded ? 'open' : ''}">${chevronIcon()}</span>
+        See company-by-company breakdown
+      </button>
+
+      ${isExpanded ? renderSimulationBreakdownTable(sim) : ''}
+    </div>
+  `;
+}
+
+function renderSimulationBreakdownTable(sim) {
+  return `
+    <div class="table-wrap simulation-table-wrap">
+      <table class="results-table simulation-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Ticker</th>
+            <th>Amount Invested</th>
+            <th>Value Today</th>
+            <th>% Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sim.rows.map(renderSimulationBreakdownRow).join('')}
+        </tbody>
+        <tfoot>
+          <tr class="simulation-total-row">
+            <td colspan="2" data-label="Total">Total</td>
+            <td data-label="Amount Invested">${formatUsd(sim.perCompanyInvestment * sim.includedCount)}</td>
+            <td data-label="Value Today">${formatUsd(sim.totalValueToday)}</td>
+            <td data-label="% Change">${formatSignedPct(sim.totalPctChange * 100)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  `;
+}
+
+function renderSimulationBreakdownRow(row) {
+  if (!row.included) {
+    return `
+      <tr class="simulation-row-excluded">
+        <td data-label="Company">${escapeHtml(row.name)}</td>
+        <td data-label="Ticker">${escapeHtml(row.ticker)}</td>
+        <td data-label="Status" colspan="3"><span class="simulation-excluded-note">${escapeHtml(row.note)}</span></td>
+      </tr>
+    `;
+  }
+
+  const changeClass = row.pctChange >= 0 ? 'positive' : 'negative';
+  return `
+    <tr>
+      <td data-label="Company">${escapeHtml(row.name)}</td>
+      <td data-label="Ticker">${escapeHtml(row.ticker)}</td>
+      <td data-label="Amount Invested">${formatUsd(row.amountInvested)}</td>
+      <td data-label="Value Today">${formatUsd(row.valueToday)}</td>
+      <td data-label="% Change" class="simulation-pct-${changeClass}">${formatSignedPct(row.pctChange)}</td>
+    </tr>
   `;
 }
 
