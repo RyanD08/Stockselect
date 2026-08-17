@@ -18,12 +18,20 @@ FINNHUB_CACHE_DIR = os.path.join(CACHE_DIR, "finnhub")
 EPA_ECHO_CACHE_DIR = os.path.join(CACHE_DIR, "epa_echo")
 OSHA_CACHE_DIR = os.path.join(CACHE_DIR, "osha")
 NLRB_CACHE_DIR = os.path.join(CACHE_DIR, "nlrb")
+FOSSIL_FREE_FUNDS_CACHE_DIR = os.path.join(CACHE_DIR, "fossil_free_funds")
+WIKIPEDIA_CACHE_DIR = os.path.join(CACHE_DIR, "wikipedia")
+SEC_PROXY_CACHE_DIR = os.path.join(CACHE_DIR, "sec_proxy")
+BLS_CACHE_DIR = os.path.join(CACHE_DIR, "bls")
 
 os.makedirs(SEC_CACHE_DIR, exist_ok=True)
 os.makedirs(FINNHUB_CACHE_DIR, exist_ok=True)
 os.makedirs(EPA_ECHO_CACHE_DIR, exist_ok=True)
 os.makedirs(OSHA_CACHE_DIR, exist_ok=True)
 os.makedirs(NLRB_CACHE_DIR, exist_ok=True)
+os.makedirs(FOSSIL_FREE_FUNDS_CACHE_DIR, exist_ok=True)
+os.makedirs(WIKIPEDIA_CACHE_DIR, exist_ok=True)
+os.makedirs(SEC_PROXY_CACHE_DIR, exist_ok=True)
+os.makedirs(BLS_CACHE_DIR, exist_ok=True)
 
 
 class RateLimiter:
@@ -60,6 +68,19 @@ class CachedHttpClient:
         safe = cache_key.replace("/", "_").replace("?", "_").replace("&", "_")
         return os.path.join(self.cache_dir, safe + ".json")
 
+    def _get_with_429_retry(self, url, params, timeout, max_retries=4):
+        """A 429 means the rate limit was already too aggressive for this
+        run; back off with growing delays rather than caching a spurious
+        failure that a resume run would then treat as a real "no data"."""
+        delay = 2.0
+        for attempt in range(max_retries + 1):
+            resp = self.session.get(url, headers=self.base_headers, params=params, timeout=timeout)
+            if resp.status_code != 429 or attempt == max_retries:
+                return resp
+            time.sleep(delay)
+            delay *= 2
+        return resp
+
     def get_json(self, url, cache_key, params=None, refresh=False, timeout=30):
         path = self._cache_path(cache_key)
         if not refresh and os.path.exists(path):
@@ -70,7 +91,7 @@ class CachedHttpClient:
             return cached["body"], cached.get("status", 200), True, cached.get("fetched_at")
 
         self.rate_limiter.wait()
-        resp = self.session.get(url, headers=self.base_headers, params=params, timeout=timeout)
+        resp = self._get_with_429_retry(url, params, timeout)
         try:
             body = resp.json()
         except ValueError:
@@ -111,7 +132,7 @@ class CachedHttpClient:
             return cached["body"], cached.get("status", 200), True, cached.get("fetched_at")
 
         self.rate_limiter.wait()
-        resp = self.session.get(url, headers=self.base_headers, params=params, timeout=timeout)
+        resp = self._get_with_429_retry(url, params, timeout)
         body = resp.text
 
         fetched_at = datetime.now(timezone.utc).isoformat()
@@ -183,4 +204,60 @@ def make_nlrb_client(contact):
         rate_limiter=limiter,
         cache_dir=NLRB_CACHE_DIR,
         name="nlrb",
+    )
+
+
+# --- Additional approved-source clients (fossilfreefunds, Wikipedia, SEC
+# proxy/8-K, BLS) added for the aggressive multi-source mining pass. Same
+# courtesy self-imposed rate limits as the clients above; none of these
+# sites document a rate limit or require an API key.
+
+def make_fossil_free_funds_client(contact):
+    # api.fossilfreefunds.org is a small loopback/Node API (not a CDN-backed
+    # static site like the others) -- stay conservative.
+    limiter = RateLimiter(max_per_window=2, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={
+            "User-Agent": f"Stockselect ESG Research ({contact})",
+            "Accept": "application/json",
+        },
+        rate_limiter=limiter,
+        cache_dir=FOSSIL_FREE_FUNDS_CACHE_DIR,
+        name="fossil_free_funds",
+    )
+
+
+def make_wikipedia_client(contact):
+    # Started at 5 req/s; in practice Wikimedia returned 429s well before
+    # that budget was exhausted (bursty client-side throttling on the
+    # w/api.php endpoints in particular), so this is deliberately conservative.
+    limiter = RateLimiter(max_per_window=1, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={"User-Agent": f"Stockselect ESG Research ({contact})"},
+        rate_limiter=limiter,
+        cache_dir=WIKIPEDIA_CACHE_DIR,
+        name="wikipedia",
+    )
+
+
+def make_sec_proxy_client(user_agent):
+    # Full DEF 14A documents are large (1-5MB); reuse the SEC's own courtesy
+    # rate limit (10 req/s max) but stay a little under it since these are
+    # bigger payloads than the XBRL/submissions calls.
+    limiter = RateLimiter(max_per_window=6, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={"User-Agent": user_agent, "Accept-Encoding": "gzip, deflate"},
+        rate_limiter=limiter,
+        cache_dir=SEC_PROXY_CACHE_DIR,
+        name="sec_proxy",
+    )
+
+
+def make_bls_client(contact):
+    limiter = RateLimiter(max_per_window=1, window_seconds=1)
+    return CachedHttpClient(
+        base_headers={"User-Agent": f"Stockselect ESG Research ({contact})"},
+        rate_limiter=limiter,
+        cache_dir=BLS_CACHE_DIR,
+        name="bls",
     )
