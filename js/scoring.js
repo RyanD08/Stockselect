@@ -1,9 +1,10 @@
 /**
  * Values-fit scoring engine.
  *
- * Every scored question (ids 1-20; ids 21-24 are Risk Philosophy and are
- * combined into a derived Risk Profile instead — see deriveRiskProfile) is
- * either:
+ * Every scored question (ids 1-20 are the core values screens; ids 21, 23,
+ * 24 are risk/portfolio-construction preferences added directly to the same
+ * sum — see "Risk preferences" below; id 22 plays two distinct roles, also
+ * described below) is either:
  *
  *   - EXCLUSIONARY: the client is rating how much they want to *avoid* a
  *     trait. A company's alignment value a_i sits in [-1, 0] — 0 if the
@@ -15,6 +16,12 @@
  *     (neutral, no bonus), up to +1 if it has the trait strongly. It never
  *     penalizes a company for lacking the trait.
  *
+ *   - TRADE-OFF (new): the client is rating a preference between two
+ *     opposites (e.g. stability vs. growth). a_i sits in [-1, +1] — +1 if
+ *     the company sits at the preferred end, -1 at the other end, 0 at a
+ *     genuine middle ground. See "Risk preferences" below for why these use
+ *     a different importance mapping than every other question here.
+ *
  * For the three judgment-based ESG categories (environmental / social_labor
  * / governance), a_i is additionally scaled by CONFIDENCE_WEIGHT so a
  * well-documented, verifiably-earned score counts more than an unverified
@@ -23,16 +30,53 @@
  *
  * Financial quality — valuation (P/E, PEG), growth, profitability (margin,
  * ROE, FCF margin), analyst sentiment, and a time-horizon-selected return
- * (Q25) weighted by beta/market-cap/dividends per the client's Risk
- * Profile — is folded in as one more preference-type criterion in the
- * exact same weighted sum (see financialQualityAlignment), not a separate
- * post-hoc blend. Its importance weight comes from the client's Q22 answer
+ * (Q25) weighted by beta/market-cap/dividends per the client's derived Risk
+ * Profile — is folded in as one more preference-type criterion in the exact
+ * same weighted sum (see financialQualityAlignment), not a separate post-hoc
+ * blend. Its importance weight comes from the client's Q22 answer
  * ("willingness to accept lower returns for values alignment"), inverted,
  * so it behaves exactly like any other question: a client who rates it a
  * 5-equivalent priority gets the same proportional influence as a 5/5 on
  * any values question, no more.
  *
- * contribution_i = clientImportance_i (1-5) * a_i
+ * Risk preferences (Q21 stability, Q23 blue-chip, Q24 dividend-income, plus
+ * Q22's second role below) used to be averaged into one derived "Risk
+ * Profile" bucket (Conservative/Balanced/Growth) that only ever reshaped
+ * *how* financial quality was judged, and only ever broke ties between
+ * companies that scored identically — a client's strongest individual risk
+ * preference could get diluted by averaging with their other three answers,
+ * and even a strong preference never moved the visible score. Now each of
+ * these has its own direct term in the same weighted sum everything else
+ * uses, so it always contributes proportionally to the visible score, on
+ * its own, independent of the other three.
+ *
+ * These four terms use a different importance mapping than every other
+ * question in this file: importance = rating - 1 (so 1->0, 5->4), instead
+ * of the raw 1-5 rating. A rating of 1 ("not important to me") must produce
+ * literally zero effect on the score in either direction — a client who
+ * doesn't care about dividends shouldn't see even a small, easy-to-miss
+ * penalty applied to a strong dividend payer just for how the weighted
+ * average happens to divide out. Ratings 2-5 scale up normally from there.
+ * (Q1-20 don't need this: they're one-directional, so a low rating already
+ * can't push a company the "wrong" way — only trade-off-style, both-
+ * directions questions have that risk.)
+ *
+ * Q22 plays two roles: it still sets financialImportance (how much the
+ * financial-quality criterion counts overall) exactly as before, AND it
+ * separately contributes its own trade-off term rewarding companies with
+ * weaker financial-quality scores — a real "prioritize values over
+ * financial strength" nudge, not just a smaller shrug at financials. Its
+ * importance also uses the rating-1 mapping, so at Q22=1 this second term
+ * is fully inert and never penalizes a strong company for being strong.
+ *
+ * The derived Risk Profile (Conservative/Balanced/Growth) still exists and
+ * is still shown to the client (see deriveRiskProfile) — it just no longer
+ * drives any of the above. It's a descriptive summary label now, not a
+ * scoring mechanism, though it's still used to shape financialQualityAlignment
+ * (see that function) since "what counts as a good return for a Growth
+ * client" is a genuinely different question than "for a Conservative client.")
+ *
+ * contribution_i = clientImportance_i * a_i
  * score = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
  *
  * 50 is the neutral starting point; the score moves up or down only as far
@@ -42,6 +86,17 @@
  */
 
 const SCORED_QUESTION_IDS = Array.from({ length: 20 }, (_, i) => i + 1); // 1-20
+// Risk/portfolio-construction trade-off questions folded directly into the
+// score (see header comment) but deliberately NOT part of SCORED_QUESTION_IDS:
+// valuesFitScore() and classifyTier()'s conflict/tier-capping logic both
+// iterate SCORED_QUESTION_IDS only, so these -- like financial quality --
+// contribute to the blended ranking score without being able to either (a)
+// count toward the minimum values-match floor or (b) cap a company's tier
+// at Partial Match. That's intentional: these are financial/portfolio-
+// construction preferences, not ethical/values screens, so they shouldn't
+// change what counts as a genuine values match any more than a company's
+// P/E ratio should.
+const RISK_DIRECT_QUESTION_IDS = [21, 23, 24];
 const HIGH_PRIORITY_THRESHOLD = 4; // client ratings of 4-5 count as "highest priority"
 const CONFLICT_ALIGNMENT_THRESHOLD = -0.5; // a_i at or below this counts as a strong conflict
 const MAX_PORTFOLIO_SIZE = 15;
@@ -163,6 +218,42 @@ const ALIGNMENT_FNS = {
   20: (c) => (c.revenue_geography.profile === 'Primarily Domestic' ? 1 : 0),
 };
 
+// Trade-off-style direct terms for the risk/portfolio-construction questions
+// (see header comment "Risk preferences"). Each returns [-1, +1]: +1 at the
+// preferred end, -1 at the opposite end, 0 at a genuine middle ground.
+const NEUTRAL_BETA = 1.0; // ~market-average volatility
+const BETA_SWING = 1.0; // beta this far from neutral in either direction reaches ±1
+function stabilityDirectAlignment(company) {
+  const beta = company.market_profile.beta_est;
+  if (beta === null || beta === undefined) return 0;
+  return Math.max(-1, Math.min(1, (NEUTRAL_BETA - beta) / BETA_SWING));
+}
+
+// DIVIDEND_YIELD_RANK (defined below, reused here) treats "Low" as the
+// neutral center: a non-payer is actively penalized, a high-yield payer is
+// actively rewarded, exactly matching the "preference for dividend-paying
+// income stocks over growth-focused reinvestment" framing of Q24.
+function dividendDirectAlignment(company) {
+  const rank = dividendYieldRank(company.dividend_policy);
+  return Math.max(-1, Math.min(1, (rank - 2) / 2));
+}
+
+// MARKET_CAP_RANK (defined below, reused here): Mega/Large rewarded,
+// Mid/Small penalized, centered between Large and Mid. This is the *soft*
+// blue-chip preference (Q23 ratings 1-4); a rating of 5 is instead a hard
+// filter — see isBlueChipEligible.
+function blueChipDirectAlignment(company) {
+  const rank = MARKET_CAP_RANK[company.market_profile.market_cap_tier];
+  if (rank === undefined) return 0;
+  return Math.max(-1, Math.min(1, (rank - 1.5) / 1.5));
+}
+
+const RISK_ALIGNMENT_FNS = {
+  21: stabilityDirectAlignment,
+  23: blueChipDirectAlignment,
+  24: dividendDirectAlignment,
+};
+
 function scoreCompany(company, answers, ctx, riskProfile) {
   let numerator = 0;
   let denominator = 0;
@@ -182,18 +273,44 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   numerator += financialImportance * financialAlignment;
   denominator += financialImportance;
 
+  // Risk/portfolio-construction trade-off terms (Q21, Q23, Q24) — rating-1
+  // importance mapping so a rating of 1 is a true no-op (see header comment).
+  RISK_DIRECT_QUESTION_IDS.forEach((qId) => {
+    const importance = Math.max(0, (answers[qId] || 3) - 1);
+    const alignment = RISK_ALIGNMENT_FNS[qId](company);
+    alignments[qId] = alignment;
+    numerator += importance * alignment;
+    denominator += importance;
+  });
+
+  // Q22's second role: reward weaker financial-quality companies (a real
+  // "prioritize values over financial strength" nudge), same rating-1
+  // mapping so it never penalizes a strong company when Q22=1.
+  const valuesOverReturnsImportance = Math.max(0, (answers[22] || 3) - 1);
+  const valuesOverReturnsAlignment = 1 - 2 * financialAlignment;
+  numerator += valuesOverReturnsImportance * valuesOverReturnsAlignment;
+  denominator += valuesOverReturnsImportance;
+
   const raw = denominator > 0 ? 50 + 50 * (numerator / denominator) : 50;
   const score = Math.round(Math.min(100, Math.max(0, raw)));
-  return { score, alignments, financialImportance, financialAlignment };
+  return {
+    score,
+    alignments,
+    financialImportance,
+    financialAlignment,
+    valuesOverReturnsImportance,
+    valuesOverReturnsAlignment,
+  };
 }
 
 // Patch v17: values-only score -- the original confidence-weighted formula
 // (Patch v1, base prompt Section 2.2) over SCORED_QUESTION_IDS alone, before
 // Patch v6 folded financial quality into the same weighted sum. Deliberately
-// excludes financial quality so a company can't buy its way past a genuine
-// values mismatch with good financials -- this is what the minimum values
-// match floor (MINIMUM_VALUES_MATCH below) is evaluated against, not the
-// blended score scoreCompany() returns for ranking.
+// excludes financial quality AND the risk/portfolio-construction trade-off
+// terms (Q21-24) so a company can't buy its way past a genuine values
+// mismatch with good financials or a risk-profile match -- this is what the
+// minimum values match floor (MINIMUM_VALUES_MATCH below) is evaluated
+// against, not the blended score scoreCompany() returns for ranking.
 function valuesFitScore(company, answers, ctx) {
   let numerator = 0;
   let denominator = 0;
@@ -236,6 +353,11 @@ function meetsValuesFloor(company, answers, ctx) {
   return valuesFitScore(company, answers, ctx) >= MINIMUM_VALUES_MATCH;
 }
 
+// Purely descriptive now (see header comment "Risk preferences") — still
+// shown to the client as a summary label ("Your Risk Profile") and still
+// used to shape financialQualityAlignment's formula (a good return means
+// something different to a Growth client than a Conservative one), but no
+// longer drives tie-breaking or bucket-switches anything else.
 // Q21-24 all share the same underlying axis once inverted: a raw answer of
 // 5 ("very important to me") on any of these four questions expresses a
 // stability/blue-chip/dividend/values-over-growth preference. Inverting
@@ -273,13 +395,21 @@ function lowerFirst(str) {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-function buildRationale(alignments, answers, financialImportance, financialAlignment) {
+function buildRationale(alignments, answers, financialImportance, financialAlignment, valuesOverReturnsImportance, valuesOverReturnsAlignment) {
   const candidates = SCORED_QUESTION_IDS.map((qId) => ({
     label: getQuestion(qId).short,
     importance: answers[qId] || 3,
     alignment: alignments[qId],
   }));
   candidates.push({ label: 'Strong financial fundamentals', importance: financialImportance, alignment: financialAlignment });
+  RISK_DIRECT_QUESTION_IDS.forEach((qId) => {
+    candidates.push({
+      label: getQuestion(qId).short,
+      importance: Math.max(0, (answers[qId] || 3) - 1),
+      alignment: alignments[qId],
+    });
+  });
+  candidates.push({ label: getQuestion(22).short, importance: valuesOverReturnsImportance, alignment: valuesOverReturnsAlignment });
 
   const highPriority = candidates.filter((c) => c.importance >= HIGH_PRIORITY_THRESHOLD);
   const pool = highPriority.length > 0 ? highPriority : candidates;
@@ -297,26 +427,17 @@ function buildRationale(alignments, answers, financialImportance, financialAlign
 
 const MARKET_CAP_RANK = { Mega: 3, Large: 2, Mid: 1, Small: 0 };
 
-// Patch v16 §1: blue-chip preference as a hard, graduated pre-filter tied
-// directly to the client's own Q23 answer ("preference for large,
-// established blue-chip companies over smaller, emerging companies"),
-// replacing Patch v15 §1's blanket default size penalty applied to every
-// client regardless of what they said. "Micro" is listed for parity with
-// the spec but never matches anything in this dataset -- the pipeline's
-// $300M market-cap floor already excludes that tier entirely, so it's a
-// no-op inclusion, not a real 5th tier.
-const BLUE_CHIP_ELIGIBLE_TIERS = {
-  5: new Set(['Mega']),
-  4: new Set(['Mega', 'Large']),
-  3: new Set(['Mega', 'Large', 'Mid']),
-  2: new Set(['Mega', 'Large', 'Mid', 'Small']),
-  1: new Set(['Mega', 'Large', 'Mid', 'Small', 'Micro']),
-};
-
+// Q23 (blue-chip preference) is now a hybrid: a rating of 5 ("only" large,
+// established companies) is still a hard, non-negotiable pre-filter --
+// smaller companies are excluded outright, never backfilled/relaxed, since
+// "only suggest blue-chip" should mean literally that. Ratings 1-4 no
+// longer filter anything: they're a soft, graded preference instead (see
+// blueChipDirectAlignment above), so a client who leans blue-chip without
+// requiring it can still see a well-matched smaller company.
 function isBlueChipEligible(company, answers) {
   const q23 = answers[23] || 3;
-  const eligibleTiers = BLUE_CHIP_ELIGIBLE_TIERS[q23] || BLUE_CHIP_ELIGIBLE_TIERS[3];
-  return eligibleTiers.has(company.market_profile.market_cap_tier);
+  if (q23 < 5) return true;
+  return company.market_profile.market_cap_tier === 'Mega';
 }
 
 function controversyCount(company) {
@@ -324,29 +445,6 @@ function controversyCount(company) {
   return ['environmental', 'social_labor', 'governance']
     .map((key) => company.esg_ratings[key].note)
     .filter((note) => noteMatches(note, regex)).length;
-}
-
-function riskProfileMatchRank(company, riskProfile) {
-  if (riskProfile === 'Balanced') return 0; // no preference at this stage for balanced clients
-  return company.performance_tier.risk_profile_fit === riskProfile ? 0 : 1;
-}
-
-function quantitativeTieBreakKey(company, riskProfile) {
-  const beta = company.market_profile.beta_est;
-  const capRank = MARKET_CAP_RANK[company.market_profile.market_cap_tier] || 0;
-  const fiveYearReturn = company.performance_tier.five_year_annualized_return_pct_est;
-
-  if (riskProfile === 'Conservative') {
-    // prefer lower beta, then larger cap, then higher return
-    return [beta, -capRank, -fiveYearReturn];
-  }
-  if (riskProfile === 'Growth') {
-    // prefer higher return, then higher beta, then smaller cap
-    return [-fiveYearReturn, -beta, capRank];
-  }
-  // Balanced: prefer the better risk-adjusted profile (return / beta)
-  const riskAdjusted = beta > 0 ? fiveYearReturn / beta : fiveYearReturn;
-  return [-riskAdjusted];
 }
 
 function compareArrays(a, b) {
@@ -446,9 +544,7 @@ function horizonReturnValue(company, timeHorizon) {
 
 // The client's selected time horizon (Q25) picks which return field is
 // used; the client's derived Risk Profile still decides how that return is
-// weighted against beta/cap/dividends — mirrors the existing Section 3.3
-// tie-break logic in quantitativeTieBreakKey, just expressed as a 0-1
-// reward instead of an ordinal comparator. This is one of the 9 metrics
+// weighted against beta/cap/dividends. This is one of the 9 metrics
 // averaged into financialQualityAlignment below, not a separate score.
 function timeHorizonReturnAlignment(company, riskProfile, timeHorizon) {
   const beta = company.market_profile.beta_est;
@@ -573,7 +669,14 @@ const BELOW_VALUES_THRESHOLD_NOTE =
   'Shown only to fill out your 15-company portfolio because not enough companies met that bar within your other preferences.';
 
 function buildScoredEntry(company, answers, ctx, riskProfile) {
-  const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
+  const {
+    score,
+    alignments,
+    financialImportance,
+    financialAlignment,
+    valuesOverReturnsImportance,
+    valuesOverReturnsAlignment,
+  } = scoreCompany(company, answers, ctx, riskProfile);
   const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
   const cautionFlags = detectCautionFlags(company);
   // Tier cap: a caution flag overrides an otherwise-Strong values match —
@@ -591,26 +694,24 @@ function buildScoredEntry(company, answers, ctx, riskProfile) {
     tier,
     conflicts,
     cautionFlags,
-    rationale: buildRationale(alignments, answers, financialImportance, financialAlignment),
+    rationale: buildRationale(alignments, answers, financialImportance, financialAlignment, valuesOverReturnsImportance, valuesOverReturnsAlignment),
     note: conflicts.length > 0 ? buildPartialMatchNote(conflicts) : null,
-    riskMatchRank: riskProfileMatchRank(company, riskProfile),
-    quantKey: quantitativeTieBreakKey(company, riskProfile),
     controversyCount: controversyCount(company),
   };
 }
 
 // Strong before Partial before Below Values Threshold as a hard rule; score
-// orders within a tier; then risk-profile fit / quantitative data /
-// controversy count / ticker as successive tie-breakers (Section 3.3).
+// orders within a tier; then controversy count / ticker as successive
+// tie-breakers. (Beta/market-cap/dividend/return preferences used to break
+// ties here too, before Q21/23/24 became direct scored criteria — now that
+// they already move the visible score, a leftover tie is a genuine toss-up
+// rather than a sign those signals still need a say.)
 const TIER_RANK = { Strong: 0, Partial: 1, 'Below Values Threshold': 2 };
 
 function sortScoredEntries(entries) {
   entries.sort((a, b) => {
     if (TIER_RANK[a.tier] !== TIER_RANK[b.tier]) return TIER_RANK[a.tier] - TIER_RANK[b.tier];
     if (b.score !== a.score) return b.score - a.score;
-    if (a.riskMatchRank !== b.riskMatchRank) return a.riskMatchRank - b.riskMatchRank;
-    const quantCompare = compareArrays(a.quantKey, b.quantKey);
-    if (quantCompare !== 0) return quantCompare;
     if (a.controversyCount !== b.controversyCount) return a.controversyCount - b.controversyCount;
     return a.company.ticker.localeCompare(b.company.ticker);
   });
@@ -639,9 +740,9 @@ function buildPortfolio(dataset, answers, clientContext) {
   };
   const riskProfile = deriveRiskProfile(answers);
 
-  // Patch v16 §1: blue-chip preference is a hard, non-negotiable pre-filter
-  // — when a client says they want blue-chip companies, "only suggest"
-  // means literally that, so this is never backfilled/relaxed.
+  // Q23 at 5/5 is still a hard, non-negotiable pre-filter — see
+  // isBlueChipEligible. At 1-4 it no longer filters anything (soft
+  // preference instead, folded into the score itself).
   const blueChipEligible = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
 
   // Patch v17 + follow-up: the minimum values-match floor IS backfillable —

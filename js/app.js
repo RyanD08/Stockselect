@@ -645,12 +645,12 @@ function riskProfileIcon(riskProfile) {
 
 function riskProfileBlurb(riskProfile) {
   if (riskProfile === 'Conservative') {
-    return 'You favor long-term stability, blue-chip/dividend-paying companies, and are less willing to trade returns for values alignment. We weighted ties toward lower-beta, larger-cap, higher-stability holdings.';
+    return 'You favor long-term stability, blue-chip/dividend-paying companies, and are less willing to trade returns for values alignment. Your stability, blue-chip, and dividend-income answers each directly rewarded lower-beta, larger-cap, higher-yield holdings in your results — not just as a tie-breaker.';
   }
   if (riskProfile === 'Growth') {
-    return 'You favor growth potential and smaller/emerging companies, and are more willing to accept lower stability in pursuit of values alignment. We weighted ties toward higher-return, higher-beta, growth-oriented holdings.';
+    return 'You favor growth potential and smaller/emerging companies, and are more willing to accept lower stability in pursuit of values alignment. Your stability, blue-chip, and dividend-income answers each directly rewarded higher-return, higher-beta, growth-oriented holdings in your results — not just as a tie-breaker.';
   }
-  return 'You are comfortable balancing stability and growth potential. We weighted ties toward holdings with the best risk-adjusted profile (five-year return relative to beta).';
+  return 'You are comfortable balancing stability and growth potential. Your financial-quality criterion rewarded the best risk-adjusted profile (return relative to beta) accordingly.';
 }
 
 function buildPortfolioRationale(answers, riskProfile, holdings) {
@@ -666,8 +666,9 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
 
   const p1 =
     `Based on your responses, we've built a ${holdings.length}-holding portfolio weighted around ${priorityPhrase}` +
-    `alongside a ${riskProfile.toLowerCase()} risk profile derived from your stability, blue-chip, and dividend ` +
-    `preferences. Each company in our sample dataset was scored on how well it aligns with your specific answers, ` +
+    `alongside a ${riskProfile.toLowerCase()} risk profile: your stability, blue-chip, and dividend-income answers ` +
+    `each directly influenced every company's score, on top of how much weight you gave financial performance ` +
+    `overall. Each company in our sample dataset was scored on how well it aligns with your specific answers, ` +
     `distinguishing criteria you asked us to screen out (like sin-stock exposure or high leverage) from criteria ` +
     `you asked us to seek out (like renewable-energy focus or domestic revenue). A company must clear a minimum ` +
     `overall values-alignment bar to be considered a genuine match at all — good financials alone can't carry a ` +
@@ -682,9 +683,10 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
           `each carries a specific trade-off against one of your top priorities, which we've called out individually ` +
           `in the table above so you can decide whether that trade-off is acceptable to you.`
         : `No holdings required a trade-off against your top priorities.`
-    } Where companies were closely tied on fit, we broke ties using your derived risk profile and quantitative ` +
-    `data (beta, market-cap tier, and estimated five-year returns). Positions are equally weighted, and we capped ` +
-    `exposure to any single sector at three holdings to keep the portfolio reasonably diversified.${
+    } Your stability, blue-chip, and dividend-income preferences directly influenced every company's score ` +
+    `alongside your values answers, rather than only breaking ties between otherwise-equal companies. Positions ` +
+    `are equally weighted, and we capped exposure to any single sector at three holdings to keep the portfolio ` +
+    `reasonably diversified.${
       belowThresholdCount > 0
         ? ` Not enough companies met the minimum values-match bar within your other preferences to fill all ` +
           `${MAX_PORTFOLIO_SIZE} slots, so the remaining ${belowThresholdCount} are shown as Below Values ` +
@@ -696,7 +698,7 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
   const p3 =
     `As always, values-based investing involves judgment calls, and the data underlying some of these criteria — ` +
     `particularly labor practices, governance details, financial leverage, and the market/performance estimates ` +
-    `used for tie-breaking — is illustrative rather than pulled from a live, licensed data feed. We'd encourage ` +
+    `behind your risk-profile criteria — is illustrative rather than pulled from a live, licensed data feed. We'd encourage ` +
     `you to treat this as a starting point for a conversation, not a finished recommendation.`;
 
   return [p1, p2, p3];
