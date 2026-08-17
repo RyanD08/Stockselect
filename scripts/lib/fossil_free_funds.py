@@ -80,10 +80,22 @@ def build_fossil_fuel_screen(record):
             except (TypeError, ValueError):
                 pass
     return {
-        "involved": bool(record.get("is_dirty")),
+        # NOT is_dirty: that raw API field was checked against every label
+        # string on fossilfreefunds.org's own JS bundle and its About/
+        # methodology pages and appears in neither -- its meaning could not
+        # be confirmed, and empirically it was True for every single one of
+        # the 497 S&P 500 companies checked in this pass (i.e. it does not
+        # discriminate at all despite its name implying it would). Per this
+        # project's "don't invent labels for unverified data" rule, it is
+        # NOT used here. involved is instead derived only from
+        # matched_categories, each of which does have a confirmed label
+        # (see _FLAG_LABELS) and does discriminate (e.g. ExxonMobil matches
+        # 2 categories; most companies match 0).
+        "involved": bool(matched_lists),
         "matched_categories": matched_lists,
         "diversity_equity_scores": scores,
-        "confidence": "High",
+        "raw_is_dirty_field_unverified": record.get("is_dirty"),
+        "confidence": "High" if matched_lists else "Medium",
         "source": (
             f"fossilfreefunds.org (As You Sow), api.fossilfreefunds.org/api/v1/companies, "
             f"matched primary_symbol={record.get('primary_symbol')!r}, "
@@ -91,13 +103,19 @@ def build_fossil_fuel_screen(record):
             f"last updated {record.get('updated_at')}"
         ),
         "note": (
-            "is_dirty is fossilfreefunds.org's own overall fossil-fuel-involvement flag "
-            "(fails their fossil-free screen). matched_categories lists which of their "
-            "specific coal/oil-gas/utility/reserve-holder lists this company appears on, if "
-            "any -- an empty list with involved=true means it fails the overall screen via a "
-            "category not itemized on the public site. diversity_equity_scores are separate "
-            "As You Sow-published scores (0-100 scale, higher = better) bundled in the same "
-            "API response; not fossil-fuel-related but collected here since they're "
+            "involved=true means this company appears on at least one of fossilfreefunds.org's "
+            "specific, named fossil-fuel lists (see matched_categories) -- Carbon Underground 200, "
+            "coal industry, oil/gas industry, Macroclimate 50, or fossil-fired utility, each "
+            "confirmed against this site's own UI label strings. An empty matched_categories list "
+            "means no confirmed match was found (confidence Medium rather than High, since a "
+            "company could still have a real but less-common fossil-fuel exposure this API's "
+            "labeled categories don't cover). raw_is_dirty_field_unverified is the API's own "
+            "'is_dirty' field, included for transparency but NOT used for `involved` above: its "
+            "meaning has no label anywhere on fossilfreefunds.org's own site, and it was observed "
+            "True for all 497 companies checked in this run -- almost certainly not a per-company "
+            "fossil-fuel screen result despite the field name implying one. diversity_equity_scores "
+            "are separate As You Sow-published scores (0-100 scale, higher = better) bundled in "
+            "the same API response; not fossil-fuel-related but collected here since they're "
             "attributable to this same verified source and could inform new criteria."
         ),
     }

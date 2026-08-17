@@ -157,9 +157,13 @@ def build_candidate_criteria(full_dataset):
     })
 
     # 8. Wikipedia-sourced founder/leadership lead (explicitly low-confidence, needs verification)
-    has_wiki_founders = lambda c: isinstance(c["additional_data_sources"].get("wikipedia_profile"), dict) and "founders" in c["additional_data_sources"]["wikipedia_profile"].get("infobox_fields", {})
+    def _founder_field(c):
+        fields = c["additional_data_sources"].get("wikipedia_profile", {})
+        fields = fields.get("infobox_fields", {}) if isinstance(fields, dict) else {}
+        return fields.get("founders") or fields.get("founder")
+    has_wiki_founders = lambda c: _founder_field(c) is not None
     n_have, _ = _coverage(companies, has_wiki_founders)
-    ex = [{"ticker": c["ticker"], "name": c["name"], "founders": c["additional_data_sources"]["wikipedia_profile"]["infobox_fields"]["founders"]} for c in companies if has_wiki_founders(c)][:5]
+    ex = [{"ticker": c["ticker"], "name": c["name"], "founders": _founder_field(c)} for c in companies if has_wiki_founders(c)][:5]
     candidates.append({
         "criterion_id": "wikipedia_founder_lead",
         "proposed_question": "(Supporting data for existing Q18 'founder-led/family-owned' -- not a new question) Wikipedia infobox founders/key_people text, to be verified against a primary source before use",

@@ -84,6 +84,83 @@ extractor risked reporting a wrong number as a verified fact, so this was
 not shipped this pass — see `candidate_additional_criteria.json` for the
 proposed question and what a follow-up implementation would need.
 
+## Self-caught error: the `is_dirty` field was never actually verified
+
+An earlier version of this pipeline labeled fossilfreefunds.org's raw
+`is_dirty` API field as "their overall fossil-fuel-involvement flag" and
+used it directly as the `involved` boolean. That label was asserted, not
+verified -- unlike every other field pulled from this source (the category
+flags and the four diversity/equity scores), `is_dirty` does not appear as
+a label anywhere in fossilfreefunds.org's own JS bundle or About/methodology
+pages. Running the full 497-company batch exposed the problem concretely:
+`is_dirty` was `True` for all 492 companies with a match, i.e. it doesn't
+discriminate at all despite what its name implies.
+
+Fixed before shipping this dataset: `involved` is now derived only from
+`matched_categories` (each with a confirmed on-site label -- Carbon
+Underground 200, coal industry, oil/gas industry, Macroclimate 50,
+fossil-fired utility), which produces a plausible, discriminating result
+(53/492 flagged -- mostly utilities, energy, chemicals, coal-hauling rail,
+and fossil-sector financiers). The raw `is_dirty` value is still included
+in the output as `raw_is_dirty_field_unverified` for transparency, with an
+explicit note that it is not used for the `involved` determination and its
+real meaning is unconfirmed.
+
+## Final coverage (497/497 companies processed, 0 outstanding errors)
+
+| Field | Coverage | Notes |
+|---|---|---|
+| `fossil_fuel_screen` (involvement + diversity/equity scores) | 492/497 | 5 misses (incl. Berkshire Hathaway/BRK-B) confirmed genuinely absent from fossilfreefunds.org's own database under any ticker variant, not a lookup bug |
+| `ceo_pay_ratio` | 375/497 (75%) | See "CEO pay ratio extraction" below for how this number was earned, not assumed |
+| `recent_8k_activity` | 496/497 | 1 miss: no CIK match |
+| `wikipedia_profile` (any usable content) | ~490/497 | |
+| `wikipedia_profile.infobox_fields.founder(s)` specifically | 203/497 | Many companies' infoboxes just don't carry a founder field (long-since-public conglomerates, spin-offs, etc.) |
+
+## CEO pay ratio extraction — regex development notes
+
+The first working version (anchored on "ratio ... is/of NUMBER to 1" close
+to the word "ratio") scored 116/497. Three real phrasing patterns found via
+manual inspection of actual filings pushed this to the final 375/497, each
+confirmed against the source text before being generalized:
+
+1. **Verb/description length**: many filers write "the ratio of the annual
+   total compensation of our CEO to the annual total compensation of our
+   median employee **was** X to 1" -- a long description between "ratio"
+   and the number, with "was" (not "is"/"of") immediately before it. Fixed
+   by decoupling the number pattern from a specific preceding verb and
+   instead requiring "annual total compensation" (the consistent
+   SEC-boilerplate-derived phrase every real disclosure sentence uses)
+   somewhere between the "pay ratio" mention and the number.
+2. **Long methodology narratives**: Abbott Laboratories precedes its number
+   with ~1,500 characters of workforce/exclusion/currency methodology
+   before stating "resulting in a ratio of 166:1" -- widened the search
+   window accordingly (3,000 chars).
+3. **Reversed, hyphenated phrasing**: Amazon writes "resulting in a ratio
+   of those amounts of **1-to-51**" (median-employee-first, hyphenated, no
+   spaces) rather than "51 to 1" -- added a dedicated pattern for this
+   direction.
+4. **Sub-1.0 ratios are real, not bugs**: Tesla, Axon, and Super Micro's
+   founder-CEOs report $0 or near-$0 compensation some years, giving a
+   genuine ratio below 1:1 (0.00, 0.3, 0.16). An earlier version rounded
+   these to a misleading "0 to 1"; fixed to keep the fractional value.
+5. **Table vs. narrative disambiguation**: Tesla's proxy also contains a
+   "Pay versus Performance" table using the same "annual total
+   compensation" phrase in a column header, with its own "X to 1"-shaped
+   numeric cells -- close enough to fool a naive first-match search.
+   Resolved by preferring the *last* qualifying occurrence in the document
+   (the standalone, fully-narrated "20XX Pay Ratio Disclosure" section
+   consistently comes after any earlier table/cross-reference, confirmed
+   against this specific filing).
+
+A random 15-company sample of the final extracted values (AES 120, AIZ 268,
+AJG 346, BA 166, BKR 310, BR 216, CEG 140, DRI 736, EME 164, F 295, LEN 284,
+PHM 142, SHW 248, TPL 46, URI 137) was spot-checked for plausibility against
+each figure's general order of magnitude and found consistent with
+publicly-known reporting for these companies. The remaining ~25% without a
+match were not chased further after this point of diminishing returns --
+each has an honest `"No verifiable data found"` entry with the actual
+regex-search failure reason, not a fabricated or estimated figure.
+
 ## What's next for a follow-up session
 
 - Re-attempt `sciencebasedtargets.org` and `justcapital.com` with a

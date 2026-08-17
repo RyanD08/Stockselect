@@ -1,0 +1,461 @@
+{
+  "meta": {
+    "purpose": "Every additional, measurable, per-company data point discovered while mining the task's approved source list beyond the existing 24-question survey schema (see js/questions.js). Kept separate from the official schema pending human review, per the task's instructions -- not renumbered or auto-inserted into the live survey.",
+    "snapshot_date": "2026-08-17",
+    "total_companies_in_dataset": 497,
+    "note_on_existing_schema": "The live site currently implements 24 rated questions + 1 time-horizon selector across 6 categories (environmental, social_labor, governance, ethical, community, risk) -- see js/questions.js. The task brief described a 28-question survey including 'religious/values' and 'political/social' categories not present in the current implementation; no data was collected for those two categories this pass since there's no existing field for them to enrich and none of the approved sources publish anything mappable to religious-compliance screening specifically."
+  },
+  "candidate_criteria": [
+    {
+      "criterion_id": "fossil_fuel_involvement_screen",
+      "proposed_question": "Excluding companies flagged by an independent fossil-fuel-divestment screen (coal, oil & gas, fossil-fired utilities, or top fossil-reserve holders), beyond the general environmental score",
+      "category_guess": "environmental",
+      "type_guess": "exclusionary",
+      "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org",
+      "raw_data_sample": [
+        {
+          "ticker": "A",
+          "name": "AGILENT TECHNOLOGIES, INC.",
+          "involved": false,
+          "matched_categories": []
+        },
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "involved": false,
+          "matched_categories": []
+        },
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "involved": false,
+          "matched_categories": []
+        },
+        {
+          "ticker": "ABNB",
+          "name": "Airbnb, Inc.",
+          "involved": false,
+          "matched_categories": []
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "involved": false,
+          "matched_categories": []
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 492,
+        "companies_flagged_involved": 53,
+        "total_companies": 497
+      },
+      "note": "This overlaps existing Q1 ('avoiding fossil fuel involvement') but is a direct, named-source screen rather than a proxy off the general EPA-derived environmental score -- could replace or supplement how Q1 is currently scored."
+    },
+    {
+      "criterion_id": "gender_equality_score",
+      "proposed_question": "Prioritizing companies with strong, third-party-scored gender equality practices",
+      "category_guess": "governance",
+      "type_guess": "preference",
+      "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org (0-100 scale, higher = better)",
+      "raw_data_sample": [
+        {
+          "ticker": "A",
+          "name": "AGILENT TECHNOLOGIES, INC.",
+          "value": 56.44
+        },
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "value": 52.35
+        },
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "value": 62.91
+        },
+        {
+          "ticker": "ABNB",
+          "name": "Airbnb, Inc.",
+          "value": 57.68
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "value": 57.52
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 492,
+        "total_companies": 497
+      },
+      "note": "Bundled in the same fossilfreefunds.org API response as the fossil-fuel screen; not fossil-fuel-related itself."
+    },
+    {
+      "criterion_id": "diversity_disclosures_score",
+      "proposed_question": "Prioritizing companies with strong, third-party-scored diversity/DEI disclosure practices",
+      "category_guess": "governance",
+      "type_guess": "preference",
+      "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org (0-100 scale, higher = better)",
+      "raw_data_sample": [
+        {
+          "ticker": "A",
+          "name": "AGILENT TECHNOLOGIES, INC.",
+          "value": 44.8
+        },
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "value": 25.0
+        },
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "value": 25.0
+        },
+        {
+          "ticker": "ABNB",
+          "name": "Airbnb, Inc.",
+          "value": 15.0
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "value": 35.0
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 492,
+        "total_companies": 497
+      },
+      "note": "Bundled in the same fossilfreefunds.org API response as the fossil-fuel screen; not fossil-fuel-related itself."
+    },
+    {
+      "criterion_id": "racial_justice_score",
+      "proposed_question": "Prioritizing companies with strong, third-party-scored racial justice practices",
+      "category_guess": "social_labor",
+      "type_guess": "preference",
+      "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org (0-100 scale, higher = better)",
+      "raw_data_sample": [
+        {
+          "ticker": "A",
+          "name": "AGILENT TECHNOLOGIES, INC.",
+          "value": 35.82
+        },
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "value": 44.78
+        },
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "value": 26.87
+        },
+        {
+          "ticker": "ABNB",
+          "name": "Airbnb, Inc.",
+          "value": 31.34
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "value": 22.39
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 492,
+        "total_companies": 497
+      },
+      "note": "Bundled in the same fossilfreefunds.org API response as the fossil-fuel screen; not fossil-fuel-related itself."
+    },
+    {
+      "criterion_id": "lgbtq_equity_score",
+      "proposed_question": "Prioritizing companies with strong LGBTQ+ workplace equity scores (Human Rights Campaign-style index)",
+      "category_guess": "social_labor",
+      "type_guess": "preference",
+      "source": "fossilfreefunds.org (As You Sow), api.fossilfreefunds.org (0-100 scale, higher = better)",
+      "raw_data_sample": [
+        {
+          "ticker": "A",
+          "name": "AGILENT TECHNOLOGIES, INC.",
+          "value": 30.0
+        },
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "value": 100.0
+        },
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "value": 100.0
+        },
+        {
+          "ticker": "ABNB",
+          "name": "Airbnb, Inc.",
+          "value": 100.0
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "value": 100.0
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 492,
+        "total_companies": 497
+      },
+      "note": "Bundled in the same fossilfreefunds.org API response as the fossil-fuel screen; not fossil-fuel-related itself."
+    },
+    {
+      "criterion_id": "ceo_pay_ratio",
+      "proposed_question": "Avoiding companies with a very high CEO-to-median-employee pay ratio",
+      "category_guess": "governance",
+      "type_guess": "exclusionary",
+      "source": "SEC EDGAR DEF 14A proxy statement, Item 402(u) mandatory disclosure",
+      "raw_data_sample": [
+        {
+          "ticker": "A",
+          "name": "AGILENT TECHNOLOGIES, INC.",
+          "ratio": "155 to 1",
+          "filing_date": "2026-02-06"
+        },
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "ratio": "533 to 1",
+          "filing_date": "2026-01-08"
+        },
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "ratio": "192 to 1",
+          "filing_date": "2026-03-23"
+        },
+        {
+          "ticker": "ABNB",
+          "name": "Airbnb, Inc.",
+          "ratio": "0.97 to 1",
+          "filing_date": "2026-04-24"
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "ratio": "166 to 1",
+          "filing_date": "2026-03-13"
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 375,
+        "total_companies": 497
+      },
+      "note": "Exact figure, not a tier -- extracted by regex from each company's latest proxy statement. Methodology varies company-to-company within SEC-permitted bounds (see field note)."
+    },
+    {
+      "criterion_id": "recent_bankruptcy_restatement_impairment",
+      "proposed_question": "Avoiding companies that recently disclosed a bankruptcy, financial restatement, or major asset impairment (SEC 8-K filing, trailing 2 years)",
+      "category_guess": "governance",
+      "type_guess": "exclusionary",
+      "source": "SEC EDGAR submissions API, standardized 8-K item numbers (1.03/2.06/4.02)",
+      "raw_data_sample": [
+        {
+          "ticker": "ABBV",
+          "name": "AbbVie Inc.",
+          "item_counts": [
+            "2.02",
+            "2.06",
+            "5.02",
+            "5.03",
+            "5.07",
+            "7.01",
+            "8.01",
+            "9.01"
+          ]
+        },
+        {
+          "ticker": "ADM",
+          "name": "Archer-Daniels-Midland Co",
+          "item_counts": [
+            "2.02",
+            "4.02",
+            "5.02",
+            "5.07",
+            "7.01",
+            "8.01",
+            "9.01"
+          ]
+        },
+        {
+          "ticker": "AES",
+          "name": "AES CORP",
+          "item_counts": [
+            "1.01",
+            "2.02",
+            "2.03",
+            "2.06",
+            "4.01",
+            "4.02",
+            "5.02",
+            "5.03",
+            "5.07",
+            "7.01",
+            "8.01",
+            "9.01"
+          ]
+        },
+        {
+          "ticker": "ALB",
+          "name": "ALBEMARLE CORP",
+          "item_counts": [
+            "1.01",
+            "2.01",
+            "2.02",
+            "2.06",
+            "5.02",
+            "5.07",
+            "7.01",
+            "8.01",
+            "9.01"
+          ]
+        },
+        {
+          "ticker": "APD",
+          "name": "Air Products & Chemicals, Inc.",
+          "item_counts": [
+            "2.02",
+            "2.06",
+            "5.02",
+            "5.03",
+            "5.07",
+            "7.01",
+            "8.01",
+            "9.01"
+          ]
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 496,
+        "companies_flagged": 26,
+        "total_companies": 497
+      },
+      "note": "Objective filing-metadata flag, not a text/sentiment read of filing content."
+    },
+    {
+      "criterion_id": "wikipedia_founder_lead",
+      "proposed_question": "(Supporting data for existing Q18 'founder-led/family-owned' -- not a new question) Wikipedia infobox founders/key_people text, to be verified against a primary source before use",
+      "category_guess": "community",
+      "type_guess": "preference",
+      "source": "en.wikipedia.org infobox wikitext",
+      "raw_data_sample": [
+        {
+          "ticker": "AAPL",
+          "name": "Apple Inc.",
+          "founders": "Steve Jobs , Steve Wozniak , Ronald Wayne"
+        },
+        {
+          "ticker": "ABT",
+          "name": "ABBOTT LABORATORIES",
+          "founders": "Wallace Calvin Abbott"
+        },
+        {
+          "ticker": "ACN",
+          "name": "Accenture plc",
+          "founders": "former_name = Andersen Consulting (1989\u20132000)"
+        },
+        {
+          "ticker": "ADBE",
+          "name": "ADOBE INC.",
+          "founders": "John Warnock, Charles Geschke"
+        },
+        {
+          "ticker": "ADP",
+          "name": "AUTOMATIC DATA PROCESSING INC",
+          "founders": "Henry Taub"
+        }
+      ],
+      "coverage": {
+        "companies_with_data": 203,
+        "total_companies": 497
+      },
+      "note": "Explicitly Low confidence per the task's own instruction that Wikipedia is a lead, not a final source -- especially for anything ownership-related. A reviewer still needs to cross-check infobox_fields.founders/key_people against current SEC-registered leadership before founder_led/family_owned booleans are set from it."
+    },
+    {
+      "criterion_id": "weapons_industry_involvement_gunfreefunds",
+      "proposed_question": "Avoiding companies flagged by an independent firearms/weapons-industry involvement screen (beyond the existing SIC-code-derived weapons_defense flag)",
+      "category_guess": "ethical",
+      "type_guess": "exclusionary",
+      "source": "gunfreefunds.org (As You Sow), api.gunfreefunds.org",
+      "raw_data_sample": [],
+      "coverage": {
+        "companies_with_data": 0,
+        "total_companies": 497
+      },
+      "note": "api.gunfreefunds.org is blocked by this environment's proxy egress policy (502 policy denial at the CONNECT step; confirmed via the proxy's own diagnostic log -- recentRelayFailures showed repeated connect_rejected entries for this exact host, not a transient network error). The public gunfreefunds.org site itself resolves fine but serves only a JS app shell with no server-rendered company data."
+    },
+    {
+      "criterion_id": "bcorp_certification",
+      "proposed_question": "Prioritizing certified B Corporations",
+      "category_guess": "governance",
+      "type_guess": "preference",
+      "source": "bcorporation.net",
+      "raw_data_sample": [],
+      "coverage": {
+        "companies_with_data": 0,
+        "total_companies": 497
+      },
+      "note": "bcorporation.net returned HTTP 403 with a Cloudflare Turnstile bot-challenge page ('Just a moment...') on every path tried (root, find-a-b-corp directory, a direct company URL), including with a browser-identifying User-Agent. Not fetchable by a plain HTTP client from this environment."
+    },
+    {
+      "criterion_id": "sbti_validated_climate_targets",
+      "proposed_question": "Prioritizing companies with a Science Based Targets initiative (SBTi) validated emissions-reduction target",
+      "category_guess": "environmental",
+      "type_guess": "preference",
+      "source": "sciencebasedtargets.org",
+      "raw_data_sample": [],
+      "coverage": {
+        "companies_with_data": 0,
+        "total_companies": 497
+      },
+      "note": "sciencebasedtargets.org's own bulk company export (companies-excel.xlsx) is hosted on files.sciencebasedtargets.org, a subdomain blocked by this environment's proxy policy (403 policy denial at CONNECT). The main sciencebasedtargets.org site's company-search page (companies-taking-action) is a client-rendered SPA that returns no company data in the raw HTTP response -- would require JS execution to scrape, which was out of scope for this pass."
+    },
+    {
+      "criterion_id": "just_capital_rank",
+      "proposed_question": "Prioritizing companies that rank highly in JUST Capital's annual stakeholder-treatment survey",
+      "category_guess": "social_labor",
+      "type_guess": "preference",
+      "source": "justcapital.com",
+      "raw_data_sample": [],
+      "coverage": {
+        "companies_with_data": 0,
+        "total_companies": 497
+      },
+      "note": "justcapital.com is reachable and its own wp-json REST API was checked, but only exposes standard WordPress posts/pages -- the rankings widget itself is a separate client-side app with no discoverable server-rendered ranking data or public REST endpoint on the justcapital.com domain."
+    },
+    {
+      "criterion_id": "board_diversity_matrix_pct",
+      "proposed_question": "Prioritizing companies with greater board gender/racial diversity",
+      "category_guess": "governance",
+      "type_guess": "preference",
+      "source": "SEC EDGAR DEF 14A proxy statement, Board Diversity Matrix disclosure",
+      "raw_data_sample": [],
+      "coverage": {
+        "companies_with_data": 0,
+        "total_companies": 497
+      },
+      "note": "Attempted and deliberately dropped this pass -- see data/mining_session_notes.md 'Board diversity matrix' section for why a blind regex extraction was judged unsafe at this scale."
+    },
+    {
+      "criterion_id": "sector_osha_injury_rate_benchmark",
+      "proposed_question": "(Supporting/contextual data, not a standalone question) Comparing a company's own OSHA-derived safety record against its industry's BLS-published injury/illness rate baseline",
+      "category_guess": "social_labor",
+      "type_guess": "preference",
+      "source": "www.bls.gov",
+      "raw_data_sample": [],
+      "coverage": {
+        "companies_with_data": 0,
+        "total_companies": 497
+      },
+      "note": "www.bls.gov is reachable but the specific injury/illness-by-industry release table renders via JavaScript with no data present in the raw HTTP response; see data/mining_session_notes.md."
+    }
+  ]
+}
