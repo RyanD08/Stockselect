@@ -477,18 +477,6 @@ function renderResults() {
           .join('')}
       </div>
 
-      <div class="disclaimer">
-        <strong>Important disclaimer:</strong> This TrueNorth tool is illustrative and educational only. Most
-        financial data (P/E, revenue growth, margins, ROE, leverage, market cap, beta, dividend policy, analyst
-        consensus, 6-month/1-year returns) is pulled from SEC EDGAR filings and live Finnhub market data. Some
-        fields have no live per-company data source available and remain rough, illustrative estimates rather than
-        verified facts: ESG category ratings, founder/family-ownership status, 5-year returns, and analyst
-        price-target upside. Sector and values-screen flags are derived from SEC industry classification codes
-        rather than a licensed ESG vendor and will occasionally be imprecise. It is not licensed financial advice,
-        and the results should not be relied upon for actual investment decisions. Please consult a registered
-        financial advisor before making any investment decisions.
-      </div>
-
       <div class="nav-row">
         <button id="edit-answers-btn" class="btn btn-secondary">Edit My Answers</button>
         <button id="restart-btn" class="btn btn-secondary">Start Over</button>
@@ -642,11 +630,6 @@ function renderSectorChart(holdings) {
   `;
 }
 
-const SIMULATION_DISCLAIMER_TEXT =
-  "This is a hypothetical, backward-looking simulation only. It applies today's recommended portfolio to last " +
-  "year's actual price history and does not reflect a real investment, future performance, fees, taxes, or the " +
-  'fact that this exact portfolio did not exist a year ago. This is not financial advice.';
-
 function formatUsd(amount) {
   return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -658,8 +641,9 @@ function formatSignedPct(pct) {
 
 // Downstream display-only feature: computeHistoricalSimulation() (js/simulation.js)
 // consumes the already-finalized `holdings` list and never feeds back into
-// buildPortfolio()/scoring.js. The disclaimer always renders alongside the hero
-// total, in the same block, regardless of the breakdown table's expand state.
+// buildPortfolio()/scoring.js. Its disclaimer text now lives in the single
+// consolidated disclaimer in the page footer (see index.html +
+// initSiteDisclaimerToggle()) rather than pinned here.
 function renderHistoricalSimulationSection(holdings) {
   if (holdings.length === 0) return '';
 
@@ -680,7 +664,6 @@ function renderHistoricalSimulationSection(holdings) {
           ? `<p class="simulation-coverage-note">Based on ${sim.includedCount} of ${sim.totalCount} companies with complete 12-month pricing data.</p>`
           : ''
       }
-      <p class="simulation-disclaimer">${escapeHtml(SIMULATION_DISCLAIMER_TEXT)}</p>
 
       <button type="button" id="simulation-toggle-btn" class="simulation-toggle-btn" aria-expanded="${isExpanded}">
         <span class="financial-toggle-chevron ${isExpanded ? 'open' : ''}">${chevronIcon()}</span>
@@ -841,8 +824,25 @@ function initLogoHomeLink() {
   });
 }
 
+// The consolidated site disclaimer in the footer is static markup (outside
+// the #app render cycle, present on every view) — its collapsed/expanded
+// state is plain DOM state, not part of `state`, since it has nothing to do
+// with survey progress and shouldn't reset when the app re-renders.
+function initSiteDisclaimerToggle() {
+  const toggleBtn = document.getElementById('disclaimer-toggle-btn');
+  const fullText = document.getElementById('disclaimer-full-text');
+  if (!toggleBtn || !fullText) return;
+  toggleBtn.addEventListener('click', () => {
+    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    toggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+    toggleBtn.textContent = isExpanded ? 'Read more' : 'Show less';
+    fullText.hidden = isExpanded;
+  });
+}
+
 async function init() {
   initLogoHomeLink();
+  initSiteDisclaimerToggle();
   render();
   try {
     state.dataset = await loadDataset();
