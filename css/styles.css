@@ -1133,16 +1133,6 @@ h2 .category-icon {
   margin: 0 0 0.75rem;
 }
 
-.simulation-disclaimer {
-  background: var(--warn-bg);
-  color: var(--warn-text);
-  border: 1px solid #f0dfb8;
-  border-radius: 8px;
-  padding: 0.85rem 1rem;
-  font-size: 0.85rem;
-  margin: 0 0 1rem;
-}
-
 .simulation-toggle-btn {
   display: inline-flex;
   align-items: center;
@@ -1205,16 +1195,6 @@ h2 .category-icon {
   height: 1.5rem;
 }
 
-.disclaimer {
-  margin-top: 1.75rem;
-  background: var(--danger-bg);
-  color: var(--danger-text);
-  border: 1px solid #eecfcd;
-  border-radius: 8px;
-  padding: 1rem 1.25rem;
-  font-size: 0.88rem;
-}
-
 #restart-btn {
   margin-top: 1.75rem;
 }
@@ -1230,4 +1210,55 @@ h2 .category-icon {
   font-family: var(--font-serif);
   font-weight: 700;
   color: var(--navy);
+}
+
+/* Single consolidated disclaimer, always present in the footer on every
+   screen. The summary line intentionally uses --text (not --muted) so it
+   reads clearly rather than disappearing as low-contrast fine print; the
+   full text underneath is the union of every disclaimer/data-limitation
+   note previously scattered across the results page. */
+.site-disclaimer {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.site-disclaimer-summary {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.site-disclaimer-toggle {
+  border: none;
+  background: none;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.35rem;
+  text-decoration: underline;
+}
+
+.site-disclaimer-toggle:hover {
+  color: var(--gold-light);
+}
+
+.site-disclaimer-full {
+  margin-top: 0.85rem;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border: 1px solid #eecfcd;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.site-disclaimer-full p {
+  margin: 0 0 0.75rem;
+}
+
+.site-disclaimer-full p:last-child {
+  margin-bottom: 0;
 }

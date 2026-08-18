@@ -28,8 +28,39 @@
   <main id="app"></main>
 
   <footer class="site-footer">
-    <span class="footer-brand">TrueNorth</span> &middot; Educational demo only &middot; Not licensed financial advice
-    &middot; Consult a registered financial advisor
+    <div class="site-disclaimer">
+      <p class="site-disclaimer-summary">
+        <span class="footer-brand">TrueNorth</span> &middot; This is an educational tool, not financial advice.
+        <button
+          type="button"
+          id="disclaimer-toggle-btn"
+          class="site-disclaimer-toggle"
+          aria-expanded="false"
+          aria-controls="disclaimer-full-text"
+        >
+          Read more
+        </button>
+      </p>
+      <div id="disclaimer-full-text" class="site-disclaimer-full" hidden>
+        <p>
+          This TrueNorth tool is illustrative and educational only. Most financial data (P/E, revenue growth,
+          margins, ROE, leverage, market cap, beta, dividend policy, analyst consensus, 6-month/1-year returns) is
+          pulled from SEC EDGAR filings and live Finnhub market data. Some fields have no live per-company data
+          source available and remain rough, illustrative estimates rather than verified facts: ESG category
+          ratings, founder/family-ownership status, 5-year returns, and analyst price-target upside. Sector and
+          values-screen flags are derived from SEC industry classification codes rather than a licensed ESG vendor
+          and will occasionally be imprecise. It is not licensed financial advice, and the results should not be
+          relied upon for actual investment decisions. Please consult a registered financial advisor before making
+          any investment decisions.
+        </p>
+        <p>
+          <strong>About the $15,000 historical simulation:</strong> This is a hypothetical, backward-looking
+          simulation only. It applies today's recommended portfolio to last year's actual price history and does
+          not reflect a real investment, future performance, fees, taxes, or the fact that this exact portfolio did
+          not exist a year ago. This is not financial advice.
+        </p>
+      </div>
+    </div>
   </footer>
 
   <script src="js/data.js"></script>
