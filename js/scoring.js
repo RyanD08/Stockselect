@@ -6,6 +6,14 @@
  * sum — see "Risk preferences" below; id 22 plays two distinct roles, also
  * described below) is either:
  *
+ * A pair of questions that currently draw on the exact same underlying
+ * datapoint (Q1/Q3, Q8/Q9 — see MERGED_QUESTION_GROUPS below) is folded into
+ * one combined scoring term rather than counted twice; scoreCompany(),
+ * valuesFitScore(), classifyTier(), and buildRationale() all iterate
+ * SCORING_UNITS, not SCORED_QUESTION_IDS directly, for this reason. The
+ * questionnaire itself is unaffected — all four questions still display and
+ * are still answered independently.
+ *
  *   - EXCLUSIONARY: the client is rating how much they want to *avoid* a
  *     trait. A company's alignment value a_i sits in [-1, 0] — 0 if the
  *     company lacks the trait (neutral, no penalty), down to -1 if it has
@@ -97,6 +105,52 @@ const SCORED_QUESTION_IDS = Array.from({ length: 20 }, (_, i) => i + 1); // 1-20
 // change what counts as a genuine values match any more than a company's
 // P/E ratio should.
 const RISK_DIRECT_QUESTION_IDS = [21, 23, 24];
+
+// Some pairs of questions currently compute the exact same alignment value
+// for every company, because both draw on the same single underlying
+// datapoint with no distinguishing logic between them: Q1/Q3 both reduce to
+// exclusionaryGraded(environmental.score), and Q8/Q9 both reduce to
+// exclusionaryGraded(governance.score) (governance is a uniform placeholder
+// today, so this pair happens to always match too — see esg_ratings.governance
+// in the dataset). Scored independently, a client who cares about that one
+// underlying concern gets it silently double-weighted just because two
+// questions currently ask about it. Each group here is folded into a single
+// scoring term instead: the client's ratings for the group are averaged into
+// one importance, and (once real per-company data lets Q1/Q3 or Q8/Q9
+// diverge) the two questions' alignment values are likewise averaged into
+// one combined alignment — so the merged concern always counts once, the
+// same as any other question, in the score, the values-match floor check,
+// conflict detection, and the "Strong fit on..." rationale text alike.
+// Front-end questionnaire is untouched: all four questions still display,
+// and are still answered, independently.
+const MERGED_QUESTION_GROUPS = [
+  { ids: [1, 3], label: 'Avoiding carbon/fossil fuel exposure or other poor environmental records' },
+  { ids: [8, 9], label: 'Avoiding governance concerns (fraud/scandals or concentrated/dual-class voting control)' },
+];
+const MERGED_QUESTION_IDS = new Set(MERGED_QUESTION_GROUPS.flatMap((g) => g.ids));
+// One "scoring unit" per merged group, plus one per remaining scored
+// question id — every function below that used to iterate
+// SCORED_QUESTION_IDS directly now iterates this instead, so a merged pair
+// only ever contributes once.
+const SCORING_UNITS = [
+  ...MERGED_QUESTION_GROUPS.map((g) => ({ ids: g.ids, label: g.label })),
+  ...SCORED_QUESTION_IDS.filter((id) => !MERGED_QUESTION_IDS.has(id)).map((id) => ({ ids: [id] })),
+];
+
+function unitLabel(unit) {
+  return unit.label || getQuestion(unit.ids[0]).short;
+}
+
+function unitImportance(unit, answers) {
+  const sum = unit.ids.reduce((total, id) => total + (answers[id] || 3), 0);
+  return sum / unit.ids.length;
+}
+
+function unitAlignment(unit, company, ctx) {
+  const sum = unit.ids.reduce((total, id) => total + ALIGNMENT_FNS[id](company, ctx), 0);
+  return sum / unit.ids.length;
+}
+
 const HIGH_PRIORITY_THRESHOLD = 4; // client ratings of 4-5 count as "highest priority"
 const CONFLICT_ALIGNMENT_THRESHOLD = -0.5; // a_i at or below this counts as a strong conflict
 const MAX_PORTFOLIO_SIZE = 15;
@@ -259,10 +313,10 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   let denominator = 0;
   const alignments = {};
 
-  SCORED_QUESTION_IDS.forEach((qId) => {
-    const importance = answers[qId] || 3;
-    const alignment = ALIGNMENT_FNS[qId](company, ctx);
-    alignments[qId] = alignment;
+  SCORING_UNITS.forEach((unit) => {
+    const importance = unitImportance(unit, answers);
+    const alignment = unitAlignment(unit, company, ctx);
+    unit.ids.forEach((id) => { alignments[id] = alignment; });
     numerator += importance * alignment;
     denominator += importance;
   });
@@ -314,9 +368,9 @@ function scoreCompany(company, answers, ctx, riskProfile) {
 function valuesFitScore(company, answers, ctx) {
   let numerator = 0;
   let denominator = 0;
-  SCORED_QUESTION_IDS.forEach((qId) => {
-    const importance = answers[qId] || 3;
-    const alignment = ALIGNMENT_FNS[qId](company, ctx);
+  SCORING_UNITS.forEach((unit) => {
+    const importance = unitImportance(unit, answers);
+    const alignment = unitAlignment(unit, company, ctx);
     numerator += importance * alignment;
     denominator += importance;
   });
@@ -347,6 +401,14 @@ function valuesFitScore(company, answers, ctx) {
 //   count was explicitly not a calibration target. This ceiling, and this
 //   threshold, will both shift once real per-company ESG data replaces the
 //   uniform placeholder.
+//
+// Note: merging the always-duplicate Q1/Q3 and Q8/Q9 pairs into single
+// scoring units (see MERGED_QUESTION_GROUPS) shifted the achievable score
+// range again -- 118 Mega/Large-cap companies now clear this floor for a
+// neutral client profile, up from the ~100 this was tuned against. Left
+// unchanged deliberately: recalibrating it is a separate decision from
+// fixing the double-count, and the same "will shift once real ESG data
+// lands" caveat above already applies.
 const MINIMUM_VALUES_MATCH = 54;
 
 function meetsValuesFloor(company, answers, ctx) {
@@ -372,19 +434,24 @@ function deriveRiskProfile(answers) {
   return 'Growth';
 }
 
+// Iterates SCORING_UNITS (not raw question ids) so a merged pair (see
+// MERGED_QUESTION_GROUPS) can only ever produce one conflict, using its
+// averaged importance/alignment — a client who flags a merged concern as a
+// top priority sees it called out once in the Partial Match note below, not
+// twice under two different question labels for what's really one signal.
 function classifyTier(alignments, answers) {
   const conflicts = [];
-  SCORED_QUESTION_IDS.forEach((qId) => {
-    const importance = answers[qId] || 3;
-    if (importance >= HIGH_PRIORITY_THRESHOLD && alignments[qId] <= CONFLICT_ALIGNMENT_THRESHOLD) {
-      conflicts.push(qId);
+  SCORING_UNITS.forEach((unit) => {
+    const importance = unitImportance(unit, answers);
+    if (importance >= HIGH_PRIORITY_THRESHOLD && alignments[unit.ids[0]] <= CONFLICT_ALIGNMENT_THRESHOLD) {
+      conflicts.push(unit);
     }
   });
   return { tier: conflicts.length > 0 ? 'Partial' : 'Strong', conflicts };
 }
 
 function buildPartialMatchNote(conflicts) {
-  const labels = conflicts.map((qId) => lowerFirst(getQuestion(qId).short));
+  const labels = conflicts.map((unit) => lowerFirst(unitLabel(unit)));
   if (labels.length === 1) return `Does not fully meet your preference for ${labels[0]}.`;
   const last = labels[labels.length - 1];
   const rest = labels.slice(0, -1);
@@ -396,10 +463,14 @@ function lowerFirst(str) {
 }
 
 function buildRationale(alignments, answers, financialImportance, financialAlignment, valuesOverReturnsImportance, valuesOverReturnsAlignment) {
-  const candidates = SCORED_QUESTION_IDS.map((qId) => ({
-    label: getQuestion(qId).short,
-    importance: answers[qId] || 3,
-    alignment: alignments[qId],
+  // SCORING_UNITS, not raw question ids, so a merged pair (see
+  // MERGED_QUESTION_GROUPS) contributes one "Strong fit on..." candidate —
+  // otherwise it could win both of the top-2 rationale slots for what's
+  // really one underlying signal counted twice.
+  const candidates = SCORING_UNITS.map((unit) => ({
+    label: unitLabel(unit),
+    importance: unitImportance(unit, answers),
+    alignment: alignments[unit.ids[0]],
   }));
   candidates.push({ label: 'Strong financial fundamentals', importance: financialImportance, alignment: financialAlignment });
   RISK_DIRECT_QUESTION_IDS.forEach((qId) => {
