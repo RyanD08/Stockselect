@@ -148,6 +148,26 @@ rather than replace with the incoming (beta-less) version -- the incoming
 one is not clearly better-sourced, it's missing an input the live site
 already has.
 
+## Post-import follow-up: Risk Philosophy restored (2026-08-21, same day)
+
+After the import landed live, the client asked to revert Risk Philosophy
+specifically to its pre-import state, using the financial data already on
+every company (this data was never touched by the ESG import in the first
+place). Reinstated: "preference for large, established blue-chip companies"
+(Q29) and "preference for dividend-paying income stocks" (Q30), with their
+original scoring mechanics (`blueChipDirectAlignment`,
+`dividendDirectAlignment`, `isBlueChipEligible`'s hard pre-filter at rating
+5) restored verbatim in `js/scoring.js`, and `deriveRiskProfile` reverted
+to averaging all 4 risk questions (was briefly 2). Appended as new ids 29
+(blue-chip) and 30 (dividend-income) rather than reclaiming their original
+23/24 slots, so nothing else in the 1-28 range needed renumbering; the
+horizon selector shifted from id 29 to 31. Net effect: the site now has 30
+rated questions (not the imported schema's own 28) -- a deliberate,
+client-requested deviation from the incoming schema, not an oversight.
+Everything else from the import (the 28-question ESG restructure, the two
+new categories, animal testing removed, women-led added, the merged ESG
+dataset) is unchanged.
+
 ## Merge conflict log
 
 See `data/merge_conflict_log.json`, written by `scripts/merge_incoming_esg_dataset.py`

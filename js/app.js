@@ -742,10 +742,10 @@ function riskProfileIcon(riskProfile) {
 
 function riskProfileBlurb(riskProfile) {
   if (riskProfile === 'Conservative') {
-    return 'You favor long-term stability and are less willing to trade returns for values alignment. Your stability and values-over-returns answers directly rewarded lower-beta, larger-cap, higher-yield holdings in your results — not just as a tie-breaker.';
+    return 'You favor long-term stability, blue-chip/dividend-paying companies, and are less willing to trade returns for values alignment. Your stability, blue-chip, and dividend-income answers each directly rewarded lower-beta, larger-cap, higher-yield holdings in your results — not just as a tie-breaker.';
   }
   if (riskProfile === 'Growth') {
-    return 'You favor growth potential and are more willing to accept lower stability in pursuit of values alignment. Your stability and values-over-returns answers directly rewarded higher-return, higher-beta, growth-oriented holdings in your results — not just as a tie-breaker.';
+    return 'You favor growth potential and smaller/emerging companies, and are more willing to accept lower stability in pursuit of values alignment. Your stability, blue-chip, and dividend-income answers each directly rewarded higher-return, higher-beta, growth-oriented holdings in your results — not just as a tie-breaker.';
   }
   return 'You are comfortable balancing stability and growth potential. Your financial-quality criterion rewarded the best risk-adjusted profile (return relative to beta) accordingly.';
 }
@@ -763,7 +763,7 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
 
   const p1 =
     `Based on your responses, we've built a ${holdings.length}-holding portfolio weighted around ${priorityPhrase}` +
-    `alongside a ${riskProfile.toLowerCase()} risk profile: your stability and values-over-returns answers ` +
+    `alongside a ${riskProfile.toLowerCase()} risk profile: your stability, blue-chip, and dividend-income answers ` +
     `each directly influenced every company's score, on top of how much weight you gave financial performance ` +
     `overall. Each company in our sample dataset was scored on how well it aligns with your specific answers, ` +
     `distinguishing criteria you asked us to screen out (like sin-stock exposure or high leverage) from criteria ` +
@@ -780,7 +780,7 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
           `each carries a specific trade-off against one of your top priorities, which we've called out individually ` +
           `in the table above so you can decide whether that trade-off is acceptable to you.`
         : `No holdings required a trade-off against your top priorities.`
-    } Your stability and values-over-returns preferences directly influenced every company's score ` +
+    } Your stability, blue-chip, and dividend-income preferences directly influenced every company's score ` +
     `alongside your values answers, rather than only breaking ties between otherwise-equal companies. Positions ` +
     `are equally weighted, and we capped exposure to any single sector at three holdings to keep the portfolio ` +
     `reasonably diversified.${

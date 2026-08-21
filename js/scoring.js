@@ -4,17 +4,24 @@
  * Restructured 2026-08-21 to match the 28-question schema imported from
  * RyanD08/stock-select-data-mine — see data/import_schema_comparison.md
  * for the full before/after (question renumbering, two new categories,
- * three risk-preference questions removed since the new schema has no
- * counterpart for them, MERGED_QUESTION_GROUPS removed since the new
- * per-company data no longer makes Q1/Q3 or Q11/Q12 literal duplicates
- * of each other). Financial-quality scoring (financialQualityAlignment
- * and everything it depends on, from here down to the end of this file)
- * is UNCHANGED — this pass only touches ESG/values-side scoring, per the
- * task's explicit "do not overwrite financial data" rule.
+ * MERGED_QUESTION_GROUPS removed since the new per-company data no longer
+ * makes Q1/Q3 or Q11/Q12 literal duplicates of each other). Financial-
+ * quality scoring (financialQualityAlignment and everything it depends on,
+ * from here down to the end of this file) is UNCHANGED throughout — this
+ * pass only ever touched ESG/values-side scoring, per the task's explicit
+ * "do not overwrite financial data" rule.
  *
- * Every scored question (ids 1-26 are the values screens; ids 27, 28 are
- * risk/portfolio-construction preferences added directly to the same sum
- * — see "Risk preferences" below) is either:
+ * Later the same day, blue-chip preference (Q29) and dividend-income
+ * preference (Q30) were restored at the client's explicit request, using
+ * the financial data (market_cap_tier, dividend yield_tier) that was never
+ * touched by the ESG import in the first place — see "Risk preferences"
+ * below. Net question count is 30 (not the imported schema's own 28); the
+ * two extra are a deliberate, client-requested deviation from that schema,
+ * not an oversight.
+ *
+ * Every scored question (ids 1-26 are the values screens; ids 27, 29, 30
+ * are risk/portfolio-construction preferences added directly to the same
+ * sum, id 28 plays a dual role — see "Risk preferences" below) is either:
  *
  *   - EXCLUSIONARY: the client is rating how much they want to *avoid* a
  *     trait. A company's alignment value a_i sits in [-1, 0] — 0 if the
@@ -57,14 +64,15 @@
  * 5-equivalent priority gets the same proportional influence as a 5/5 on
  * any values question, no more.
  *
- * Risk preferences (Q27 stability, plus Q28's second role below) each have
- * their own direct term in the same weighted sum everything else uses, so
- * they always contribute proportionally to the visible score, on their
- * own. (v2 also had blue-chip and dividend-income preference questions
- * here; both were removed in the 2026-08-21 restructure since the
- * imported 28-question schema has no counterpart for them — see
- * data/import_schema_comparison.md. Their scoring functions are fully
- * removed, not left unused, but recoverable from this repo's git history.)
+ * Risk preferences (Q27 stability, Q29 blue-chip, Q30 dividend-income, plus
+ * Q28's second role below) each have their own direct term in the same
+ * weighted sum everything else uses, so they always contribute
+ * proportionally to the visible score, on their own. (Q29/Q30 were briefly
+ * removed when the ESG dataset import first landed, since the imported
+ * schema's own Risk Philosophy section only defines 2 items -- restored
+ * the same day at the client's explicit request, using financial data the
+ * import never touched. See data/import_schema_comparison.md for the full
+ * history.)
  *
  * These terms use a different importance mapping than every other question
  * in this file: importance = rating - 1 (so 1->0, 5->4), instead of the
@@ -112,7 +120,7 @@ const SCORED_QUESTION_IDS = Array.from({ length: 26 }, (_, i) => i + 1); // 1-26
 // construction preferences, not ethical/values screens, so they shouldn't
 // change what counts as a genuine values match any more than a company's
 // P/E ratio should.
-const RISK_DIRECT_QUESTION_IDS = [27];
+const RISK_DIRECT_QUESTION_IDS = [27, 29, 30];
 
 // One "scoring unit" per scored question id. (v2 had MERGED_QUESTION_GROUPS
 // here, folding Q1/Q3 and Q8/Q9 into one term each because both members of
@@ -396,10 +404,7 @@ const ALIGNMENT_FNS = {
   26: womenLedAlignment,
 };
 
-// Q27 (stability-over-growth) is the only remaining direct risk trade-off
-// term (v2 also had blue-chip and dividend-income preference here -- both
-// removed 2026-08-21, see header comment and
-// data/import_schema_comparison.md). Unchanged from v2's Q21.
+// Q27 (stability-over-growth). Unchanged from v2's Q21.
 const NEUTRAL_BETA = 1.0; // ~market-average volatility
 const BETA_SWING = 1.0; // beta this far from neutral in either direction reaches ±1
 function stabilityDirectAlignment(company) {
@@ -408,8 +413,39 @@ function stabilityDirectAlignment(company) {
   return Math.max(-1, Math.min(1, (NEUTRAL_BETA - beta) / BETA_SWING));
 }
 
+// Q30 (dividend-income preference). DIVIDEND_YIELD_RANK (defined below,
+// reused here) treats "Low" as the neutral center: a non-payer is actively
+// penalized, a high-yield payer is actively rewarded, exactly matching the
+// "preference for dividend-paying income stocks over growth-focused
+// reinvestment" framing. Restored 2026-08-21, unchanged from v2's Q24.
+function dividendDirectAlignment(company) {
+  const rank = dividendYieldRank(company.dividend_policy);
+  return Math.max(-1, Math.min(1, (rank - 2) / 2));
+}
+
+// Q29 (blue-chip preference). MARKET_CAP_RANK (defined below, reused
+// here): Mega/Large rewarded, Mid/Small penalized, centered between Large
+// and Mid. This is the *soft* blue-chip preference (ratings 1-4); a rating
+// of 5 is instead a hard filter -- see isBlueChipEligible. Restored
+// 2026-08-21, unchanged from v2's Q23.
+function blueChipDirectAlignment(company) {
+  const rank = MARKET_CAP_RANK[company.market_profile.market_cap_tier];
+  if (rank === undefined) return 0;
+  return Math.max(-1, Math.min(1, (rank - 1.5) / 1.5));
+}
+
+// Q29 at 5/5 is a hard pre-filter (see buildPortfolio); 1-4 don't filter
+// anything. Restored 2026-08-21, unchanged from v2's Q23/isBlueChipEligible.
+function isBlueChipEligible(company, answers) {
+  const q29 = answers[29] || 3;
+  if (q29 < 5) return true;
+  return company.market_profile.market_cap_tier === 'Mega';
+}
+
 const RISK_ALIGNMENT_FNS = {
   27: stabilityDirectAlignment,
+  29: blueChipDirectAlignment,
+  30: dividendDirectAlignment,
 };
 
 function scoreCompany(company, answers, ctx, riskProfile) {
@@ -496,14 +532,13 @@ function meetsValuesFloor(company, answers, ctx) {
 
 // Purely descriptive (see header comment "Risk preferences") — shown to
 // the client as a summary label ("Your Risk Profile") and used to shape
-// financialQualityAlignment's formula. v2 averaged 4 inverted risk-question
-// answers (Q21-24) into this; only 2 remain after the 2026-08-21
-// restructure (Q27 stability, Q28 values-over-returns) -- same thresholds
-// kept since the underlying 1-5-inverted scale is unchanged, just fewer
-// inputs averaged; a candidate for recalibration alongside MINIMUM_VALUES_MATCH
-// above if real usage shows the buckets skew.
+// financialQualityAlignment's formula. Averages 4 inverted risk-question
+// answers (Q27 stability, Q28 values-over-returns, Q29 blue-chip, Q30
+// dividend-income) into a single growth-orientation axis, restored to this
+// original 4-input form on 2026-08-21 alongside Q29/Q30 themselves (see
+// header comment) after a brief window with only 2 inputs.
 function deriveRiskProfile(answers) {
-  const growthAxisValues = [27, 28].map((qId) => 6 - (answers[qId] || 3));
+  const growthAxisValues = [27, 28, 29, 30].map((qId) => 6 - (answers[qId] || 3));
   const avg = growthAxisValues.reduce((sum, v) => sum + v, 0) / growthAxisValues.length;
   if (avg <= 2.3) return 'Conservative';
   if (avg <= 3.7) return 'Balanced';
@@ -867,16 +902,20 @@ function buildPortfolio(dataset, answers, clientContext) {
   };
   const riskProfile = deriveRiskProfile(answers);
 
-  // v2 also hard-filtered on a blue-chip-only preference (Q23 at 5/5) here
-  // -- removed 2026-08-21 along with the blue-chip question itself (see
-  // header comment). Every company is now eligible; the values-match floor
-  // below is the only gate.
+  // Q29 (blue-chip preference) at 5/5 is a hard, non-negotiable pre-filter
+  // -- smaller companies are excluded outright, never backfilled/relaxed,
+  // since "only suggest blue-chip" should mean literally that. Ratings 1-4
+  // don't filter anything: they're a soft, graded preference instead (see
+  // blueChipDirectAlignment above). Restored 2026-08-21 alongside Q29
+  // itself.
+  const blueChipEligible = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
+
   const meetsFloor = (c) => meetsValuesFloor(c, answers, ctx);
   const primaryCandidates = sortScoredEntries(
-    dataset.companies.filter(meetsFloor).map((c) => buildScoredEntry(c, answers, ctx, riskProfile))
+    blueChipEligible.filter(meetsFloor).map((c) => buildScoredEntry(c, answers, ctx, riskProfile))
   );
   const backfillCandidates = sortScoredEntries(
-    dataset.companies
+    blueChipEligible
       .filter((c) => !meetsFloor(c))
       .map((c) => {
         const entry = buildScoredEntry(c, answers, ctx, riskProfile);

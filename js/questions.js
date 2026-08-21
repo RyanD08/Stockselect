@@ -1,16 +1,16 @@
 /**
- * Survey question definitions (v3 — 28 questions, restructured 2026-08-21
+ * Survey question definitions (v3.1 — 30 questions, restructured 2026-08-21
  * to match the canonical 27-question schema (+ women-led) defined by the
  * data-mining repo, RyanD08/stock-select-data-mine's
  * schema/company_schema.json — see data/import_schema_comparison.md for
- * the full before/after comparison and what changed.
+ * the full before/after comparison and what changed in that pass.
  *
  * Kept separate from scoring.js and app.js so the questionnaire itself
  * can be edited independently of how answers are scored or rendered.
  *
- * Every question maps to a real field in the esg_dataset_sp500.json schema
- * (see scoring.js). `type` distinguishes how a client's importance rating
- * should be applied:
+ * Every question maps to a real field in the esg_dataset_sp500.json or
+ * financial_dataset_sp500.json schema (see scoring.js). `type`
+ * distinguishes how a client's importance rating should be applied:
  *   - 'exclusionary': a 5 means "strongly penalize companies with this trait"
  *   - 'preference':   a 5 means "strongly reward companies with this trait"
  *   - 'risk':         not scored per-company; combined into a derived Risk
@@ -21,17 +21,20 @@
  * Changes from v2 (24 questions, 6 categories):
  *   - Removed: "Avoiding companies involved in animal testing" (no
  *     verified per-company data source exists at S&P 500 scale).
- *   - Removed as separate questions (folded into other criteria or
- *     dropped — see data/import_schema_comparison.md): "preferring
- *     primarily domestic revenue" (merged into domestic-HQ, Q23),
- *     "preference for blue-chip companies" and "preference for
- *     dividend-paying stocks" (no counterpart in the new 28-question
- *     schema; the underlying scoring functions are removed from
- *     scoring.js, not left as dead code, but fully recoverable from this
- *     repo's git history).
+ *   - Removed as a separate question (folded into domestic-HQ, Q23):
+ *     "preferring primarily domestic revenue".
  *   - Added: Religious Values and Political/Social as new categories
  *     (5 new questions total), plus women-led as a new Community/Identity
  *     question.
+ *   - Risk Philosophy was temporarily reduced to 2 questions (stability,
+ *     values-over-returns) when the data import first landed, since the
+ *     imported schema's Risk Philosophy section only defines those two.
+ *     Restored 2026-08-21 (post-import) at the client's explicit request:
+ *     blue-chip preference (Q29) and dividend-income preference (Q30) are
+ *     back, using the financial data already on every company
+ *     (market_cap_tier, dividend yield_tier) which the ESG import never
+ *     touched. Appended as new ids rather than reclaiming their old 23/24
+ *     slots, so nothing else needed renumbering.
  */
 
 const QUESTIONS = [
@@ -78,11 +81,19 @@ const QUESTIONS = [
   // Risk Philosophy (combined into a derived Risk Profile, not scored per-company)
   { id: 27, category: 'risk', type: 'risk', text: 'Long-term stability over short-term growth potential', short: 'Stability over growth' },
   { id: 28, category: 'risk', type: 'risk', text: 'Willingness to accept lower returns for values alignment', short: 'Accept lower returns for values' },
+  // Restored 2026-08-21 (post-import) at the client's request, using the
+  // financial data already on every company (market_cap_tier, dividend
+  // yield_tier) -- untouched by the ESG-data import. Reinstated exactly as
+  // they were pre-import: same wording, same direct-scoring mechanics (see
+  // scoring.js), appended here as new ids rather than reclaiming the old
+  // 23/24 slots so nothing else needed renumbering.
+  { id: 29, category: 'risk', type: 'risk', text: 'Preference for large, established "blue-chip" companies over smaller, emerging companies', short: 'Blue-chip over emerging companies' },
+  { id: 30, category: 'risk', type: 'risk', text: 'Preference for dividend-paying income stocks over growth-focused reinvestment', short: 'Dividend income over growth reinvestment' },
 
   // Single-select, not a 1-5 rating — picks which return field feeds the
   // financial-quality criterion (see scoring.js financialQualityAlignment).
   {
-    id: 29,
+    id: 31,
     category: 'risk',
     type: 'horizon',
     text: 'My typical investment time horizon is:',
