@@ -19,6 +19,22 @@
  * two extra are a deliberate, client-requested deviation from that schema,
  * not an oversight.
  *
+ * Still the same day: a client-requested simulation ("how many of the 502
+ * companies can actually appear in a recommendation?") found only 34.7%
+ * ever could, across thousands of simulated client profiles -- and that
+ * sweeping MINIMUM_VALUES_MATCH from 54 down to a near-trivial 42 barely
+ * moved that number, proving the floor was never the real constraint. The
+ * actual cause: unitImportance's old LINEAR rating weighting let ~25
+ * neutral/no-data fields dilute a client's genuine top priorities into an
+ * indistinguishable ~50-58 band for nearly every company. Fixed by
+ * squaring importance and excluding genuinely-missing data from the
+ * weighting denominator entirely (see unitImportance/questionHasData
+ * below) -- simulated to raise reachability to 43.2% on its own, no floor
+ * or cap changes at all. MINIMUM_VALUES_MATCH (54->52) and MAX_PER_SECTOR
+ * (3->5) were then also loosened modestly on top of that fix, landing
+ * around 48% in simulation. Full methodology and numbers in
+ * data/import_schema_comparison.md "Scoring formula recalibration".
+ *
  * Every scored question (ids 1-26 are the values screens; ids 27, 29, 30
  * are risk/portfolio-construction preferences added directly to the same
  * sum, id 28 plays a dual role — see "Risk preferences" below) is either:
@@ -138,9 +154,80 @@ function unitLabel(unit) {
   return unit.label || getQuestion(unit.ids[0]).short;
 }
 
+// Recalibrated 2026-08-21 (see data/import_schema_comparison.md "Scoring
+// formula recalibration"): squares each rating instead of using it
+// linearly, so a client's actual top priorities (4s/5s) dominate the
+// weighted sum instead of being diluted by ~25 other fields left at the
+// neutral default of 3. Simulated against 502 real companies: this alone
+// (no floor/cap changes) raised the fraction of the S&P 500 that can ever
+// appear in a recommended portfolio from 34.7% to 43.2%, and roughly
+// doubled the spread of values-fit scores across companies (stddev 1.71 ->
+// 3.60 on a fixed neutral profile) -- confirming the flat linear average
+// was compressing nearly every company into an indistinguishable ~50-58
+// band, not the values-match floor (see MINIMUM_VALUES_MATCH below).
 function unitImportance(unit, answers) {
+  const sum = unit.ids.reduce((total, id) => total + Math.pow(answers[id] || 3, 2), 0);
+  return sum / unit.ids.length;
+}
+
+// The RAW (unsquared) 1-5 rating -- used wherever code asks "did the
+// client actually rate this a high priority?" (classifyTier's conflict
+// detection, buildRationale's high-priority filter), as opposed to
+// unitImportance's squared value, which is only meant for the weighted-sum
+// math above. Squared importance's minimum possible value (9, at the
+// default rating of 3) already exceeds HIGH_PRIORITY_THRESHOLD (4), so
+// using it for these "is this really a 4-5 rating" checks would trigger
+// unconditionally -- every question would read as "high priority," and in
+// buildRationale specifically it would drown out genuinely high-priority
+// financial/risk terms (which stayed on the original 0-5 scale) in the
+// pool comparison.
+function unitRawRating(unit, answers) {
   const sum = unit.ids.reduce((total, id) => total + (answers[id] || 3), 0);
   return sum / unit.ids.length;
+}
+
+// Companion to unitImportance: a question with genuinely no verifiable
+// data for this company must not just score neutral (0) -- its importance
+// weight also has to be excluded from the denominator entirely, or a
+// client's high priority on an unanswerable question silently dilutes
+// their real, answerable priorities (the same root problem unitImportance
+// above addresses, from the other side). Mirrors each ALIGNMENT_FNS
+// entry's own no-data check exactly, one case per scored question
+// (ids 1-26); ids 27+ (risk/financial terms) never call this.
+function questionHasData(qid, company, ctx) {
+  switch (qid) {
+    case 1: return !hasNoData(fieldOf(company, 'carbon_fossil_fuel_involvement'));
+    case 2: return !hasNoData(fieldOf(company, 'renewable_clean_tech_involvement'));
+    case 3: { const f = fieldOf(company, 'environmental_pollution_violations'); return !hasNoData(f) && typeof f.value === 'object'; }
+    case 4: return !hasNoData(fieldOf(company, 'sustainable_agriculture_resource_use'));
+    case 5: return !hasNoData(fieldOf(company, 'fair_wages_labor_practices'));
+    case 6: { const f = fieldOf(company, 'labor_disputes_exploitation_history'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.case_count === 'number'; }
+    case 7: return !hasNoData(fieldOf(company, 'workplace_diversity_equity_inclusion'));
+    case 8: { const f = fieldOf(company, 'worker_safety_record'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.matched_establishment_rows === 'number'; }
+    case 9: { const f = fieldOf(company, 'board_transparency_independence'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.pct_independent_directors === 'number'; }
+    case 10: { const f = fieldOf(company, 'ceo_pay_ratio'); return !hasNoData(f) && typeof f.value === 'number'; }
+    case 11: { const f = fieldOf(company, 'fraud_corruption_scandal_history'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.case_count === 'number'; }
+    case 12: return !hasNoData(fieldOf(company, 'shareholder_rights_voting_structure'));
+    case 13: return !hasNoData(fieldOf(company, 'tobacco_involvement'));
+    case 14: return !hasNoData(fieldOf(company, 'alcohol_involvement'));
+    case 15: return !hasNoData(fieldOf(company, 'gambling_casino_involvement'));
+    case 16: return !hasNoData(fieldOf(company, 'weapons_defense_involvement'));
+    case 17: return !hasNoData(fieldOf(company, 'adult_entertainment_involvement'));
+    case 18: return false; // religious compliance -- no comprehensive public data source exists at S&P 500 scale, always excluded
+    case 19: return !hasNoData(fieldOf(company, 'interest_based_financial_products'));
+    case 20: return !hasNoData(fieldOf(company, 'political_donation_transparency'));
+    case 21: { const f = fieldOf(company, 'countries_of_concern_operations'); return !hasNoData(f) && Array.isArray(f.value); }
+    case 22: { const f = fieldOf(company, 'data_privacy_practices'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.item_1_05_incident_count === 'number'; }
+    case 23: return true; // domestic HQ -- hq_country is always populated, real identity data
+    case 24: { const fl = fieldOf(company, 'founder_led'); const fo = fieldOf(company, 'family_owned'); return !hasNoData(fl) || !hasNoData(fo); }
+    case 25: return !!ctx.tiesSector; // inert for this question entirely when the client leaves it unset
+    case 26: return !hasNoData(fieldOf(company, 'women_led'));
+    default: return true;
+  }
+}
+
+function unitHasData(unit, company, ctx) {
+  return unit.ids.every((id) => questionHasData(id, company, ctx));
 }
 
 function unitAlignment(unit, company, ctx) {
@@ -151,7 +238,14 @@ function unitAlignment(unit, company, ctx) {
 const HIGH_PRIORITY_THRESHOLD = 4; // client ratings of 4-5 count as "highest priority"
 const CONFLICT_ALIGNMENT_THRESHOLD = -0.5; // a_i at or below this counts as a strong conflict
 const MAX_PORTFOLIO_SIZE = 15;
-const MAX_PER_SECTOR = 3;
+// Raised 3 -> 5 on 2026-08-21 alongside the scoring formula recalibration
+// (see unitImportance/MINIMUM_VALUES_MATCH comments and
+// data/import_schema_comparison.md) -- simulated: at cap=3 even removing
+// this limit entirely only reached ~48% universe reachability, so the cap
+// alone was never the main constraint, but a modest loosening still helps
+// on top of the formula fix (which did the real work) without abandoning
+// sector diversification as a goal.
+const MAX_PER_SECTOR = 5;
 
 // Judgment-based ESG scores are dampened by how well-documented they are,
 // so a Low-confidence "safe" finding no longer counts the same as a
@@ -454,7 +548,8 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   const alignments = {};
 
   SCORING_UNITS.forEach((unit) => {
-    const importance = unitImportance(unit, answers);
+    const hasData = unitHasData(unit, company, ctx);
+    const importance = hasData ? unitImportance(unit, answers) : 0;
     const alignment = unitAlignment(unit, company, ctx);
     unit.ids.forEach((id) => { alignments[id] = alignment; });
     numerator += importance * alignment;
@@ -509,7 +604,8 @@ function valuesFitScore(company, answers, ctx) {
   let numerator = 0;
   let denominator = 0;
   SCORING_UNITS.forEach((unit) => {
-    const importance = unitImportance(unit, answers);
+    const hasData = unitHasData(unit, company, ctx);
+    const importance = hasData ? unitImportance(unit, answers) : 0;
     const alignment = unitAlignment(unit, company, ctx);
     numerator += importance * alignment;
     denominator += importance;
@@ -518,13 +614,23 @@ function valuesFitScore(company, answers, ctx) {
   return Math.round(Math.min(100, Math.max(0, raw)));
 }
 
-// Carried forward unchanged from v2's calibration (see prior git history
-// for the original derivation against the placeholder-ESG dataset). The
-// imported dataset gives real per-company differentiation on far more
-// questions than v2 had, which will likely shift the achievable score
-// range again -- flagged here as a candidate for recalibration in a
-// follow-up pass, not changed speculatively in this one.
-const MINIMUM_VALUES_MATCH = 54;
+// Recalibrated 54 -> 52 on 2026-08-21, alongside the unitImportance
+// formula change above (see that comment and
+// data/import_schema_comparison.md "Scoring formula recalibration" for the
+// full simulation). The prior value (54) was tuned against the old
+// placeholder-ESG dataset where every company scored near-identically;
+// once real per-company data landed, simulation showed the floor was NOT
+// the actual bottleneck on how much of the S&P 500 could ever appear in a
+// recommendation (dropping it all the way to 42 barely moved the needle,
+// 34.7% -> ~40%) -- the flat linear weighted-average formula was doing the
+// real damping, addressed above. This modest floor reduction, combined
+// with the formula fix and MAX_PER_SECTOR's widening, raises universe
+// reachability to ~48% in simulation while keeping the floor's original
+// purpose intact: requiring genuine positive alignment, not just "not
+// disqualified" -- a company still cannot clear it on financial strength
+// alone (financial quality is excluded from valuesFitScore by design, see
+// that function).
+const MINIMUM_VALUES_MATCH = 52;
 
 function meetsValuesFloor(company, answers, ctx) {
   return valuesFitScore(company, answers, ctx) >= MINIMUM_VALUES_MATCH;
@@ -548,8 +654,8 @@ function deriveRiskProfile(answers) {
 function classifyTier(alignments, answers) {
   const conflicts = [];
   SCORING_UNITS.forEach((unit) => {
-    const importance = unitImportance(unit, answers);
-    if (importance >= HIGH_PRIORITY_THRESHOLD && alignments[unit.ids[0]] <= CONFLICT_ALIGNMENT_THRESHOLD) {
+    const rawRating = unitRawRating(unit, answers);
+    if (rawRating >= HIGH_PRIORITY_THRESHOLD && alignments[unit.ids[0]] <= CONFLICT_ALIGNMENT_THRESHOLD) {
       conflicts.push(unit);
     }
   });
@@ -571,7 +677,7 @@ function lowerFirst(str) {
 function buildRationale(alignments, answers, financialImportance, financialAlignment, valuesOverReturnsImportance, valuesOverReturnsAlignment) {
   const candidates = SCORING_UNITS.map((unit) => ({
     label: unitLabel(unit),
-    importance: unitImportance(unit, answers),
+    importance: unitRawRating(unit, answers),
     alignment: alignments[unit.ids[0]],
   }));
   candidates.push({ label: 'Strong financial fundamentals', importance: financialImportance, alignment: financialAlignment });

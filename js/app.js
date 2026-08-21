@@ -435,7 +435,7 @@ function renderResults() {
       <h2>Recommended Holdings</h2>
       <p class="muted">
         ${holdings.length} companies, equally weighted at ${holdings.length > 0 ? (100 / holdings.length).toFixed(2) : '0'}% each.
-        No more than 3 holdings are drawn from any single sector. Strong Matches are always listed ahead of Partial
+        No more than 5 holdings are drawn from any single sector. Strong Matches are always listed ahead of Partial
         Matches. Domestic-company match is based on headquarters in <strong>${escapeHtml(state.homeCountry)}</strong>.
       </p>
 
@@ -782,7 +782,7 @@ function buildPortfolioRationale(answers, riskProfile, holdings) {
         : `No holdings required a trade-off against your top priorities.`
     } Your stability, blue-chip, and dividend-income preferences directly influenced every company's score ` +
     `alongside your values answers, rather than only breaking ties between otherwise-equal companies. Positions ` +
-    `are equally weighted, and we capped exposure to any single sector at three holdings to keep the portfolio ` +
+    `are equally weighted, and we capped exposure to any single sector at five holdings to keep the portfolio ` +
     `reasonably diversified.${
       belowThresholdCount > 0
         ? ` Not enough companies met the minimum values-match bar within your other preferences to fill all ` +

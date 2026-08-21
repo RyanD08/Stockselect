@@ -168,6 +168,97 @@ Everything else from the import (the 28-question ESG restructure, the two
 new categories, animal testing removed, women-led added, the merged ESG
 dataset) is unchanged.
 
+## Scoring formula recalibration (2026-08-21, same day)
+
+The client asked for a simulation of how much of the 502-company universe
+could ever appear in a recommended portfolio, across many different client
+answer profiles. Method: ran `buildPortfolio()` (the real client-facing
+function) against 1,500+ randomized answer profiles (all 30 questions
+randomized 1-5, random home country/ties-sector/time-horizon) plus a
+targeted single-question-maxed profile for every question, and tracked the
+union of every ticker that ever appeared in the resulting 15-holding table.
+
+**Finding: only 34.7% of companies (174/502) could ever appear.** Sweeping
+`MINIMUM_VALUES_MATCH` from 54 down to a near-trivial 42 barely moved this
+(34.7% -> ~40%, plateauing with more trials) -- the floor was not the real
+constraint, contrary to the initial hypothesis. Removing `MAX_PER_SECTOR`
+entirely (at floor 50) only reached 47.6%. **Root cause, confirmed by
+tracing AAPL specifically**: `unitImportance()` used the client's raw 1-5
+rating linearly, and every question's importance weight counted toward the
+weighted-average denominator even when the underlying data was "No
+verifiable data found." With most of the 26 ESG questions neutral/no-data
+for most companies, this diluted a company's few real, distinguishing
+signals into an indistinguishable ~50-58 score band for nearly every
+company -- a company with one real strength and one real weakness (e.g.
+AAPL: positive on data privacy/domestic HQ, negative on CEO pay ratio/EPA
+record) could never separate itself from a company with no real signal at
+all in either direction.
+
+**Fix, prototyped and simulated in isolation before touching live code**
+(same 1,500+ trials, same floor/cap, only the formula changed):
+1. `unitImportance()` now squares the rating (`Math.pow(answers[id] || 3,
+   2)`) instead of using it linearly, so a client's actual top priorities
+   (4s/5s) dominate the weighted sum instead of being diluted by ~25
+   untouched neutral-3 fields.
+2. A new `questionHasData()`/`unitHasData()` check (one case per scored
+   question, mirroring each `ALIGNMENT_FNS` entry's own no-data logic)
+   excludes a question's importance weight from the denominator ENTIRELY
+   when the company has no real, verifiable data for it -- previously a
+   client's high priority on an unanswerable question actively diluted
+   their real, answerable priorities.
+
+Formula fix alone (no floor/cap changes): **43.2% reachable** (217/502),
+and the spread of values-fit scores across companies at a fixed neutral
+profile roughly doubled (stddev 1.71 -> 3.60) -- confirming the diagnosis.
+Combined with a modest, separately-simulated loosening of
+`MINIMUM_VALUES_MATCH` (54->52) and `MAX_PER_SECTOR` (3->5): **~48% in
+prototype, 50.4% (253/502) confirmed on the actual live code** after
+implementation (1,500-trial run).
+
+**A real bug caught during implementation, not present in the prototype's
+narrower testing**: `classifyTier()` (Partial-Match conflict detection)
+and `buildRationale()` (the "Strong fit on..." text) both compared
+`unitImportance()`'s value against `HIGH_PRIORITY_THRESHOLD` (4) to detect
+"did the client rate this a top priority." With importance now squared,
+its minimum possible value (9, at the default rating of 3) already exceeds
+4 -- this comparison would have fired unconditionally, breaking conflict
+detection (every company would show phantom "Partial Match" conflicts) and
+drowning out genuinely high-priority financial/risk terms in the
+rationale's candidate pool. Fixed by adding a separate `unitRawRating()`
+(the original, unsquared 1-5 average) used specifically for these
+"is this really a 4-5 rating" checks, while `unitImportance()` (squared) is
+used only for the actual weighted-sum score math. Verified with a direct
+test: 0 companies show a conflict at an all-neutral-3 answer profile (was
+previously implicitly correct under the linear formula; would have been
+502/502 false positives under the squared formula without this fix).
+
+**Trade-off, checked explicitly, not just assumed**: this is not a pure
+superset of the old reachable set. Comparing the two sets at the same
+floor/cap: 62 companies became newly reachable (including household names
+Oracle, Adobe, and Boeing, plus Eli Lilly, Marriott, Hilton, Constellation
+Brands, CrowdStrike, Workday, and others), while 19 companies that were
+reachable under the old formula are not under the new one (net +43). The
+19 losers share a common profile: real MIXED positive-and-negative ESG
+signals (e.g. PepsiCo: +political transparency, +domestic HQ, but -CEO pay
+ratio, -EPA record, -a Medium-confidence alcohol-involvement flag likely
+traceable to a hard-seltzer joint venture) -- companies that used to
+occasionally sneak past the floor because the old linear formula diluted
+their real negatives along with everything else. This is the formula
+working as intended (a client who actually prioritizes one of these
+companies' real negatives should see it penalized more, not less), not a
+regression, though it does mean any underlying data-quality issues (like
+PepsiCo's flag) now carry more weight than before -- a separate, existing
+data-quality question, not something this formula change introduced.
+
+Some well-known names remain unreachable even after the fix (AAPL, JPM,
+JNJ, DIS, INTC, WFC, NKE, SBUX) -- traced specifically for AAPL and JPM:
+both CAN now clear the values-match floor under an optimal weighting
+(blended score 60-62, up from ~56-59 under the old formula), but both
+compete in the largest, most crowded sectors (Information Technology: 77
+companies, Financials: 97 companies, sharing 5 sector slots per portfolio)
+against peers with fewer real negative dings. That's `MAX_PER_SECTOR`
+doing its job, not a formula flaw.
+
 ## Merge conflict log
 
 See `data/merge_conflict_log.json`, written by `scripts/merge_incoming_esg_dataset.py`
