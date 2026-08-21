@@ -1712,6 +1712,54 @@
       }
     },
     {
+      "ticker": "APA",
+      "name": "APA Corporation",
+      "sector": "Energy",
+      "hq_country": "United States",
+      "market_profile": {
+        "market_cap_usd_billions_est": null,
+        "market_cap_tier": null,
+        "beta_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_leverage": {
+        "level": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "dividend_policy": {
+        "status": "Non-payer",
+        "yield_tier": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "performance_tier": {
+        "growth_potential": "Medium",
+        "stability": "Medium",
+        "risk_profile_fit": "Balanced",
+        "five_year_annualized_return_pct_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_metrics": {
+        "pe_ratio": null,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.0,
+        "profit_margin_pct": 0.0,
+        "roe_pct": null,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": null,
+        "analyst_price_target_upside_pct": null,
+        "six_month_return_pct": null,
+        "one_year_return_pct": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass.",
+        "overall_financial_score": null,
+        "overall_financial_score_label": null
+      }
+    },
+    {
       "ticker": "APD",
       "name": "Air Products & Chemicals, Inc.",
       "sector": "Materials",
@@ -2769,6 +2817,54 @@
         "note": "P/E, PEG, revenue growth, margins, ROE, FCF margin from SEC EDGAR XBRL (most recent annual filing) and Finnhub live TTM metrics. analyst_consensus from Finnhub analyst recommendation trend. Analyst price-target data requires a premium Finnhub plan and was not available on this API key. Left null rather than estimated; the site's scoring treats a null upside as neutral for this metric.",
         "overall_financial_score": 36.0,
         "overall_financial_score_label": "Below Average"
+      }
+    },
+    {
+      "ticker": "BF-B",
+      "name": "Brown-Forman Corporation",
+      "sector": "Consumer Staples",
+      "hq_country": "United States",
+      "market_profile": {
+        "market_cap_usd_billions_est": null,
+        "market_cap_tier": null,
+        "beta_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_leverage": {
+        "level": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "dividend_policy": {
+        "status": "Non-payer",
+        "yield_tier": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "performance_tier": {
+        "growth_potential": "Medium",
+        "stability": "Medium",
+        "risk_profile_fit": "Balanced",
+        "five_year_annualized_return_pct_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_metrics": {
+        "pe_ratio": null,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.0,
+        "profit_margin_pct": 0.0,
+        "roe_pct": null,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": null,
+        "analyst_price_target_upside_pct": null,
+        "six_month_return_pct": null,
+        "one_year_return_pct": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass.",
+        "overall_financial_score": null,
+        "overall_financial_score_label": null
       }
     },
     {
@@ -10810,6 +10906,54 @@
       }
     },
     {
+      "ticker": "HONA",
+      "name": "Honeywell Aerospace",
+      "sector": "Industrials",
+      "hq_country": "United States",
+      "market_profile": {
+        "market_cap_usd_billions_est": null,
+        "market_cap_tier": null,
+        "beta_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_leverage": {
+        "level": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "dividend_policy": {
+        "status": "Non-payer",
+        "yield_tier": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "performance_tier": {
+        "growth_potential": "Medium",
+        "stability": "Medium",
+        "risk_profile_fit": "Balanced",
+        "five_year_annualized_return_pct_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_metrics": {
+        "pe_ratio": null,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.0,
+        "profit_margin_pct": 0.0,
+        "roe_pct": null,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": null,
+        "analyst_price_target_upside_pct": null,
+        "six_month_return_pct": null,
+        "one_year_return_pct": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass.",
+        "overall_financial_score": null,
+        "overall_financial_score_label": null
+      }
+    },
+    {
       "ticker": "HOOD",
       "name": "Robinhood Markets, Inc.",
       "sector": "Financials",
@@ -18369,6 +18513,54 @@
       }
     },
     {
+      "ticker": "RDDT",
+      "name": "Reddit, Inc.",
+      "sector": "Communication Services",
+      "hq_country": "United States",
+      "market_profile": {
+        "market_cap_usd_billions_est": null,
+        "market_cap_tier": null,
+        "beta_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_leverage": {
+        "level": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "dividend_policy": {
+        "status": "Non-payer",
+        "yield_tier": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "performance_tier": {
+        "growth_potential": "Medium",
+        "stability": "Medium",
+        "risk_profile_fit": "Balanced",
+        "five_year_annualized_return_pct_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_metrics": {
+        "pe_ratio": null,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.0,
+        "profit_margin_pct": 0.0,
+        "roe_pct": null,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": null,
+        "analyst_price_target_upside_pct": null,
+        "six_month_return_pct": null,
+        "one_year_return_pct": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass.",
+        "overall_financial_score": null,
+        "overall_financial_score_label": null
+      }
+    },
+    {
       "ticker": "REG",
       "name": "REGENCY CENTERS CORP",
       "sector": "Financials",
@@ -22359,6 +22551,54 @@
         "note": "P/E, PEG, revenue growth, margins, ROE, FCF margin from SEC EDGAR XBRL (most recent annual filing) and Finnhub live TTM metrics. analyst_consensus from Finnhub analyst recommendation trend. Analyst price-target data requires a premium Finnhub plan and was not available on this API key. Left null rather than estimated; the site's scoring treats a null upside as neutral for this metric.",
         "overall_financial_score": 39.1,
         "overall_financial_score_label": "Below Average"
+      }
+    },
+    {
+      "ticker": "VMRK",
+      "name": "Vivmark Residential",
+      "sector": "Real Estate",
+      "hq_country": "United States",
+      "market_profile": {
+        "market_cap_usd_billions_est": null,
+        "market_cap_tier": null,
+        "beta_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_leverage": {
+        "level": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "dividend_policy": {
+        "status": "Non-payer",
+        "yield_tier": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "performance_tier": {
+        "growth_potential": "Medium",
+        "stability": "Medium",
+        "risk_profile_fit": "Balanced",
+        "five_year_annualized_return_pct_est": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass."
+      },
+      "financial_metrics": {
+        "pe_ratio": null,
+        "peg_ratio": null,
+        "revenue_growth_yoy_pct": 0.0,
+        "profit_margin_pct": 0.0,
+        "roe_pct": null,
+        "free_cash_flow_margin_pct": null,
+        "analyst_consensus": null,
+        "analyst_price_target_upside_pct": null,
+        "six_month_return_pct": null,
+        "one_year_return_pct": null,
+        "confidence": "None",
+        "note": "No financial_dataset_sp500.json entry existed for this ticker before the 2026-08-21 ESG dataset import (a genuinely new S&P 500 constituent per the incoming dataset -- see data/import_schema_comparison.md). Left null/0.0 rather than fabricated, matching this pipeline's existing convention for missing fundamentals (0.0 for growth/margin/return fields, null for ratio/estimate fields the scoring engine already treats as neutral when null). Needs a real SEC EDGAR + Finnhub pull in a follow-up pass.",
+        "overall_financial_score": null,
+        "overall_financial_score_label": null
       }
     },
     {

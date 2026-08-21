@@ -1,0 +1,26 @@
+{
+  "description": "Well-documented, real per-company data points found during research that are not covered by the 27 official survey questions but could plausibly matter to a values-driven investor. Logged here for review -- NOT added to the official question set. Each entry: a proposed survey question in the same plain-language 1-5-importance style, the supporting data source, and current coverage.",
+  "candidates": [
+    {
+      "proposed_question": "Prioritizing companies with a validated Science Based Targets initiative (SBTi) emissions-reduction commitment",
+      "rationale": "SBTi validation is a much stronger, independently-verified signal of real decarbonization commitment than the 10-K keyword scan used for Q1/Q2, which only detects whether a company *mentions* climate/renewable topics in its business description, not whether it has a validated target.",
+      "source": "sciencebasedtargets.org (company/target search)",
+      "coverage_status": "Source confirmed reachable from this environment (HTTP 200) but not yet integrated into the collection pipeline -- see logs/suggested_sources.md. 0 companies currently checked.",
+      "confidence_if_implemented": "High (SBTi validation status is a binary, independently-audited fact)"
+    },
+    {
+      "proposed_question": "Prioritizing companies recognized in JUST Capital's annual worker-treatment rankings",
+      "rationale": "JUST Capital publishes an independently-compiled worker-treatment ranking across large-cap US companies, which would materially strengthen Q5 (fair wages)/Q7 (DEI)/Q8 (worker safety) beyond the current 10-K keyword scan and OSHA name-match.",
+      "source": "justcapital.com/rankings",
+      "coverage_status": "Source confirmed reachable (HTTP 200) but not yet integrated -- see logs/suggested_sources.md. 0 companies currently checked.",
+      "confidence_if_implemented": "Medium-High (methodology-driven ranking, but requires interpretation into the dataset's confidence scale)"
+    },
+    {
+      "proposed_question": "Supporting women-run companies",
+      "rationale": "A common values-investing screen (comparable in spirit to founder_led/family_owned in Q24) that the official 27-question list does not cover. Implemented and populated for all 503 companies as the `women_led` field -- see schema/company_schema.json's `additional_criteria` section for the field's data dictionary entry.",
+      "source": "DEF 14A proxy statement (EDGAR) -- see find_ceo_gender_signal() in scripts/lib.py",
+      "coverage_status": "IMPLEMENTED 2026-08-20 via scripts/fix_women_led.py, run across all 503 companies (503/503 populated: 40 True, 334 False, 129 None). Identifies the CEO's surname via a name+title-adjacency regex, then reads the filing's own honorific (Mr./Ms./Mrs.) or, failing that, a majority of pronoun references (she/her vs he/his) for that specific named person -- never guessed from a first name. Required three full backfill passes to reach a clean result -- each of the first two surfaced a real, distinct false-positive class only found by spot-checking against public knowledge, not by the initial ~30-ticker regression test: (1) some companies (P&G) use \"Chief Executive Officer\" as an internal title for multiple business-segment heads, not just the overall corporate CEO, so raw mention-frequency alone picked the wrong person -- fixed by preferring a name whose matched title includes Chair(man/woman) language, since segment heads are essentially never also Board Chair; (2) that same chair-tag fix then over-fired on a SINGLE stray mention of an outside director's title *at their own separate company* (Disney's board-bio table describes director Mary Barra using her actual GM title, which briefly outranked Disney's real CEO Robert Iger) -- fixed by requiring a chair-tagged candidate to independently clear the same >=2-mentions bar the raw-frequency path already requires. The third full run was cross-checked in full: every one of the 40 True hits verified against public knowledge, and zero were resolved via the chair-tag override path (i.e. the specific code path both prior bugs lived in never fired in the final, clean run).",
+      "confidence_if_implemented": "Low (flattened-text regex heuristic reading the filing's own gendered language -- same class of caveat as founder_led/family_owned, not a verified/audited fact)"
+    }
+  ]
+}

@@ -1,0 +1,441 @@
+{
+  "entries": [
+    {
+      "ticker": "AMZN",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "AOS",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "APA",
+      "field": "sector/hq_country",
+      "resolution": "new_company_added",
+      "note": "New S&P 500 constituent not in the prior live dataset (company_name='APA Corporation'). sector/hq_country manually set from incoming gics_sub_industry='Oil & Gas Exploration & Production' / headquarters_location='Houston, Texas' (incoming's own gics_sector field is blank for all companies -- see data/import_schema_comparison.md). Has no financial_dataset_sp500.json entry yet -- financial fields will be blank on the live site until a financial-data refresh covers it."
+    },
+    {
+      "ticker": "ARES",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "AXON",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "BAX",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "BF-B",
+      "field": "sector/hq_country",
+      "resolution": "new_company_added",
+      "note": "New S&P 500 constituent not in the prior live dataset (company_name='Brown\u2013Forman'). sector/hq_country manually set from incoming gics_sub_industry='Distillers & Vintners' / headquarters_location='Louisville, Kentucky' (incoming's own gics_sector field is blank for all companies -- see data/import_schema_comparison.md). Has no financial_dataset_sp500.json entry yet -- financial fields will be blank on the live site until a financial-data refresh covers it."
+    },
+    {
+      "ticker": "CB",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "CMCSA",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "CMCSA",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "COF",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "COIN",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "COIN",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "CTAS",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "CTAS",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "CVNA",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "D",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "DE",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "DELL",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "DELL",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "DOW",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "F",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "F",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "FOXA",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "FOXA",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "GRMN",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "HONA",
+      "field": "sector/hq_country",
+      "resolution": "new_company_added",
+      "note": "New S&P 500 constituent not in the prior live dataset (company_name='Honeywell Aerospace'). sector/hq_country manually set from incoming gics_sub_industry='Aerospace & Defense' / headquarters_location='Phoenix, Arizona' (incoming's own gics_sector field is blank for all companies -- see data/import_schema_comparison.md). Has no financial_dataset_sp500.json entry yet -- financial fields will be blank on the live site until a financial-data refresh covers it."
+    },
+    {
+      "ticker": "HRL",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "JKHY",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "LVS",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "MKC",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "MPWR",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "NKE",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "NVDA",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "NWSA",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "ORCL",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "PG",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "PLTR",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "PLTR",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "PSX",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "RDDT",
+      "field": "sector/hq_country",
+      "resolution": "new_company_added",
+      "note": "New S&P 500 constituent not in the prior live dataset (company_name='Reddit'). sector/hq_country manually set from incoming gics_sub_industry='Interactive Media & Services' / headquarters_location='San Francisco, California' (incoming's own gics_sector field is blank for all companies -- see data/import_schema_comparison.md). Has no financial_dataset_sp500.json entry yet -- financial fields will be blank on the live site until a financial-data refresh covers it."
+    },
+    {
+      "ticker": "ROL",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "SHW",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "SJM",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "SMCI",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "SMCI",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "SPG",
+      "field": "founder_led",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "TSN",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "UHS",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "VMRK",
+      "field": "sector/hq_country",
+      "resolution": "new_company_added",
+      "note": "New S&P 500 constituent not in the prior live dataset (company_name='Vivmark Residential'). sector/hq_country manually set from incoming gics_sub_industry='Multi-Family Residential REITs' / headquarters_location='Chicago, Illinois' (incoming's own gics_sector field is blank for all companies -- see data/import_schema_comparison.md). Has no financial_dataset_sp500.json entry yet -- financial fields will be blank on the live site until a financial-data refresh covers it."
+    },
+    {
+      "ticker": "WMT",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": true,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "XYZ",
+      "field": "family_owned",
+      "resolution": "replaced_with_incoming",
+      "old_value": true,
+      "new_value": false,
+      "note": "Both this repo's prior SEC-EDGAR-sourced remediation pass and the incoming dataset's independently-validated pipeline had real data here; incoming kept per Step 4's 'fully replace non-financial fields' rule and the task brief's own framing of this field as something the import is meant to fix."
+    },
+    {
+      "ticker": "AVB",
+      "field": "(entire ESG record)",
+      "resolution": "kept_existing_untouched",
+      "note": "Ticker not present in the incoming dataset (company_name='AVALONBAY COMMUNITIES INC'). No confirmation it actually exited the S&P 500 vs. an incoming-side omission, so kept with its prior ESG data rather than dropped -- see data/import_schema_comparison.md."
+    },
+    {
+      "ticker": "EQR",
+      "field": "(entire ESG record)",
+      "resolution": "kept_existing_untouched",
+      "note": "Ticker not present in the incoming dataset (company_name='EQUITY RESIDENTIAL'). No confirmation it actually exited the S&P 500 vs. an incoming-side omission, so kept with its prior ESG data rather than dropped -- see data/import_schema_comparison.md."
+    },
+    {
+      "ticker": "FOX",
+      "field": "(entire record)",
+      "resolution": "excluded_duplicate_share_class",
+      "note": "'Fox Corporation(Class B)' -- a second share-class ticker of a company already represented in the merged set under its primary ticker; excluded to keep one row per company."
+    },
+    {
+      "ticker": "GOOG",
+      "field": "(entire record)",
+      "resolution": "excluded_duplicate_share_class",
+      "note": "'Alphabet Inc.(Class C)' -- a second share-class ticker of a company already represented in the merged set under its primary ticker; excluded to keep one row per company."
+    },
+    {
+      "ticker": "NWS",
+      "field": "(entire record)",
+      "resolution": "excluded_duplicate_share_class",
+      "note": "'News Corp(Class B)' -- a second share-class ticker of a company already represented in the merged set under its primary ticker; excluded to keep one row per company."
+    }
+  ],
+  "count": 57
+}

@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Data dictionary for the TrueNorth S&P 500 values-investing dataset. Each scored field on a company record is an object of shape { value, source, source_url, confidence, notes, last_updated }. confidence is one of High (primary-source verified), Medium (documented but requires interpretation), Low (indirect/sector-level inference), or None (no verifiable data found -- never a fabricated placeholder). Confidence levels are used internally by the TrueNorth app and are not shown directly to survey respondents.",
+  "confidence_levels": {
+    "High": "Primary-source verified (e.g. a specific SEC filing, EPA/OSHA/NLRB record, or SIC code lookup).",
+    "Medium": "Documented but requires interpretation (e.g. business description implies involvement without an exact figure).",
+    "Low": "Indirect or sector-level inference (e.g. peer/sector benchmarking, no company-specific record).",
+    "None": "No verifiable data found via an approved source. value is the literal string 'No verifiable data found'."
+  },
+  "scored_field_shape": {
+    "value": "The score/answer itself. Type varies by field (boolean, enum string, number, or descriptive string).",
+    "source": "Human-readable name of the specific source used (e.g. 'SEC 10-K Item 1 Business, FY2024', 'EPA ECHO enforcement case #...').",
+    "source_url": "Direct URL (or API endpoint + query) used to retrieve the value.",
+    "confidence": "One of High | Medium | Low | None.",
+    "notes": "Optional free-text interpretation notes, caveats, or context (e.g. flagging a recent merger distorting a figure).",
+    "last_updated": "ISO 8601 date the field was last verified/populated."
+  },
+  "top_level_fields": {
+    "ticker": "Exchange ticker symbol, as listed by Wikipedia's S&P 500 constituents table.",
+    "company_name": "Official company name (Wikipedia 'Security' column).",
+    "gics_sector": "GICS Sector classification (Wikipedia).",
+    "gics_sub_industry": "GICS Sub-Industry classification (Wikipedia).",
+    "headquarters_location": "City, state/country of headquarters (Wikipedia).",
+    "cik": "SEC EDGAR Central Index Key, 10-digit zero-padded string. Used as the key for all SEC EDGAR lookups.",
+    "date_added_to_sp500": "Date the company was added to the S&P 500 index, if listed by Wikipedia.",
+    "founded_year": "Year the company (or a listed predecessor) was founded, if listed by Wikipedia.",
+    "recent_corporate_action_flag": {
+      "type": "boolean + notes",
+      "description": "True if the company underwent a merger, spin-off, IPO, or major restructuring within the trailing 12 months. Per TrueNorth methodology, single-year revenue/return comparisons for such companies are unreliable and must be flagged rather than silently scored (see EXE/Expand Energy case in background doc)."
+    },
+    "processing_status": "pending | in_progress | complete | manual_review_needed -- tracked here and mirrored in logs/progress.json."
+  },
+  "questions": {
+    "environmental": {
+      "q1_carbon_fossil_fuel_involvement": {
+        "survey_question": "Avoiding companies with high carbon emissions or fossil fuel involvement",
+        "field": "carbon_fossil_fuel_involvement",
+        "value_type": "enum: High | Medium | Low | None (level of fossil-fuel/high-carbon involvement)",
+        "sources": ["SEC 10-K Item 1/1A (EDGAR)", "SIC code (oil & gas / coal / utilities)", "Science Based Targets (climate commitment context)"]
+      },
+      "q2_renewable_clean_tech_involvement": {
+        "survey_question": "Prioritizing renewable energy or clean tech companies",
+        "field": "renewable_clean_tech_involvement",
+        "value_type": "enum: High | Medium | Low | None",
+        "sources": ["SEC 10-K Item 1 Business description", "Science Based Targets validated-target status"]
+      },
+      "q3_environmental_pollution_violations": {
+        "survey_question": "Avoiding companies with poor environmental/pollution records",
+        "field": "environmental_pollution_violations",
+        "value_type": "object: { violation_count, penalty_total_usd, most_recent_case } or 'No verifiable data found'",
+        "sources": ["EPA ECHO (echo.epa.gov, echodata.epa.gov REST API)"]
+      },
+      "q4_sustainable_agriculture_resource_use": {
+        "survey_question": "Supporting sustainable agriculture or resource use",
+        "field": "sustainable_agriculture_resource_use",
+        "value_type": "enum: High | Medium | Low | None",
+        "sources": ["SEC 10-K Business description", "Science Based Targets"]
+      }
+    },
+    "social_labor": {
+      "q5_fair_wages_labor_practices": {
+        "survey_question": "Fair wages and labor practices across the supply chain",
+        "field": "fair_wages_labor_practices",
+        "value_type": "enum: High | Medium | Low | None",
+        "sources": ["10-K Human Capital section (EDGAR)", "JUST Capital worker-treatment ranking"]
+      },
+      "q6_labor_disputes_exploitation_history": {
+        "survey_question": "Avoiding companies with histories of labor disputes or exploitation",
+        "field": "labor_disputes_exploitation_history",
+        "value_type": "object: { case_count, most_recent_case } or 'No verifiable data found'",
+        "sources": ["NLRB case search (www.nlrb.gov)"]
+      },
+      "q7_workplace_diversity_equity_inclusion": {
+        "survey_question": "Workplace diversity, equity, and inclusion practices",
+        "field": "workplace_diversity_equity_inclusion",
+        "value_type": "enum: High | Medium | Low | None",
+        "sources": ["10-K Human Capital section (EDGAR)", "JUST Capital"]
+      },
+      "q8_worker_safety_record": {
+        "survey_question": "Companies with strong worker safety records",
+        "field": "worker_safety_record",
+        "value_type": "object: { inspection_count, violation_count, most_recent_case } or 'No verifiable data found'",
+        "sources": ["OSHA establishment/violation search (www.osha.gov)"]
+      }
+    },
+    "governance": {
+      "q9_board_transparency_independence": {
+        "survey_question": "Transparent and independent corporate boards",
+        "field": "board_transparency_independence",
+        "value_type": "object: { pct_independent_directors } or enum fallback",
+        "sources": ["DEF 14A proxy statement (EDGAR)"]
+      },
+      "q10_ceo_pay_ratio": {
+        "survey_question": "Reasonable executive compensation relative to average employee pay",
+        "field": "ceo_pay_ratio",
+        "value_type": "number (disclosed CEO pay ratio, e.g. 250 = 250:1) or 'No verifiable data found'",
+        "sources": ["DEF 14A Pay Ratio Disclosure (EDGAR)"]
+      },
+      "q11_fraud_corruption_scandal_history": {
+        "survey_question": "Avoiding companies with histories of fraud, corruption, or major scandals",
+        "field": "fraud_corruption_scandal_history",
+        "value_type": "object: { case_count, description } or 'No verifiable data found'",
+        "sources": ["SEC Litigation Releases / full-text search (efts.sec.gov)", "FTC Legal Library case search (ftc.gov)", "Violation Tracker (blocked -- see manual_review_needed.md)", "Stanford Securities Class Action Clearinghouse (blocked -- see manual_review_needed.md)"]
+      },
+      "q12_shareholder_rights_voting_structure": {
+        "survey_question": "Shareholder rights and voting power",
+        "field": "shareholder_rights_voting_structure",
+        "value_type": "enum: single_class | dual_class | multi_class",
+        "sources": ["DEF 14A / 10-K cover page share class disclosure (EDGAR)"]
+      }
+    },
+    "ethical_sin_stock": {
+      "q13_tobacco": {"survey_question": "Avoiding tobacco companies", "field": "tobacco_involvement", "value_type": "boolean", "sources": ["SIC code 2100-2199"]},
+      "q14_alcohol": {"survey_question": "Avoiding alcohol producers", "field": "alcohol_involvement", "value_type": "boolean", "sources": ["SIC code 2080-2085"]},
+      "q15_gambling": {"survey_question": "Avoiding gambling/casino companies", "field": "gambling_casino_involvement", "value_type": "boolean", "sources": ["SIC code 7990-7999"]},
+      "q16_weapons_defense": {"survey_question": "Avoiding weapons/defense manufacturers", "field": "weapons_defense_involvement", "value_type": "boolean", "sources": ["SIC code 3480-3489, 3760-3769", "Gun Free Funds (gunfreefunds.org)"]},
+      "q17_adult_entertainment": {"survey_question": "Avoiding adult entertainment industries", "field": "adult_entertainment_involvement", "value_type": "boolean", "sources": ["SIC code 7990-7999 subset / business description review"]}
+    },
+    "religious_values": {
+      "q18_religious_compliance": {
+        "survey_question": "Compliance with religious investment principles (e.g., halal, kosher, faith-based screens)",
+        "field": "religious_investment_compliance",
+        "value_type": "'No verifiable per-company religious compliance data source available'",
+        "sources": [],
+        "note": "No comprehensive free public halal/kosher screening database exists at S&P 500 scale. Always confidence None. Honest gap, not a research failure -- flagged in background doc as a possible future candidate for removal from the survey."
+      },
+      "q19_interest_based_products": {
+        "survey_question": "Avoiding interest-based financial products",
+        "field": "interest_based_financial_products",
+        "value_type": "boolean (true if core business is interest-based lending/banking)",
+        "sources": ["SIC code 6000-6199", "10-K business description (EDGAR)"]
+      }
+    },
+    "political_social": {
+      "q20_political_donation_transparency": {
+        "survey_question": "Company political donation transparency",
+        "field": "political_donation_transparency",
+        "value_type": "enum: Disclosed | Partial | None",
+        "sources": ["FEC bulk committee-master + committee-summary data (fec.gov)", "DEF 14A political spending disclosure (EDGAR)", "cii.org (blocked by proxy policy -- see manual_review_needed.md)", "opensecrets.org (blocked by Cloudflare -- see manual_review_needed.md)"]
+      },
+      "q21_countries_of_concern": {
+        "survey_question": "Avoiding companies operating in specific countries or regions of concern",
+        "field": "countries_of_concern_operations",
+        "value_type": "array of country names (possibly empty) or 'No verifiable data found'",
+        "sources": ["10-K Item 1/1A text scan for an OFAC-comprehensively-sanctioned country name near real operational-presence language", "SEC Section 13(r) of the Exchange Act (Iran/Syria disclosure requirement)"],
+        "note": "Implemented 2026-08-20 -- see find_countries_of_concern() in scripts/lib.py. The XBRL Frames API originally proposed here turned out not to expose per-company dimensional geographic-segment breakdowns (only company-wide scalar totals), so this uses the 10-K text scan instead. Deliberately narrow country list (Russia, Iran, North Korea, Syria, Cuba, Belarus, Venezuela -- OFAC's comprehensively-sanctioned jurisdictions) rather than an editorial judgment call about broader geopolitical concern (e.g. does not include China). Section 13(r) presence is High confidence (a purpose-built mandatory disclosure item -- a company only includes it when it has actual Iran/Syria-connected activity); a context-matched country name without Section 13(r) is Medium; an empty result (no match at all) is Low, not None, since the company's own 10-K was successfully searched."
+      },
+      "q22_data_privacy_practices": {
+        "survey_question": "Companies with strong data privacy practices",
+        "field": "data_privacy_practices",
+        "value_type": "object: { item_1_05_incident_count, examples } or 'No verifiable data found'",
+        "sources": ["SEC EDGAR full-text search (efts.sec.gov), scoped to the company's own CIK, for 8-K Item 1.05 filings"],
+        "note": "Implemented 2026-08-20 -- see cybersecurity_incident_search() in scripts/lib.py. SEC Litigation Releases (the source originally proposed here) are not indexed by EDGAR full-text search (which only covers filings, not the separate litigation microsite) and have no other free structured API, so this uses Item 1.05 instead -- the SEC rule (effective December 2023) requiring disclosure of a material cybersecurity incident within four business days. Because the search is scoped to the company's own CIK rather than a name-matched search across all filers, a zero result is a real, meaningful answer (Low confidence) rather than a failed match -- though Item 1.05 only covers incidents from December 2023 onward."
+      }
+    },
+    "community_identity": {
+      "q23_domestic_hq": {
+        "survey_question": "Supporting locally-headquartered or domestic companies",
+        "field": "domestic_hq",
+        "value_type": "boolean",
+        "sources": ["Wikipedia HQ field", "SEC filings"]
+      },
+      "q24_founder_family": {
+        "survey_question": "Supporting founder-led or family-owned businesses",
+        "field": "founder_led / family_owned",
+        "value_type": "founder_led: boolean (true only if founder/co-founder currently holds CEO or Exec Chairman); family_owned: boolean + ownership_pct (true only if founding family retains a documented significant ownership/voting stake)",
+        "sources": ["DEF 14A beneficial ownership tables (EDGAR)", "Wikipedia founding history"],
+        "note": "Must show real variation across companies, not default to false. This was a known pipeline bug in the prior dataset per background doc."
+      },
+      "q25_industry_personal_tie": {
+        "survey_question": "Supporting companies in industries the client has personal/professional ties to",
+        "field": "N/A -- client-side matching only",
+        "value_type": "n/a",
+        "sources": [],
+        "note": "This question is about the client, not the company. Satisfied by accurate gics_sector/gics_sub_industry tagging already captured at top level."
+      }
+    },
+    "risk_philosophy": {
+      "q26_27_derived_risk_profile": {
+        "survey_question": "26: Long-term stability over short-term growth potential; 27: Willingness to accept lower returns for values alignment",
+        "field": "growth_potential (High/Medium/Low) and stability (High/Medium/Low) -- two SEPARATE tiers, never blended per background doc section 4",
+        "value_type": "growth_potential driven by revenue_growth_pct and five_year_total_return_pct; stability driven by beta/volatility, dividend_consistency, debt_to_equity",
+        "sources": ["Finnhub free tier (finnhub.io) -- requires API key, currently unavailable, see manual_review_needed.md", "Stooq.com -- blocked by JS bot-challenge in this environment, see manual_review_needed.md", "Alpha Vantage free tier (alphavantage.co)", "SEC EDGAR financial statements (XBRL company facts API)"],
+        "note": "Companies flagged via recent_corporate_action_flag must not have single-year revenue growth used at face value -- see EXE/Expand Energy example in background doc."
+      }
+    }
+  },
+  "additional_criteria": {
+    "description": "Real, populated fields that exist on every company record but are NOT one of the 27 official survey questions from the founding materials -- see data/candidate_additional_criteria.json for the full proposal/review record. Kept out of `questions` above so the numbered 1-27 schema the app repo may depend on stays unchanged.",
+    "women_led": {
+      "proposed_survey_question": "Supporting women-run companies",
+      "value_type": "boolean (true if the current CEO is a woman) or 'No verifiable data found'",
+      "sources": ["DEF 14A proxy statement (EDGAR) -- see find_ceo_gender_signal() in scripts/lib.py"],
+      "note": "Identifies the CEO's surname via a name-immediately-before-title regex, then reads which honorific (Mr./Ms./Mrs.) or, failing that, which pronoun (she/her vs he/his) the filing itself consistently uses for that specific named person -- never inferred from a first name. Low confidence, same class of flattened-text heuristic as founder_led/family_owned; the matched surname and evidence quote are always shown in notes for spot-checking."
+    }
+  }
+}
