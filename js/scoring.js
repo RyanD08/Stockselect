@@ -35,6 +35,20 @@
  * around 48% in simulation. Full methodology and numbers in
  * data/import_schema_comparison.md "Scoring formula recalibration".
  *
+ * 2026-08-22: a follow-up simulation ("who keeps showing up") found that
+ * fixing reachability had an unaddressed side effect -- a small group of
+ * companies structurally immune to every exclusionary screen (never
+ * scoring negatively on any of the 26 values questions, simply by not
+ * being in a screened industry) appeared in recommended portfolios 7.4x
+ * more often on average than every other company. Ford Motor Company
+ * appeared in 75% of 3,000 simulated portfolios regardless of what the
+ * simulated client said mattered. Fixed with NEVER_NEGATIVE_RANKING_PENALTY
+ * (see that constant and scoreCompany below): a ranking-only discount for
+ * companies with zero negative alignment anywhere, sized (via the same
+ * simulation) to bring that group's appearance rate back to parity with
+ * everyone else without touching eligibility, so the Aug-21 reachability
+ * fix is unaffected (reachability actually improved slightly).
+ *
  * Every scored question (ids 1-26 are the values screens; ids 27, 29, 30
  * are risk/portfolio-construction preferences added directly to the same
  * sum, id 28 plays a dual role — see "Risk preferences" below) is either:
@@ -246,6 +260,33 @@ const MAX_PORTFOLIO_SIZE = 15;
 // on top of the formula fix (which did the real work) without abandoning
 // sector diversification as a goal.
 const MAX_PER_SECTOR = 5;
+
+// Added 2026-08-22: a "who keeps showing up" simulation (3,000 random
+// client profiles) found that companies with ZERO negative alignment
+// across every values question they have real data for -- i.e. companies
+// structurally immune to every exclusionary screen, simply by not being in
+// a screened industry -- appeared in recommended portfolios 7.4x more
+// often on average than every other company (45 of 502 companies, ~9% of
+// the dataset, averaged a 14% appearance rate vs. 1.9% for everyone else).
+// Ford Motor Company was the extreme case: it appeared in 75% of all
+// simulated portfolios simply because no exclusionary question could ever
+// score it negatively, regardless of what a given client said mattered.
+// This penalty targets that specific mechanism -- see
+// neverNegativeAcrossValues in scoreCompany below -- without touching
+// valuesFitScore/meetsValuesFloor, so portfolio ELIGIBILITY (and the
+// Aug-21 reachability fix) is untouched; it only discounts the blended
+// RANKING score, so a "never negative" company has to show real positive
+// strength to keep outranking companies that actually engage what the
+// client said mattered. Simulated across penalty values 0/3/5/6/8: 5 was
+// the value where the never-negative group's appearance rate came back
+// into line with everyone else's (7.4x -> 1.0x), with universe
+// reachability unchanged (in fact +5pp, since the previously-crowded-out
+// companies gained room). This doesn't flatten all concentration -- a
+// company with real, broadly-positive data and just one mild negative
+// (e.g. AMGN, NDAQ) still ranks well across many client profiles after
+// this fix, which is a legitimate outcome, not the free-pass problem this
+// targets.
+const NEVER_NEGATIVE_RANKING_PENALTY = 5;
 
 // Judgment-based ESG scores are dampened by how well-documented they are,
 // so a Low-confidence "safe" finding no longer counts the same as a
@@ -580,7 +621,20 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   numerator += valuesOverReturnsImportance * valuesOverReturnsAlignment;
   denominator += valuesOverReturnsImportance;
 
-  const raw = denominator > 0 ? 50 + 50 * (numerator / denominator) : 50;
+  // Over-representation dampener (see NEVER_NEGATIVE_RANKING_PENALTY above):
+  // a company that has real data on a values question but never once
+  // scores negatively on any of them is structurally immune to every
+  // exclusionary screen -- discount its RANKING score so it has to show
+  // genuine positive strength to keep outranking companies that actually
+  // engage the client's stated priorities. Eligibility (valuesFitScore /
+  // meetsValuesFloor) deliberately does not use this -- only ranking does.
+  let neverNegativeAcrossValues = true;
+  SCORED_QUESTION_IDS.forEach((qid) => {
+    if (questionHasData(qid, company, ctx) && alignments[qid] < 0) neverNegativeAcrossValues = false;
+  });
+  const overrepPenalty = neverNegativeAcrossValues ? NEVER_NEGATIVE_RANKING_PENALTY : 0;
+
+  const raw = (denominator > 0 ? 50 + 50 * (numerator / denominator) : 50) - overrepPenalty;
   const score = Math.round(Math.min(100, Math.max(0, raw)));
   return {
     score,
