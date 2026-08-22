@@ -42,12 +42,16 @@
  * being in a screened industry) appeared in recommended portfolios 7.4x
  * more often on average than every other company. Ford Motor Company
  * appeared in 75% of 3,000 simulated portfolios regardless of what the
- * simulated client said mattered. Fixed with NEVER_NEGATIVE_RANKING_PENALTY
- * (see that constant and scoreCompany below): a ranking-only discount for
- * companies with zero negative alignment anywhere, sized (via the same
- * simulation) to bring that group's appearance rate back to parity with
- * everyone else without touching eligibility, so the Aug-21 reachability
- * fix is unaffected (reachability actually improved slightly).
+ * simulated client said mattered. First fixed with a flat ranking discount
+ * for zero-negative companies (parity, +5pp reachability) -- then revised
+ * the same day to a continuous version, OVERREP_MAX_PENALTY / (1 +
+ * negativeCount) (see that constant and scoreCompany below), after
+ * noticing the flat version was a cliff: a company with exactly one real
+ * negative got zero discount and could still dominate almost as much as a
+ * fully clean one. The continuous version decays smoothly instead, and
+ * simulated better on every metric (0 companies left over 50% of
+ * portfolios vs. 4, 66.3% universe reachability vs. 60.4%). Eligibility is
+ * untouched either way, so the Aug-21 reachability fix is unaffected.
  *
  * Every scored question (ids 1-26 are the values screens; ids 27, 29, 30
  * are risk/portfolio-construction preferences added directly to the same
@@ -271,22 +275,26 @@ const MAX_PER_SECTOR = 5;
 // Ford Motor Company was the extreme case: it appeared in 75% of all
 // simulated portfolios simply because no exclusionary question could ever
 // score it negatively, regardless of what a given client said mattered.
-// This penalty targets that specific mechanism -- see
-// neverNegativeAcrossValues in scoreCompany below -- without touching
-// valuesFitScore/meetsValuesFloor, so portfolio ELIGIBILITY (and the
-// Aug-21 reachability fix) is untouched; it only discounts the blended
-// RANKING score, so a "never negative" company has to show real positive
-// strength to keep outranking companies that actually engage what the
-// client said mattered. Simulated across penalty values 0/3/5/6/8: 5 was
-// the value where the never-negative group's appearance rate came back
-// into line with everyone else's (7.4x -> 1.0x), with universe
-// reachability unchanged (in fact +5pp, since the previously-crowded-out
-// companies gained room). This doesn't flatten all concentration -- a
-// company with real, broadly-positive data and just one mild negative
-// (e.g. AMGN, NDAQ) still ranks well across many client profiles after
-// this fix, which is a legitimate outcome, not the free-pass problem this
-// targets.
-const NEVER_NEGATIVE_RANKING_PENALTY = 5;
+// Fixed the same day with a flat penalty for zero-negative companies
+// (5 -> 1.0x parity, +5pp reachability), which shipped and confirmed live.
+//
+// Revised later the same day: the flat version was a cliff -- a company
+// with exactly ONE real negative (e.g. AMGN, NDAQ's elevated CEO pay
+// ratio) got zero discount, so it could still dominate almost as much as
+// a fully clean company used to. Replaced with a continuous discount (see
+// overrepPenalty in scoreCompany below): OVERREP_MAX_PENALTY / (1 +
+// negativeCount), so each additional real negative smoothly shrinks the
+// discount instead of it vanishing entirely after the first one. Swept
+// OVERREP_MAX_PENALTY across 8/12/16 (3,000-trial confirmation at 12):
+// 12 was the best of the three -- zero companies left appearing in over
+// half of all portfolios (the flat version still had 4) and the best
+// universe reachability of anything tried (66.3%, vs 60.4% under the flat
+// version, 50.8% before either fix). Bucketing appearance rate by real-
+// negative-count at MAX_PENALTY=12 confirmed no group runs away with it
+// (0 negatives: 2.6%, 1: 2.3%, 2: 3.8%, 3: 3.3%, 4+: 1.5%). Still does not
+// touch valuesFitScore/meetsValuesFloor -- eligibility (and the Aug-21
+// reachability fix) is untouched either way, only the ranking score is.
+const OVERREP_MAX_PENALTY = 12;
 
 // Judgment-based ESG scores are dampened by how well-documented they are,
 // so a Low-confidence "safe" finding no longer counts the same as a
@@ -621,18 +629,20 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   numerator += valuesOverReturnsImportance * valuesOverReturnsAlignment;
   denominator += valuesOverReturnsImportance;
 
-  // Over-representation dampener (see NEVER_NEGATIVE_RANKING_PENALTY above):
-  // a company that has real data on a values question but never once
-  // scores negatively on any of them is structurally immune to every
-  // exclusionary screen -- discount its RANKING score so it has to show
-  // genuine positive strength to keep outranking companies that actually
-  // engage the client's stated priorities. Eligibility (valuesFitScore /
-  // meetsValuesFloor) deliberately does not use this -- only ranking does.
-  let neverNegativeAcrossValues = true;
+  // Over-representation dampener (see OVERREP_MAX_PENALTY above): count how
+  // many values questions a company has real data on AND scores negatively.
+  // A company with real data on a question is only immune to that specific
+  // exclusionary screen if it's not the target of it -- companies with
+  // fewer real negatives are, on average, more likely to be structurally
+  // immune across the board, so the discount decays smoothly as the real-
+  // negative count rises instead of vanishing entirely after the first one.
+  // Eligibility (valuesFitScore/meetsValuesFloor) deliberately does not use
+  // this -- only the blended ranking score does.
+  let negativeCount = 0;
   SCORED_QUESTION_IDS.forEach((qid) => {
-    if (questionHasData(qid, company, ctx) && alignments[qid] < 0) neverNegativeAcrossValues = false;
+    if (questionHasData(qid, company, ctx) && alignments[qid] < 0) negativeCount += 1;
   });
-  const overrepPenalty = neverNegativeAcrossValues ? NEVER_NEGATIVE_RANKING_PENALTY : 0;
+  const overrepPenalty = OVERREP_MAX_PENALTY / (1 + negativeCount);
 
   const raw = (denominator > 0 ? 50 + 50 * (numerator / denominator) : 50) - overrepPenalty;
   const score = Math.round(Math.min(100, Math.max(0, raw)));
