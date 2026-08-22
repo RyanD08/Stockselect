@@ -73,7 +73,7 @@ function renderIntro() {
 
       <div class="mini-stepper">
         ${CATEGORIES.map(() => '<span class="mini-stepper-dot"></span>').join('')}
-        <span class="mini-stepper-text">${CATEGORIES.length} short steps &middot; ~4-6 min</span>
+        <span class="mini-stepper-text">${CATEGORIES.length} short steps &middot; ~5 min</span>
       </div>
 
       <p class="lede">Nothing you enter is saved or sent anywhere.</p>
