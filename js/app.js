@@ -562,18 +562,17 @@ function renderResults() {
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
-        // Logged, not just swallowed -- the on-screen message is
-        // deliberately generic (a raw Firestore error code isn't
-        // meaningful to a client), but the real cause (e.g.
-        // "permission-denied" vs "unavailable") should be diagnosable from
-        // the console rather than a total black box. The 5-survey-limit
-        // case is a real, expected outcome rather than a failure, so it
-        // gets its own status/message instead of the generic one.
+        // Logged, not just swallowed. The on-screen message also includes
+        // the raw Firestore error code (see describeFirestoreError in
+        // auth.js) so a real cause like "permission-denied" is diagnosable
+        // without opening devtools. The 5-survey-limit case is a real,
+        // expected outcome rather than a failure, so it gets its own
+        // status/message instead of the generic one.
         console.error('saveNewSurvey failed:', err);
         state.saveResultState =
           err && err.code === 'survey-limit-reached'
             ? { status: 'limit-reached', errorMessage: err.message }
-            : { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
+            : { status: 'error', errorMessage: describeFirestoreError(err, 'Could not save your survey') };
       }
       renderInPlace();
     });

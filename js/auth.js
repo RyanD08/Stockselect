@@ -80,6 +80,17 @@ function friendlyAuthError(err) {
   return AUTH_ERROR_MESSAGES[err && err.code] || 'Something went wrong. Please try again.';
 }
 
+// Firestore save/load/rename/delete errors are still logged in full to the
+// console (see the catches below), but unlike auth errors above they also
+// show their raw code on-screen -- something like "permission-denied" or
+// "unavailable" is actually diagnosable by a client without opening
+// devtools, and surfacing it turns a "still doesn't work" report into an
+// actionable one instead of a black box.
+function describeFirestoreError(err, action) {
+  const code = err && err.code;
+  return code ? `${action} (${code}). Please try again.` : `${action}. Please try again.`;
+}
+
 // --- Firebase Auth actions --------------------------------------------
 
 async function signUp(email, password) {
@@ -126,7 +137,7 @@ if (firebaseReady) {
         state.saveResultState =
           err && err.code === 'survey-limit-reached'
             ? { status: 'limit-reached', errorMessage: err.message }
-            : { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
+            : { status: 'error', errorMessage: describeFirestoreError(err, 'Could not save your survey') };
       }
       state.view = 'results';
       render();
@@ -373,7 +384,7 @@ async function openMySurveysView() {
     mySurveysViewState.surveys = await listSavedSurveys();
   } catch (err) {
     console.error('listSavedSurveys failed:', err);
-    mySurveysViewState.error = 'Could not load your saved surveys. Please try again.';
+    mySurveysViewState.error = describeFirestoreError(err, 'Could not load your saved surveys');
   }
   mySurveysViewState.loading = false;
   renderInPlace();
@@ -481,7 +492,7 @@ function wireSurveyEntryButtons() {
         mySurveysViewState.renamingId = null;
       } catch (err) {
         console.error('renameSavedSurvey failed:', err);
-        mySurveysViewState.error = 'Could not rename that survey. Please try again.';
+        mySurveysViewState.error = describeFirestoreError(err, 'Could not rename that survey');
       }
       renderInPlace();
     });
@@ -498,7 +509,7 @@ function wireSurveyEntryButtons() {
         mySurveysViewState.surveys = mySurveysViewState.surveys.filter((s) => s.id !== survey.id);
       } catch (err) {
         console.error('deleteSavedSurvey failed:', err);
-        mySurveysViewState.error = 'Could not delete that survey. Please try again.';
+        mySurveysViewState.error = describeFirestoreError(err, 'Could not delete that survey');
       }
       renderInPlace();
     });
