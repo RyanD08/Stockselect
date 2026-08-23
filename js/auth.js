@@ -107,6 +107,7 @@ if (firebaseReady) {
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
+        console.error('saveSurveyAnswers failed (post-login auto-save):', err);
         state.saveResultState = { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
       }
       state.view = 'results';

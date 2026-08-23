@@ -551,6 +551,12 @@ function renderResults() {
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
+        // Logged, not just swallowed -- the on-screen message is
+        // deliberately generic (a raw Firestore error code isn't
+        // meaningful to a client), but the real cause (e.g.
+        // "permission-denied" vs "unavailable") should be diagnosable from
+        // the console rather than a total black box.
+        console.error('saveSurveyAnswers failed:', err);
         state.saveResultState = { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
       }
       renderInPlace();
