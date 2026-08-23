@@ -1,6 +1,7 @@
 /**
  * Ticker Tester: look up one company and see how it scores against the
- * client's own values priorities, with a full per-criterion breakdown.
+ * client's own values priorities -- a 1-10 score per category plus a
+ * radar chart, not a question-by-question list (see 2026-08-23c below).
  *
  * Deliberately its own file/screen, not merged into the survey/results
  * flow (app.js) -- reachable from the header nav to any visitor, logged in
@@ -24,12 +25,32 @@
  * both files). Because both actions write into the same `state.answers`,
  * whichever happened most recently is naturally what's used -- no separate
  * "which source" bookkeeping needed here.
+ *
+ * 2026-08-23c: replaced the full 27/29-criterion breakdown with a per-
+ * category (7 categories) 1-10 score plus a Chart.js radar chart. Each
+ * category's score is a weighted average of that category's own
+ * per-question alignment values (the exact same `entry.alignments[qid]`
+ * scoring.js already computed for the tier/rationale above -- see
+ * computeCategoryScore) weighted by the client's own 1-5 importance rating
+ * per question, then rescaled from alignment's [-1,+1] range onto 1-10.
+ * This is a new AGGREGATION of already-computed scoring data, not a new
+ * scoring method -- no company's underlying alignment on any question is
+ * computed any differently than it already was for the main tier/score.
+ * Chart.js is loaded via CDN (see index.html) and degrades to just the
+ * numeric list (no crash, no blank space) if it fails to load, matching
+ * this site's existing pattern for every other optional external SDK.
  */
 
 const tickerTesterState = {
   query: '',
   selectedTicker: null,
 };
+
+// Chart.js requires destroying a previous chart bound to a <canvas> before
+// creating a new one there, or it throws "Canvas is already in use" --
+// tracked here so selecting a different company (which re-renders the same
+// canvas id) replaces the chart cleanly instead of erroring.
+let tickerRadarChartInstance = null;
 
 function initTickerTesterNav() {
   const btn = document.getElementById('ticker-tester-nav-btn');
@@ -127,7 +148,12 @@ function renderTickerTester() {
 
   wireTickerTesterBackButton();
   wireTickerSearch();
-  if (company) wireTickerResultActions();
+  if (company) {
+    wireTickerResultActions();
+    renderTickerRadarChartIfPresent(company);
+  } else {
+    destroyTickerRadarChart();
+  }
 }
 
 function wireTickerTesterBackButton() {
@@ -278,6 +304,7 @@ function renderTickerResult(company) {
 
   const { entry, ctx } = scored;
   const display = TIER_DISPLAY[entry.tier] || TIER_DISPLAY.Partial;
+  const categoryScores = computeCategoryScores(company, entry, ctx);
 
   return `
     <div class="ticker-result">
@@ -294,61 +321,138 @@ function renderTickerResult(company) {
         }
       </div>
 
-      ${renderCriterionBreakdown(company, entry, ctx)}
+      ${renderCategorySection(company, categoryScores)}
     </div>
   `;
 }
 
-function alignmentBucket(value) {
-  if (value > 0.05) return { key: 'positive', text: 'Aligns' };
-  if (value < -0.05) return { key: 'negative', text: 'Conflicts' };
-  return { key: 'neutral', text: 'Neutral' };
-}
-
-function renderCriterionBreakdown(company, entry, ctx) {
-  const rows = SCORED_QUESTION_IDS.map((qid) => breakdownRow(qid, company, ctx, entry.alignments[qid]));
-
-  RISK_DIRECT_QUESTION_IDS.forEach((qid) => {
-    rows.push(breakdownRow(qid, company, ctx, entry.alignments[qid]));
-  });
-
-  // Q27 (values-over-returns) plays a dual role in scoring and isn't
-  // stored in `alignments` by scoreCompany (see header comment) -- derived
-  // here the exact same way scoreCompany itself derives it, from the same
-  // financialQualityAlignment() call, not a new formula.
+// One 1-10 score per category, weighted-average of that category's own
+// per-question alignment values (already computed by scoreCompany/
+// buildScoredEntry above -- see entry.alignments) by the client's raw 1-5
+// importance rating on each question. A question with no verifiable data
+// for this company (questionHasData -- values questions 1-25 only, same
+// as scoreCompany's own unitImportance gating) is excluded from the
+// average entirely rather than counted as a false "neutral," so it can't
+// silently drag a category toward the middle. Risk questions (26/28/29)
+// have no such data-gate in the main engine either, so none is applied
+// here. Alignment values span roughly [-1, +1]; rescaled onto [1, 10]
+// with 5.5 (not 1) as the neutral midpoint, matching the main engine's own
+// "50 is neutral" convention on its 0-100 scale.
+function computeCategoryScores(company, entry, ctx) {
   const financialAlignment = financialQualityAlignment(company, deriveRiskProfile(state.answers), ctx.timeHorizon);
-  rows.push(breakdownRow(27, company, ctx, 1 - 2 * financialAlignment, true));
 
-  rows.sort((a, b) => a.id - b.id);
+  return CATEGORIES.map((category) => {
+    const questions = questionsForCategory(category.key).filter((q) => q.type !== 'horizon');
+    let weightedSum = 0;
+    let weightTotal = 0;
 
+    questions.forEach((q) => {
+      if (q.id <= 25 && !questionHasData(q.id, company, ctx)) return;
+      const importance = state.answers[q.id] || 3;
+      const alignment = q.id === 27 ? 1 - 2 * financialAlignment : entry.alignments[q.id];
+      weightedSum += importance * alignment;
+      weightTotal += importance;
+    });
+
+    const avgAlignment = weightTotal > 0 ? weightedSum / weightTotal : 0;
+    const score = Math.round(Math.min(10, Math.max(1, 5.5 + 4.5 * avgAlignment)));
+    return { key: category.key, label: category.label, score };
+  });
+}
+
+function renderCategorySection(company, categoryScores) {
   return `
-    <div class="ticker-breakdown">
-      <h3>Full Criterion Breakdown</h3>
-      <p class="muted">How ${escapeHtml(company.ticker)} scores on each of your rated priorities.</p>
-      <ul class="ticker-breakdown-list">
-        ${rows.map(renderBreakdownRowHtml).join('')}
-      </ul>
+    <div class="ticker-categories">
+      <h3>Category Match Scores</h3>
+      <p class="muted">How ${escapeHtml(company.ticker)} scores (1-10) in each category, weighted by how important you rated each question within it.</p>
+      <div class="ticker-category-layout">
+        <div class="ticker-radar-wrap">
+          <canvas id="ticker-radar-chart" role="img" aria-label="Radar chart of category match scores"></canvas>
+          <p id="ticker-radar-unavailable" class="muted ticker-radar-unavailable" hidden>Chart unavailable — see the scores below.</p>
+        </div>
+        <ul class="ticker-category-list">
+          ${categoryScores
+            .map(
+              (c) => `
+            <li class="ticker-category-row">
+              <span class="ticker-category-label">${escapeHtml(c.label)}</span>
+              <span class="ticker-category-track"><span class="ticker-category-fill" style="width:${(c.score / 10) * 100}%"></span></span>
+              <span class="ticker-category-score">${c.score}/10</span>
+            </li>
+          `
+            )
+            .join('')}
+        </ul>
+      </div>
     </div>
   `;
 }
 
-function breakdownRow(qid, company, ctx, alignmentValue, alwaysHasData) {
-  const question = getQuestion(qid);
-  const hasData = alwaysHasData || questionHasData(qid, company, ctx);
-  const rating = state.answers[qid];
-  const bucket = hasData ? alignmentBucket(alignmentValue) : { key: 'neutral', text: 'No data' };
-  return { id: qid, label: question.short, rating, hasData, bucket };
+function destroyTickerRadarChart() {
+  if (tickerRadarChartInstance) {
+    tickerRadarChartInstance.destroy();
+    tickerRadarChartInstance = null;
+  }
 }
 
-function renderBreakdownRowHtml(row) {
-  return `
-    <li class="ticker-breakdown-row">
-      <span class="ticker-breakdown-label">${escapeHtml(row.label)}</span>
-      <span class="ticker-breakdown-rating">Your rating: ${row.rating}/5</span>
-      <span class="ticker-breakdown-badge ticker-breakdown-${row.bucket.key}">${escapeHtml(row.bucket.text)}</span>
-      ${!row.hasData ? '<span class="ticker-breakdown-nodata">No verifiable data for this company</span>' : ''}
-    </li>
-  `;
+// Runs after renderTickerTester() has already written the canvas into the
+// DOM (Chart.js needs a real <canvas> element to bind to). No-ops
+// (destroying any prior chart) whenever personalization isn't available or
+// the company is blue-chip-excluded, since renderTickerResult doesn't emit
+// a canvas in either of those cases. Degrades to the numeric list alone,
+// with no crash and no blank gap, if Chart.js itself never loaded (e.g.
+// CDN blocked) -- same graceful-degradation convention as every other
+// optional external SDK on this site (see firebase-config.js).
+function renderTickerRadarChartIfPresent(company) {
+  const canvas = document.getElementById('ticker-radar-chart');
+  if (!canvas) {
+    destroyTickerRadarChart();
+    return;
+  }
+
+  if (typeof Chart === 'undefined') {
+    canvas.hidden = true;
+    const unavailable = document.getElementById('ticker-radar-unavailable');
+    if (unavailable) unavailable.hidden = false;
+    return;
+  }
+
+  const scored = buildCompanyScoreEntry(company);
+  if (!scored.entry) return; // blue-chip-excluded or otherwise no entry -- no chart to draw
+  const categoryScores = computeCategoryScores(company, scored.entry, scored.ctx);
+
+  destroyTickerRadarChart();
+  tickerRadarChartInstance = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: categoryScores.map((c) => c.label),
+      datasets: [
+        {
+          label: `${company.ticker} match`,
+          data: categoryScores.map((c) => c.score),
+          backgroundColor: 'rgba(201, 150, 47, 0.25)', // --gold, translucent fill
+          borderColor: '#0f1f3d', // --navy
+          borderWidth: 2,
+          pointBackgroundColor: '#c9962f', // --gold
+          pointBorderColor: '#0f1f3d',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 1,
+          max: 10,
+          ticks: { stepSize: 1, showLabelBackdrop: false, color: '#6b675c' },
+          pointLabels: { color: '#1c2530', font: { size: 12 } },
+          grid: { color: '#e1ddd3' },
+          angleLines: { color: '#e1ddd3' },
+        },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
 }
 
 function renderRawCompanyData(company) {

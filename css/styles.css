@@ -1706,69 +1706,81 @@ h2 .category-icon {
   margin: 0 !important;
 }
 
-.ticker-breakdown {
+.ticker-categories {
   margin-top: 1.75rem;
 }
 
-.ticker-breakdown-list {
+.ticker-category-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .ticker-category-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ticker-radar-wrap {
+  position: relative;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.ticker-radar-unavailable {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.ticker-category-list {
   list-style: none;
-  margin: 1rem 0 0;
+  margin: 0;
   padding: 0;
 }
 
-.ticker-breakdown-row {
+.ticker-category-row {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) minmax(60px, 100px) 44px;
   align-items: center;
-  gap: 0.5rem 0.9rem;
-  padding: 0.6rem 0;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
   border-top: 1px solid var(--border);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
 }
 
-.ticker-breakdown-row:first-child {
+.ticker-category-row:first-child {
   border-top: none;
 }
 
-.ticker-breakdown-label {
+.ticker-category-label {
   color: var(--text);
-}
-
-.ticker-breakdown-rating {
-  color: var(--muted);
-  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ticker-breakdown-badge {
-  display: inline-block;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.76rem;
-  font-weight: 600;
+.ticker-category-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.ticker-category-fill {
+  display: block;
+  height: 100%;
+  background: var(--gold);
+  border-radius: 4px;
+}
+
+.ticker-category-score {
+  color: var(--navy);
+  font-weight: 700;
+  text-align: right;
   white-space: nowrap;
-}
-
-.ticker-breakdown-positive {
-  background: var(--success-bg);
-  color: var(--success-text);
-}
-
-.ticker-breakdown-negative {
-  background: var(--danger-bg);
-  color: var(--danger-text);
-}
-
-.ticker-breakdown-neutral {
-  background: var(--neutral-bg);
-  color: var(--neutral-text);
-}
-
-.ticker-breakdown-nodata {
-  grid-column: 1 / -1;
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-style: italic;
 }
 
 .ticker-raw-data {
@@ -1806,15 +1818,6 @@ h2 .category-icon {
   color: var(--text);
   font-weight: 600;
   text-align: right;
-}
-
-@media (max-width: 560px) {
-  .ticker-breakdown-row {
-    grid-template-columns: 1fr auto;
-  }
-  .ticker-breakdown-rating {
-    grid-column: 1 / -1;
-  }
 }
 
 .site-footer {
