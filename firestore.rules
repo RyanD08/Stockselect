@@ -6,23 +6,32 @@
 // truth to paste in, and should be kept in sync with whatever is live in
 // the console.
 //
-// Data model this matches (see js/auth.js saveNewSurvey/listSavedSurveys):
-//   users/{userId}                          — no documents are read/written at this level directly
-//   users/{userId}/savedSurveys/{surveyId}  — CURRENT: up to 5 independently named saved surveys
-//                                              per user (name, answers, savedAt), each rename-able,
-//                                              loadable, and delete-able from My Surveys. The
-//                                              5-survey cap is enforced client-side (see auth.js),
-//                                              not by these rules.
-//   users/{userId}/savedSurvey/current      — LEGACY: a same-day-superseded single "most recent
+// Data model this matches (see js/auth.js saveNewPortfolio/listSavedPortfolios):
+//   users/{userId}                             — no documents are read/written at this level directly
+//   users/{userId}/savedPortfolios/{portfolioId} — CURRENT: up to 5 independently named saved
+//                                              portfolios per user (name, answers, savedAt), each
+//                                              rename-able, loadable, and delete-able from My
+//                                              Portfolios. The 5-saved-portfolio cap is enforced
+//                                              client-side (see auth.js), not by these rules.
+//   users/{userId}/meta/migration            — CURRENT: a single marker doc recording whether this
+//                                              user's old savedSurveys data has already been copied
+//                                              into savedPortfolios (see
+//                                              migrateLegacySurveysIfNeeded in auth.js). Not survey
+//                                              or portfolio data itself.
+//   users/{userId}/savedSurveys/{surveyId}   — LEGACY (superseded 2026-08-23b): the same feature
+//                                              under its old "survey" naming, before saved results
+//                                              were renamed to "portfolios." Its data is copied into
+//                                              savedPortfolios above by the one-time migration; the
+//                                              app no longer reads or writes this collection itself.
+//   users/{userId}/savedSurvey/current       — LEGACY: a same-day-superseded single "most recent
 //                                              survey" slot. The app no longer reads or writes it.
-//   users/{userId}/surveys/{surveyId}       — LEGACY: an even earlier version of this feature that
+//   users/{userId}/surveys/{surveyId}        — LEGACY: an even earlier version of this feature that
 //                                              saved a full, browsable history of survey+portfolio
 //                                              snapshots. The app no longer reads or writes this
 //                                              collection either.
-//   Both legacy paths are kept here, not deleted, purely so a user who
-//   saved under either earlier design isn't locked out of their own old
-//   data -- safe to remove once you've confirmed nothing still depends on
-//   them.
+//   All legacy paths are kept here, not deleted, purely so a user who
+//   saved under an earlier design isn't locked out of their own old data --
+//   safe to remove once you've confirmed nothing still depends on them.
 //
 // Rules:
 //   - A signed-in user may read and write ONLY documents under their own
@@ -41,7 +50,22 @@ service cloud.firestore {
 
     match /users/{userId} {
 
-      // Current: up to 5 named saved surveys this app actually uses now.
+      // Current: up to 5 named saved portfolios this app actually uses now.
+      match /savedPortfolios/{portfolioId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Current: the one-time savedSurveys -> savedPortfolios migration
+      // marker (see auth.js). Same per-owner access rule as everything
+      // else here, even though it isn't survey/portfolio data.
+      match /meta/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Legacy (superseded 2026-08-23b): the pre-rename "savedSurveys"
+      // collection. Still readable/writable by its own owner, and still
+      // read once by the migration above -- see the note at the top of
+      // this file.
       match /savedSurveys/{surveyId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }

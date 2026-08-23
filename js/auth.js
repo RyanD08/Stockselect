@@ -1,34 +1,50 @@
 /**
- * Account layer: Firebase Authentication + Firestore save of survey
- * answers, plus the account-related UI (header widget, login/sign-up
- * screen, My Surveys list).
+ * Account layer: Firebase Authentication + Firestore save of a completed
+ * survey's answers as a named "portfolio," plus the account-related UI
+ * (header widget, login/sign-up screen, My Portfolios list).
  *
  * Kept separate from app.js on purpose: app.js owns the survey flow
  * (intro/survey/review/results) and knows nothing about accounts beyond
  * calling the functions here; this file owns everything account-related
  * and knows nothing about scoring/questions, except for the one place it
- * has to reach into the survey flow directly: loading a saved survey sets
- * app.js's `state.answers`/`touchedQuestionIds` and jumps straight to the
- * results view (see the "Load" handler in renderMySurveys below) -- there
- * was no clean way to do that without either function knowing a little
- * about the other's state, and this direction (auth.js reaching into
- * `state`) already matches every other place these two files meet
+ * has to reach into the survey flow directly: loading a saved portfolio
+ * sets app.js's `state.answers`/`touchedQuestionIds` and jumps straight to
+ * the results view (see the "Load" handler in renderMyPortfolios below) --
+ * there was no clean way to do that without either function knowing a
+ * little about the other's state, and this direction (auth.js reaching
+ * into `state`) already matches every other place these two files meet
  * (`state.view`, the results screen's Save control).
  *
  * Login is strictly optional — see firebase-config.js's `firebaseReady`.
  * Every function here checks it first and fails softly (never touches the
  * survey/results experience for a signed-out visitor).
  *
+ * Naming note: the 27-question client survey itself is still "the survey"
+ * everywhere (app.js, questions.js) -- only a *saved, completed* survey's
+ * answers are called a "portfolio" here, since that's what a client is
+ * actually naming/managing in this file's UI.
+ *
  * 2026-08-23: reworked from a single "most recent survey" slot
- * (users/{uid}/savedSurvey/current) into up to MAX_SAVED_SURVEYS named,
- * independently manageable saves (users/{uid}/savedSurveys/{surveyId}),
- * each rename-able and delete-able from a new My Surveys list, and each
- * loadable back into the survey/results flow. Still answers + a timestamp
- * only -- never the computed portfolio -- now plus an editable display
- * name. The single-slot `savedSurvey` collection this superseded, and the
- * even earlier full-portfolio-snapshot `surveys` collection before that,
- * are both left alone in Firestore (and firestore.rules) rather than
- * migrated or deleted -- neither is read or written by this file anymore.
+ * (users/{uid}/savedSurvey/current) into up to MAX_SAVED_PORTFOLIOS named,
+ * independently manageable saves, each rename-able and delete-able from a
+ * My Portfolios list, and each loadable back into the survey/results flow.
+ * Still answers + a timestamp only -- never the computed portfolio itself
+ * -- plus an editable display name. The single-slot `savedSurvey`
+ * collection this superseded, and the even earlier full-portfolio-snapshot
+ * `surveys` collection before that, are both left alone in Firestore (and
+ * firestore.rules) rather than migrated or deleted -- neither is read or
+ * written by this file anymore.
+ *
+ * 2026-08-23b: renamed the saved-survey concept itself to "portfolio"
+ * end-to-end, including the Firestore collection (`savedSurveys` ->
+ * `savedPortfolios`). Unlike the rework above, this one DOES migrate:
+ * migrateLegacySurveysIfNeeded() below copies each signed-in user's
+ * existing `savedSurveys` docs into `savedPortfolios` (same doc ids, so
+ * it's safe to re-run) the first time they open My Portfolios, verifies
+ * every id landed before recording it done, and leaves the old
+ * `savedSurveys` collection (and its firestore.rules entry) in place,
+ * unread by the app from here on, exactly like the two legacy collections
+ * before it.
  */
 
 const authState = {
@@ -46,15 +62,15 @@ const authViewState = {
   info: null,
 };
 
-// UI-only state for the My Surveys list.
-const mySurveysViewState = {
+// UI-only state for the My Portfolios list.
+const myPortfoliosViewState = {
   loading: true,
   error: null,
-  surveys: [],
+  portfolios: [],
   renamingId: null, // id of the entry currently showing its rename input, or null
 };
 
-// Set when a signed-out visitor clicks "Save My Survey" on the results
+// Set when a signed-out visitor clicks "Save My Portfolio" on the results
 // screen: their answers at that moment, held here until they finish
 // logging in (or signing up), at which point onAuthStateChanged below
 // saves them automatically with no second click required. Cleared as soon
@@ -126,22 +142,23 @@ if (firebaseReady) {
     renderAccountWidget();
 
     if (user && pendingSaveAnswers) {
-      // A signed-out visitor clicked "Save My Survey," was redirected here
-      // to log in, and has now done so -- finish the save they started
-      // without making them click it again, then take them back to their
-      // results with the same "Saved!" confirmation the normal flow shows.
+      // A signed-out visitor clicked "Save My Portfolio," was redirected
+      // here to log in, and has now done so -- finish the save they
+      // started without making them click it again, then take them back to
+      // their results with the same "Saved!" confirmation the normal flow
+      // shows.
       const answersToSave = pendingSaveAnswers;
       pendingSaveAnswers = null;
       try {
-        await saveNewSurvey(answersToSave);
+        await saveNewPortfolio(answersToSave);
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
-        console.error('saveNewSurvey failed (post-login auto-save):', err);
+        console.error('saveNewPortfolio failed (post-login auto-save):', err);
         state.saveResultState =
-          err && err.code === 'survey-limit-reached'
+          err && err.code === 'portfolio-limit-reached'
             ? { status: 'limit-reached', errorMessage: err.message }
-            : { status: 'error', errorMessage: describeFirestoreError(err, 'Could not save your survey') };
+            : { status: 'error', errorMessage: describeFirestoreError(err, 'Could not save your portfolio') };
       }
       state.view = 'results';
       render();
@@ -155,7 +172,7 @@ if (firebaseReady) {
       state.view = 'intro';
       render();
     } else if (state.view === 'results') {
-      // Refresh the Save-My-Survey control for the new auth state.
+      // Refresh the Save-My-Portfolio control for the new auth state.
       render();
     }
   });
@@ -166,49 +183,96 @@ if (firebaseReady) {
   authState.ready = true;
 }
 
-// --- Firestore: save/rename/delete/list survey answers -------------------
+// --- Firestore: save/rename/delete/list portfolios (saved survey answers) --
 
-const MAX_SAVED_SURVEYS = 5;
+const MAX_SAVED_PORTFOLIOS = 5;
 
-function savedSurveysCollection() {
+function savedPortfoliosCollection() {
+  return firebaseDb.collection('users').doc(authState.user.uid).collection('savedPortfolios');
+}
+
+function legacySavedSurveysCollection() {
   return firebaseDb.collection('users').doc(authState.user.uid).collection('savedSurveys');
 }
 
-function formatAutoSurveyName(date) {
-  return `Survey — ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+function migrationStateDoc() {
+  return firebaseDb.collection('users').doc(authState.user.uid).collection('meta').doc('migration');
 }
 
-// Enforces the 5-saved-survey cap client-side (an extra read before the
+function formatAutoPortfolioName(date) {
+  return `Portfolio — ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+}
+
+// One-time-per-user copy of the old `savedSurveys` collection into the
+// current `savedPortfolios` one, run lazily from listSavedPortfolios()
+// below (so it happens the first time a signed-in user opens My
+// Portfolios, and nowhere else). Preserves each
+// document's original id, so copying the same source doc twice is a no-op
+// overwrite rather than a duplicate -- safe to retry on a partial failure.
+// Only marks itself done in migrationStateDoc() once every copied id is
+// verified present in savedPortfolios; if verification fails, the marker
+// is left unset so the next call retries rather than silently losing data.
+// The `savedSurveys` originals are never deleted here (same as every
+// other legacy collection in this file/firestore.rules).
+async function migrateLegacySurveysIfNeeded() {
+  if (!firebaseReady || !authState.user) return;
+
+  const marker = migrationStateDoc();
+  const markerSnap = await marker.get();
+  if (markerSnap.exists && markerSnap.data().savedSurveysMigrated) return;
+
+  const legacySnap = await legacySavedSurveysCollection().get();
+  if (legacySnap.empty) {
+    await marker.set({ savedSurveysMigrated: true, migratedCount: 0 }, { merge: true });
+    return;
+  }
+
+  const portfoliosColl = savedPortfoliosCollection();
+  await Promise.all(legacySnap.docs.map((doc) => portfoliosColl.doc(doc.id).set(doc.data(), { merge: true })));
+
+  const verifySnap = await portfoliosColl.get();
+  const verifiedIds = new Set(verifySnap.docs.map((doc) => doc.id));
+  const allPresent = legacySnap.docs.every((doc) => verifiedIds.has(doc.id));
+  if (!allPresent) {
+    console.error('Legacy savedSurveys -> savedPortfolios migration incomplete; will retry next time.');
+    return;
+  }
+
+  await marker.set({ savedSurveysMigrated: true, migratedCount: legacySnap.size }, { merge: true });
+}
+
+// Enforces the 5-saved-portfolio cap client-side (an extra read before the
 // write) -- Firestore security rules can restrict WHO can write, not easily
 // COUNT a user's existing documents, so there's no server-side quota here.
 // That's an acceptable gap for a personal-quota feature bounded to a
 // user's own account (see firestore.rules): the worst a client bypassing
 // this check could do is store extra data under their own uid, not access
 // anyone else's.
-async function saveNewSurvey(answers) {
+async function saveNewPortfolio(answers) {
   if (!firebaseReady) throw new Error('Account features are unavailable right now.');
-  if (!authState.user) throw new Error('You need to be logged in to save your survey.');
+  if (!authState.user) throw new Error('You need to be logged in to save your portfolio.');
 
-  const coll = savedSurveysCollection();
+  const coll = savedPortfoliosCollection();
   const existing = await coll.get();
-  if (existing.size >= MAX_SAVED_SURVEYS) {
+  if (existing.size >= MAX_SAVED_PORTFOLIOS) {
     const limitErr = new Error(
-      `You've reached your limit of ${MAX_SAVED_SURVEYS} saved surveys. Delete one from My Surveys to save a new one.`
+      `You've reached your limit of ${MAX_SAVED_PORTFOLIOS} saved portfolios. Delete one from My Portfolios to save a new one.`
     );
-    limitErr.code = 'survey-limit-reached';
+    limitErr.code = 'portfolio-limit-reached';
     throw limitErr;
   }
 
   await coll.add({
-    name: formatAutoSurveyName(new Date()),
+    name: formatAutoPortfolioName(new Date()),
     answers,
     savedAt: firebase.firestore.FieldValue.serverTimestamp(),
   });
 }
 
-async function listSavedSurveys() {
+async function listSavedPortfolios() {
   if (!firebaseReady || !authState.user) return [];
-  const snapshot = await savedSurveysCollection().orderBy('savedAt', 'desc').get();
+  await migrateLegacySurveysIfNeeded();
+  const snapshot = await savedPortfoliosCollection().orderBy('savedAt', 'desc').get();
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
@@ -216,14 +280,14 @@ async function listSavedSurveys() {
 // original savedAt (still used for sort order after a rename) are
 // untouched, per the "does not affect the underlying answers or original
 // save timestamp" requirement.
-async function renameSavedSurvey(surveyId, newName) {
+async function renameSavedPortfolio(portfolioId, newName) {
   if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
-  await savedSurveysCollection().doc(surveyId).update({ name: newName });
+  await savedPortfoliosCollection().doc(portfolioId).update({ name: newName });
 }
 
-async function deleteSavedSurvey(surveyId) {
+async function deleteSavedPortfolio(portfolioId) {
   if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
-  await savedSurveysCollection().doc(surveyId).delete();
+  await savedPortfoliosCollection().doc(portfolioId).delete();
 }
 
 // --- Header account widget (static markup outside #app, present on every view) --
@@ -239,13 +303,13 @@ function renderAccountWidget() {
   if (authState.user) {
     el.innerHTML = `
       <span class="account-widget-email">${escapeHtml(authState.user.email)}</span>
-      <button type="button" id="account-my-surveys-link" class="account-widget-link">My Surveys</button>
+      <button type="button" id="account-my-portfolios-link" class="account-widget-link">My Portfolios</button>
       <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
     `;
-    document.getElementById('account-my-surveys-link').addEventListener('click', openMySurveysView);
+    document.getElementById('account-my-portfolios-link').addEventListener('click', openMyPortfoliosView);
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
-      if (state.view === 'account' || state.view === 'surveys') {
+      if (state.view === 'account' || state.view === 'portfolios') {
         state.view = 'intro';
         render();
       }
@@ -274,8 +338,8 @@ function renderAccount() {
       <p class="lede">
         ${
           isSignup
-            ? 'Save your survey answers so you can pick up where you left off.'
-            : 'Log in to save your TrueNorth survey.'
+            ? 'Save your portfolio so you can pick up where you left off.'
+            : 'Log in to save your TrueNorth portfolio.'
         }
       </p>
 
@@ -324,7 +388,7 @@ function renderAccount() {
       else await logIn(email, password);
       authViewState.loading = false;
       // onAuthStateChanged (above) handles navigating away -- either
-      // finishing an interrupted "Save My Survey," or back to the intro
+      // finishing an interrupted "Save My Portfolio," or back to the intro
       // screen -- once the user resolves.
     } catch (err) {
       authViewState.loading = false;
@@ -367,153 +431,153 @@ function renderAccount() {
   document.getElementById('auth-back-btn').addEventListener('click', () => {
     authViewState.error = null;
     authViewState.info = null;
-    pendingSaveAnswers = null; // abandon any interrupted "Save My Survey" too
+    pendingSaveAnswers = null; // abandon any interrupted "Save My Portfolio" too
     state.view = 'intro';
     render();
   });
 }
 
-// --- My Surveys view -------------------------------------------------------
+// --- My Portfolios view ----------------------------------------------------
 
-async function openMySurveysView() {
-  state.view = 'surveys';
-  mySurveysViewState.loading = true;
-  mySurveysViewState.error = null;
-  mySurveysViewState.renamingId = null;
+async function openMyPortfoliosView() {
+  state.view = 'portfolios';
+  myPortfoliosViewState.loading = true;
+  myPortfoliosViewState.error = null;
+  myPortfoliosViewState.renamingId = null;
   // A stale "limit reached" message shouldn't still be sitting on the
   // results screen after the client comes here to make room for a new save.
   state.saveResultState = { status: 'idle', errorMessage: null };
   render();
   try {
-    mySurveysViewState.surveys = await listSavedSurveys();
+    myPortfoliosViewState.portfolios = await listSavedPortfolios();
   } catch (err) {
-    console.error('listSavedSurveys failed:', err);
-    mySurveysViewState.error = describeFirestoreError(err, 'Could not load your saved surveys');
+    console.error('listSavedPortfolios failed:', err);
+    myPortfoliosViewState.error = describeFirestoreError(err, 'Could not load your saved portfolios');
   }
-  mySurveysViewState.loading = false;
+  myPortfoliosViewState.loading = false;
   renderInPlace();
 }
 
-function renderMySurveys() {
-  const count = mySurveysViewState.surveys.length;
+function renderMyPortfolios() {
+  const count = myPortfoliosViewState.portfolios.length;
   appEl.innerHTML = `
-    <section class="card surveys-card">
+    <section class="card portfolios-card">
       <p class="eyebrow">Account</p>
-      <h1>My Surveys</h1>
+      <h1>My Portfolios</h1>
       <p class="lede">
-        ${mySurveysViewState.loading ? 'Your saved surveys.' : `${count} of ${MAX_SAVED_SURVEYS} saved surveys.`}
+        ${myPortfoliosViewState.loading ? 'Your saved portfolios.' : `${count} of ${MAX_SAVED_PORTFOLIOS} saved portfolios.`}
       </p>
-      ${mySurveysViewState.loading ? '<p class="muted">Loading…</p>' : renderSurveysList()}
+      ${myPortfoliosViewState.loading ? '<p class="muted">Loading…</p>' : renderPortfoliosList()}
       <div class="nav-row">
-        <button type="button" id="surveys-back-btn" class="btn btn-secondary">Back</button>
+        <button type="button" id="portfolios-back-btn" class="btn btn-secondary">Back</button>
       </div>
     </section>
   `;
 
-  document.getElementById('surveys-back-btn').addEventListener('click', () => {
+  document.getElementById('portfolios-back-btn').addEventListener('click', () => {
     state.view = 'intro';
     render();
   });
 
-  wireSurveyEntryButtons();
+  wirePortfolioEntryButtons();
 }
 
-function renderSurveysList() {
-  if (mySurveysViewState.error) return `<p class="error-text">${escapeHtml(mySurveysViewState.error)}</p>`;
-  if (mySurveysViewState.surveys.length === 0) {
-    return '<p class="muted">You haven\'t saved any surveys yet. Complete the questionnaire and click "Save My Survey" on your results page to see it here.</p>';
+function renderPortfoliosList() {
+  if (myPortfoliosViewState.error) return `<p class="error-text">${escapeHtml(myPortfoliosViewState.error)}</p>`;
+  if (myPortfoliosViewState.portfolios.length === 0) {
+    return '<p class="muted">You haven\'t saved any portfolios yet. Complete the questionnaire and click "Save My Portfolio" on your results page to see it here.</p>';
   }
-  return `<ul class="surveys-list">${mySurveysViewState.surveys.map(renderSurveyEntry).join('')}</ul>`;
+  return `<ul class="portfolios-list">${myPortfoliosViewState.portfolios.map(renderPortfolioEntry).join('')}</ul>`;
 }
 
-function renderSurveyEntry(survey) {
-  const isRenaming = mySurveysViewState.renamingId === survey.id;
+function renderPortfolioEntry(portfolio) {
+  const isRenaming = myPortfoliosViewState.renamingId === portfolio.id;
   const dateLabel =
-    survey.savedAt && typeof survey.savedAt.toDate === 'function'
-      ? survey.savedAt.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })
+    portfolio.savedAt && typeof portfolio.savedAt.toDate === 'function'
+      ? portfolio.savedAt.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })
       : 'Just now';
 
   if (isRenaming) {
     return `
-      <li class="survey-entry survey-entry-renaming" data-id="${survey.id}">
-        <form class="survey-rename-form" data-id="${survey.id}">
-          <input type="text" class="survey-rename-input" value="${escapeHtml(survey.name)}" maxlength="80" autofocus />
-          <button type="submit" class="btn-link-action survey-rename-save">Save</button>
-          <button type="button" class="btn-link-action survey-rename-cancel">Cancel</button>
+      <li class="portfolio-entry portfolio-entry-renaming" data-id="${portfolio.id}">
+        <form class="portfolio-rename-form" data-id="${portfolio.id}">
+          <input type="text" class="portfolio-rename-input" value="${escapeHtml(portfolio.name)}" maxlength="80" autofocus />
+          <button type="submit" class="btn-link-action portfolio-rename-save">Save</button>
+          <button type="button" class="btn-link-action portfolio-rename-cancel">Cancel</button>
         </form>
       </li>
     `;
   }
 
   return `
-    <li class="survey-entry" data-id="${survey.id}">
-      <div class="survey-entry-info">
-        <span class="survey-entry-name">${escapeHtml(survey.name)}</span>
-        <span class="survey-entry-date">Saved ${escapeHtml(dateLabel)}</span>
+    <li class="portfolio-entry" data-id="${portfolio.id}">
+      <div class="portfolio-entry-info">
+        <span class="portfolio-entry-name">${escapeHtml(portfolio.name)}</span>
+        <span class="portfolio-entry-date">Saved ${escapeHtml(dateLabel)}</span>
       </div>
-      <div class="survey-entry-actions">
-        <button type="button" class="btn-link-action survey-load-btn" data-id="${survey.id}" ${state.dataset ? '' : 'disabled title="Data still loading — try again in a moment"'}>Load</button>
-        <button type="button" class="btn-link-action survey-rename-btn" data-id="${survey.id}">Rename</button>
-        <button type="button" class="btn-link-action survey-delete-btn danger" data-id="${survey.id}">Delete</button>
+      <div class="portfolio-entry-actions">
+        <button type="button" class="btn-link-action portfolio-load-btn" data-id="${portfolio.id}" ${state.dataset ? '' : 'disabled title="Data still loading — try again in a moment"'}>Load</button>
+        <button type="button" class="btn-link-action portfolio-rename-btn" data-id="${portfolio.id}">Rename</button>
+        <button type="button" class="btn-link-action portfolio-delete-btn danger" data-id="${portfolio.id}">Delete</button>
       </div>
     </li>
   `;
 }
 
-function wireSurveyEntryButtons() {
-  document.querySelectorAll('.survey-load-btn').forEach((btn) => {
+function wirePortfolioEntryButtons() {
+  document.querySelectorAll('.portfolio-load-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const survey = mySurveysViewState.surveys.find((s) => s.id === btn.dataset.id);
-      if (survey) loadSurveyIntoResults(survey);
+      const portfolio = myPortfoliosViewState.portfolios.find((p) => p.id === btn.dataset.id);
+      if (portfolio) loadPortfolioIntoResults(portfolio);
     });
   });
 
-  document.querySelectorAll('.survey-rename-btn').forEach((btn) => {
+  document.querySelectorAll('.portfolio-rename-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      mySurveysViewState.renamingId = btn.dataset.id;
+      myPortfoliosViewState.renamingId = btn.dataset.id;
       renderInPlace();
     });
   });
 
-  document.querySelectorAll('.survey-rename-cancel').forEach((btn) => {
+  document.querySelectorAll('.portfolio-rename-cancel').forEach((btn) => {
     btn.addEventListener('click', () => {
-      mySurveysViewState.renamingId = null;
+      myPortfoliosViewState.renamingId = null;
       renderInPlace();
     });
   });
 
-  document.querySelectorAll('.survey-rename-form').forEach((form) => {
+  document.querySelectorAll('.portfolio-rename-form').forEach((form) => {
     form.addEventListener('submit', async (evt) => {
       evt.preventDefault();
-      const surveyId = form.dataset.id;
-      const input = form.querySelector('.survey-rename-input');
+      const portfolioId = form.dataset.id;
+      const input = form.querySelector('.portfolio-rename-input');
       const newName = input.value.trim();
       if (!newName) return;
       try {
-        await renameSavedSurvey(surveyId, newName);
-        const entry = mySurveysViewState.surveys.find((s) => s.id === surveyId);
+        await renameSavedPortfolio(portfolioId, newName);
+        const entry = myPortfoliosViewState.portfolios.find((p) => p.id === portfolioId);
         if (entry) entry.name = newName;
-        mySurveysViewState.renamingId = null;
+        myPortfoliosViewState.renamingId = null;
       } catch (err) {
-        console.error('renameSavedSurvey failed:', err);
-        mySurveysViewState.error = describeFirestoreError(err, 'Could not rename that survey');
+        console.error('renameSavedPortfolio failed:', err);
+        myPortfoliosViewState.error = describeFirestoreError(err, 'Could not rename that portfolio');
       }
       renderInPlace();
     });
   });
 
-  document.querySelectorAll('.survey-delete-btn').forEach((btn) => {
+  document.querySelectorAll('.portfolio-delete-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      const survey = mySurveysViewState.surveys.find((s) => s.id === btn.dataset.id);
-      if (!survey) return;
-      const confirmed = window.confirm(`Delete "${survey.name}"? This can't be undone.`);
+      const portfolio = myPortfoliosViewState.portfolios.find((p) => p.id === btn.dataset.id);
+      if (!portfolio) return;
+      const confirmed = window.confirm(`Delete "${portfolio.name}"? This can't be undone.`);
       if (!confirmed) return;
       try {
-        await deleteSavedSurvey(survey.id);
-        mySurveysViewState.surveys = mySurveysViewState.surveys.filter((s) => s.id !== survey.id);
+        await deleteSavedPortfolio(portfolio.id);
+        myPortfoliosViewState.portfolios = myPortfoliosViewState.portfolios.filter((p) => p.id !== portfolio.id);
       } catch (err) {
-        console.error('deleteSavedSurvey failed:', err);
-        mySurveysViewState.error = describeFirestoreError(err, 'Could not delete that survey');
+        console.error('deleteSavedPortfolio failed:', err);
+        myPortfoliosViewState.error = describeFirestoreError(err, 'Could not delete that portfolio');
       }
       renderInPlace();
     });
@@ -529,9 +593,9 @@ function wireSurveyEntryButtons() {
 // country/industry-ties/time-horizon aren't part of what's saved (see the
 // header comment -- only answers + a name/timestamp are), so those stay
 // at their current session values rather than being reset by a load.
-function loadSurveyIntoResults(survey) {
+function loadPortfolioIntoResults(portfolio) {
   if (!state.dataset) return;
-  state.answers = { ...survey.answers };
+  state.answers = { ...portfolio.answers };
   state.touchedQuestionIds = new Set(
     QUESTIONS.filter((q) => q.type !== 'horizon').map((q) => q.id)
   );

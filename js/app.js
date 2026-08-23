@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'surveys'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -12,7 +12,7 @@ const state = {
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
   expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
-  saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Survey" control (see auth.js for the actual save)
+  saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Portfolio" control (see auth.js for the actual save)
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -37,7 +37,7 @@ function renderInPlace() {
   else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
   else if (state.view === 'account') renderAccount(); // js/auth.js
-  else if (state.view === 'surveys') renderMySurveys(); // js/auth.js
+  else if (state.view === 'portfolios') renderMyPortfolios(); // js/auth.js
 }
 
 // For actual navigation (view/step changes) — re-renders and scrolls to
@@ -125,8 +125,10 @@ function renderSurvey() {
       <div class="category-chips">
         ${CATEGORIES.map((cat, i) => renderCategoryChip(cat, i)).join('')}
       </div>
-      <p class="step-label">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
-      <h2><span class="category-icon">${category.icon}</span>${escapeHtml(category.label)}</h2>
+      <div class="survey-sticky-header">
+        <p class="step-label">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
+        <h2><span class="category-icon">${category.icon}</span>${escapeHtml(category.label)}</h2>
+      </div>
       <p class="scale-hint">For each item, rate how important it is to you: 1 = not important, 5 = very important.</p>
       <div class="questions-list">
         ${questions.map(renderQuestionRow).join('')}
@@ -409,7 +411,7 @@ function chevronIcon() {
 
 // Login is optional (see firebase-config.js/auth.js) — this renders
 // nothing at all if Firebase never loaded. One button always: its own
-// label carries every state ("Save My Survey" / "Saving…" / "Saved!"), and
+// label carries every state ("Save My Portfolio" / "Saving…" / "Saved!"), and
 // a signed-out click redirects to login rather than swapping in a
 // different control (see the click handler in renderResults() below).
 function renderSaveResultsControl() {
@@ -421,12 +423,12 @@ function renderSaveResultsControl() {
     return `
       <div class="save-results-row save-results-limit">
         <p class="error-text">${escapeHtml(errorMessage)}</p>
-        <button type="button" id="go-to-my-surveys-btn" class="save-results-link">Go to My Surveys</button>
+        <button type="button" id="go-to-my-portfolios-btn" class="save-results-link">Go to My Portfolios</button>
       </div>
     `;
   }
 
-  const label = status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved!' : 'Save My Survey';
+  const label = status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved!' : 'Save My Portfolio';
   return `
     <p class="save-results-row">
       <button type="button" id="save-results-btn" class="btn btn-secondary" ${status === 'saving' ? 'disabled' : ''}>
@@ -438,7 +440,7 @@ function renderSaveResultsControl() {
 }
 
 // Purely cosmetic: after a successful save, the button's label reverts
-// from "Saved!" back to "Save My Survey" on its own after a couple of
+// from "Saved!" back to "Save My Portfolio" on its own after a couple of
 // seconds, rather than staying changed forever or requiring a click to
 // dismiss. Guards against a stale timer firing after the client has since
 // saved again, hit an error, or navigated away from the results screen.
@@ -461,6 +463,9 @@ function renderResults() {
   appEl.innerHTML = `
     <section class="card results-card">
       <h1>Your TrueNorth Portfolio</h1>
+      <p class="results-top-actions">
+        <button type="button" class="btn btn-secondary edit-answers-btn" data-edit-answers>Edit My Answers</button>
+      </p>
       ${renderSaveResultsControl()}
 
       <div class="summary-grid">
@@ -525,7 +530,7 @@ function renderResults() {
       </div>
 
       <div class="nav-row">
-        <button id="edit-answers-btn" class="btn btn-secondary">Edit My Answers</button>
+        <button class="btn btn-secondary edit-answers-btn" data-edit-answers>Edit My Answers</button>
         <button id="restart-btn" class="btn btn-secondary">Start Over</button>
       </div>
     </section>
@@ -558,29 +563,29 @@ function renderResults() {
       state.saveResultState = { status: 'saving', errorMessage: null };
       renderInPlace();
       try {
-        await saveNewSurvey(state.answers);
+        await saveNewPortfolio(state.answers);
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
         // Logged, not just swallowed. The on-screen message also includes
         // the raw Firestore error code (see describeFirestoreError in
         // auth.js) so a real cause like "permission-denied" is diagnosable
-        // without opening devtools. The 5-survey-limit case is a real,
+        // without opening devtools. The 5-portfolio-limit case is a real,
         // expected outcome rather than a failure, so it gets its own
         // status/message instead of the generic one.
-        console.error('saveNewSurvey failed:', err);
+        console.error('saveNewPortfolio failed:', err);
         state.saveResultState =
-          err && err.code === 'survey-limit-reached'
+          err && err.code === 'portfolio-limit-reached'
             ? { status: 'limit-reached', errorMessage: err.message }
-            : { status: 'error', errorMessage: describeFirestoreError(err, 'Could not save your survey') };
+            : { status: 'error', errorMessage: describeFirestoreError(err, 'Could not save your portfolio') };
       }
       renderInPlace();
     });
   }
 
-  const goToMySurveysBtn = document.getElementById('go-to-my-surveys-btn');
-  if (goToMySurveysBtn) {
-    goToMySurveysBtn.addEventListener('click', openMySurveysView);
+  const goToMyPortfoliosBtn = document.getElementById('go-to-my-portfolios-btn');
+  if (goToMyPortfoliosBtn) {
+    goToMyPortfoliosBtn.addEventListener('click', openMyPortfoliosView);
   }
 
   const simulationToggleBtn = document.getElementById('simulation-toggle-btn');
@@ -591,10 +596,15 @@ function renderResults() {
     });
   }
 
-  document.getElementById('edit-answers-btn').addEventListener('click', () => {
-    state.editOrigin = null;
-    state.view = 'review';
-    render();
+  // Two buttons (one near the top of the results screen, one in the
+  // bottom nav row) trigger the exact same behavior -- the top one exists
+  // purely so it's reachable without scrolling on a long results page.
+  document.querySelectorAll('[data-edit-answers]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.editOrigin = null;
+      state.view = 'review';
+      render();
+    });
   });
 
   document.getElementById('restart-btn').addEventListener('click', () => {

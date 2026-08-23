@@ -459,6 +459,32 @@ select:focus-visible {
   letter-spacing: 0.14em;
 }
 
+/* Pins the current step's "Step X of Y" + category name to the top of the
+   viewport while the client scrolls through that category's questions, so
+   they're never left wondering which section they're answering without
+   scrolling back up. Each survey step only ever shows one category at a
+   time (see renderSurvey in app.js), so this never needs to swap between
+   categories mid-scroll -- it just keeps the one already at the top of
+   this step in view. Sits inside .survey-card's own padding rather than
+   spanning edge-to-edge, so it reads as part of the page, not an overlay. */
+.survey-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--card-bg);
+  padding: 0.5rem 0 0.6rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.survey-sticky-header .step-label {
+  margin: 0 0 0.2rem;
+}
+
+.survey-sticky-header h2 {
+  margin: 0;
+}
+
 h2 .category-icon {
   display: inline-flex;
   align-items: center;
@@ -1262,7 +1288,7 @@ h2 .category-icon {
   margin-top: 1.75rem;
 }
 
-/* Account: login/sign-up screen and "Save My Survey". All optional — see
+/* Account: login/sign-up screen and "Save My Portfolio". All optional — see
    auth.js — so these only ever render when Firebase is actually
    available. */
 
@@ -1347,9 +1373,13 @@ h2 .category-icon {
   text-decoration: underline;
 }
 
-/* "Save My Survey" (Results screen) — a single button whose own label
-   carries most states; the 5-survey-limit case gets its own small block
-   with a link into My Surveys instead. */
+/* "Save My Portfolio" (Results screen) — a single button whose own label
+   carries most states; the 5-portfolio-limit case gets its own small block
+   with a link into My Portfolios instead. */
+
+.results-top-actions {
+  margin: 0 0 1.25rem;
+}
 
 .save-results-row {
   margin: 0.75rem 0 1.25rem;
@@ -1385,20 +1415,20 @@ h2 .category-icon {
   text-decoration: underline;
 }
 
-/* My Surveys list */
+/* My Portfolios list */
 
-.surveys-card {
+.portfolios-card {
   max-width: 640px;
   margin: 0 auto;
 }
 
-.surveys-list {
+.portfolios-list {
   list-style: none;
   margin: 1.25rem 0 0;
   padding: 0;
 }
 
-.survey-entry {
+.portfolio-entry {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1407,18 +1437,18 @@ h2 .category-icon {
   border-top: 1px solid var(--border);
 }
 
-.survey-entry:first-child {
+.portfolio-entry:first-child {
   border-top: none;
 }
 
-.survey-entry-info {
+.portfolio-entry-info {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
   min-width: 0;
 }
 
-.survey-entry-name {
+.portfolio-entry-name {
   font-weight: 600;
   color: var(--navy);
   overflow: hidden;
@@ -1426,12 +1456,12 @@ h2 .category-icon {
   white-space: nowrap;
 }
 
-.survey-entry-date {
+.portfolio-entry-date {
   font-size: 0.8rem;
   color: var(--muted);
 }
 
-.survey-entry-actions {
+.portfolio-entry-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -1462,18 +1492,18 @@ h2 .category-icon {
   color: var(--danger-text);
 }
 
-.survey-entry-renaming {
+.portfolio-entry-renaming {
   display: block;
 }
 
-.survey-rename-form {
+.portfolio-rename-form {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   width: 100%;
 }
 
-.survey-rename-input {
+.portfolio-rename-input {
   flex: 1;
   min-width: 0;
   padding: 0.45rem 0.6rem;
@@ -1484,7 +1514,7 @@ h2 .category-icon {
   background: #fff;
 }
 
-.survey-rename-input:focus {
+.portfolio-rename-input:focus {
   outline: 2px solid var(--gold-light);
   outline-offset: 1px;
 }
