@@ -18,6 +18,18 @@
  * touching auth/Firestore.
  */
 
+// The site's own live URL — used as the "continue" destination Firebase
+// sends a user back to after they finish a hosted flow (currently: the
+// password reset email's confirmation page). This domain MUST be present
+// under Authentication > Settings > Authorized domains in the Firebase
+// console, or sendPasswordResetEmail will throw auth/unauthorized-continue-uri.
+// Firebase only adds `localhost` and the project's own *.firebaseapp.com
+// there by default -- a custom domain like ryand08.github.io is not added
+// automatically just because email/password sign-in already works from it
+// (that list is specifically consulted for continue/redirect URLs, not for
+// the sign-in calls themselves), so this needs to be checked in the console.
+const siteUrl = 'https://ryand08.github.io/Stockselect/';
+
 const firebaseConfig = {
   apiKey: 'AIzaSyDwwUO4RwXYDP-x6r5L5pea3vEbX7qrWZI',
   authDomain: 'truenorth-a93e7.firebaseapp.com',

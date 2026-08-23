@@ -112,7 +112,11 @@ async function logOut() {
 
 async function resetPassword(email) {
   if (!firebaseReady) throw new Error('Account features are unavailable right now.');
-  await firebaseAuth.sendPasswordResetEmail(email);
+  // actionCodeSettings.url makes Firebase's hosted "your password has been
+  // reset" confirmation page show a "Continue" link back to the site,
+  // instead of leaving the user stranded there. See firebase-config.js for
+  // the siteUrl constant and the Authorized domains requirement.
+  await firebaseAuth.sendPasswordResetEmail(email, { url: siteUrl });
 }
 
 if (firebaseReady) {
