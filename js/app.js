@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'tickerTester'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -13,6 +13,7 @@ const state = {
   expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
   saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Portfolio" control (see auth.js for the actual save)
+  hasPersonalizedAnswers: false, // true once this session has real answers to score against: finished the survey (set below) or loaded a saved portfolio (see auth.js loadPortfolioIntoResults) — read by ticker-tester.js
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -38,6 +39,7 @@ function renderInPlace() {
   else if (state.view === 'results') renderResults();
   else if (state.view === 'account') renderAccount(); // js/auth.js
   else if (state.view === 'portfolios') renderMyPortfolios(); // js/auth.js
+  else if (state.view === 'tickerTester') renderTickerTester(); // js/ticker-tester.js
 }
 
 // For actual navigation (view/step changes) — re-renders and scrolls to
@@ -352,6 +354,7 @@ function renderReview() {
   });
 
   document.getElementById('review-submit-btn').addEventListener('click', () => {
+    state.hasPersonalizedAnswers = true; // real answers now exist -- see ticker-tester.js
     state.view = 'results';
     render();
   });
@@ -629,6 +632,7 @@ function resetSurveyState() {
   state.expandedFinancialDetails.clear();
   state.simulationBreakdownExpanded = false;
   state.saveResultState = { status: 'idle', errorMessage: null };
+  state.hasPersonalizedAnswers = false;
   state.touchedQuestionIds.clear();
   state.reviewExpanded.clear();
   state.categoryIndex = 0;
@@ -946,6 +950,7 @@ function initSiteDisclaimerToggle() {
 async function init() {
   initLogoHomeLink();
   initSiteDisclaimerToggle();
+  initTickerTesterNav(); // js/ticker-tester.js
   render();
   try {
     state.dataset = await loadDataset();

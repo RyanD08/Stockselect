@@ -636,6 +636,7 @@ function loadPortfolioIntoResults(portfolio) {
     QUESTIONS.filter((q) => q.type !== 'horizon').map((q) => q.id)
   );
   state.saveResultState = { status: 'idle', errorMessage: null };
+  state.hasPersonalizedAnswers = true; // real answers now exist -- see ticker-tester.js
   state.view = 'results';
   render();
 }

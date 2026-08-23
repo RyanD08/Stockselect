@@ -8,7 +8,7 @@
     name="description"
     content="TrueNorth is a values-guided investing tool that builds an illustrative, personalized portfolio screen from your environmental, social, governance, and financial priorities."
   />
-  <link rel="stylesheet" href="css/styles.css?v=20260823e" />
+  <link rel="stylesheet" href="css/styles.css?v=20260823f" />
 </head>
 <body>
   <header class="site-header">
@@ -24,7 +24,12 @@
           />
         </a>
       </div>
-      <div id="account-widget" class="account-widget"></div>
+      <div class="site-header-actions">
+        <nav class="site-nav">
+          <button type="button" id="ticker-tester-nav-btn" class="site-nav-link">Ticker Tester</button>
+        </nav>
+        <div id="account-widget" class="account-widget"></div>
+      </div>
     </div>
   </header>
 
@@ -80,13 +85,14 @@
        bump the value whenever any js/*.js file changes, or a deploy can
        serve a stale script indefinitely to a visitor who already has it
        cached (no build step here to hash the filename automatically). -->
-  <script src="js/firebase-config.js?v=20260823e"></script>
-  <script src="js/auth.js?v=20260823e"></script>
+  <script src="js/firebase-config.js?v=20260823f"></script>
+  <script src="js/auth.js?v=20260823f"></script>
+  <script src="js/ticker-tester.js?v=20260823f"></script>
 
-  <script src="js/data.js?v=20260823e"></script>
-  <script src="js/questions.js?v=20260823e"></script>
-  <script src="js/scoring.js?v=20260823e"></script>
-  <script src="js/simulation.js?v=20260823e"></script>
-  <script src="js/app.js?v=20260823e"></script>
+  <script src="js/data.js?v=20260823f"></script>
+  <script src="js/questions.js?v=20260823f"></script>
+  <script src="js/scoring.js?v=20260823f"></script>
+  <script src="js/simulation.js?v=20260823f"></script>
+  <script src="js/app.js?v=20260823f"></script>
 </body>
 </html>
