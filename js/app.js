@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'surveys'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -37,6 +37,7 @@ function renderInPlace() {
   else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
   else if (state.view === 'account') renderAccount(); // js/auth.js
+  else if (state.view === 'surveys') renderMySurveys(); // js/auth.js
 }
 
 // For actual navigation (view/step changes) — re-renders and scrolls to
@@ -415,6 +416,16 @@ function renderSaveResultsControl() {
   if (typeof firebaseReady === 'undefined' || !firebaseReady || !authState.ready) return '';
 
   const { status, errorMessage } = state.saveResultState;
+
+  if (status === 'limit-reached') {
+    return `
+      <div class="save-results-row save-results-limit">
+        <p class="error-text">${escapeHtml(errorMessage)}</p>
+        <button type="button" id="go-to-my-surveys-btn" class="save-results-link">Go to My Surveys</button>
+      </div>
+    `;
+  }
+
   const label = status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved!' : 'Save My Survey';
   return `
     <p class="save-results-row">
@@ -547,7 +558,7 @@ function renderResults() {
       state.saveResultState = { status: 'saving', errorMessage: null };
       renderInPlace();
       try {
-        await saveSurveyAnswers(state.answers);
+        await saveNewSurvey(state.answers);
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
@@ -555,12 +566,22 @@ function renderResults() {
         // deliberately generic (a raw Firestore error code isn't
         // meaningful to a client), but the real cause (e.g.
         // "permission-denied" vs "unavailable") should be diagnosable from
-        // the console rather than a total black box.
-        console.error('saveSurveyAnswers failed:', err);
-        state.saveResultState = { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
+        // the console rather than a total black box. The 5-survey-limit
+        // case is a real, expected outcome rather than a failure, so it
+        // gets its own status/message instead of the generic one.
+        console.error('saveNewSurvey failed:', err);
+        state.saveResultState =
+          err && err.code === 'survey-limit-reached'
+            ? { status: 'limit-reached', errorMessage: err.message }
+            : { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
       }
       renderInPlace();
     });
+  }
+
+  const goToMySurveysBtn = document.getElementById('go-to-my-surveys-btn');
+  if (goToMySurveysBtn) {
+    goToMySurveysBtn.addEventListener('click', openMySurveysView);
   }
 
   const simulationToggleBtn = document.getElementById('simulation-toggle-btn');

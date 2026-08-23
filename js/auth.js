@@ -1,27 +1,34 @@
 /**
  * Account layer: Firebase Authentication + Firestore save of survey
  * answers, plus the account-related UI (header widget, login/sign-up
- * screen).
+ * screen, My Surveys list).
  *
  * Kept separate from app.js on purpose: app.js owns the survey flow
  * (intro/survey/review/results) and knows nothing about accounts beyond
  * calling the functions here; this file owns everything account-related
- * and knows nothing about scoring/questions. The two meet only at
- * `state.view` ('account' is added here, dispatched from app.js's
- * renderInPlace()) and the "Save My Survey" control on the results screen
- * (in app.js, calling saveSurveyAnswers() below).
+ * and knows nothing about scoring/questions, except for the one place it
+ * has to reach into the survey flow directly: loading a saved survey sets
+ * app.js's `state.answers`/`touchedQuestionIds` and jumps straight to the
+ * results view (see the "Load" handler in renderMySurveys below) -- there
+ * was no clean way to do that without either function knowing a little
+ * about the other's state, and this direction (auth.js reaching into
+ * `state`) already matches every other place these two files meet
+ * (`state.view`, the results screen's Save control).
  *
  * Login is strictly optional — see firebase-config.js's `firebaseReady`.
  * Every function here checks it first and fails softly (never touches the
  * survey/results experience for a signed-out visitor).
  *
- * There is no saved-results browsing screen — each user's Firestore
- * document at users/{uid}/savedSurvey/current holds only their single most
- * recent save (answers + timestamp), overwritten on every save. An earlier
- * version of this feature stored a growable users/{uid}/surveys collection
- * (full portfolio snapshots, browsable in a list); that collection is no
- * longer written to or read by this file, but nothing in it is deleted --
- * see firestore.rules for why its access rule is still kept around.
+ * 2026-08-23: reworked from a single "most recent survey" slot
+ * (users/{uid}/savedSurvey/current) into up to MAX_SAVED_SURVEYS named,
+ * independently manageable saves (users/{uid}/savedSurveys/{surveyId}),
+ * each rename-able and delete-able from a new My Surveys list, and each
+ * loadable back into the survey/results flow. Still answers + a timestamp
+ * only -- never the computed portfolio -- now plus an editable display
+ * name. The single-slot `savedSurvey` collection this superseded, and the
+ * even earlier full-portfolio-snapshot `surveys` collection before that,
+ * are both left alone in Firestore (and firestore.rules) rather than
+ * migrated or deleted -- neither is read or written by this file anymore.
  */
 
 const authState = {
@@ -37,6 +44,14 @@ const authViewState = {
   loading: false,
   error: null,
   info: null,
+};
+
+// UI-only state for the My Surveys list.
+const mySurveysViewState = {
+  loading: true,
+  error: null,
+  surveys: [],
+  renamingId: null, // id of the entry currently showing its rename input, or null
 };
 
 // Set when a signed-out visitor clicks "Save My Survey" on the results
@@ -103,12 +118,15 @@ if (firebaseReady) {
       const answersToSave = pendingSaveAnswers;
       pendingSaveAnswers = null;
       try {
-        await saveSurveyAnswers(answersToSave);
+        await saveNewSurvey(answersToSave);
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
       } catch (err) {
-        console.error('saveSurveyAnswers failed (post-login auto-save):', err);
-        state.saveResultState = { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
+        console.error('saveNewSurvey failed (post-login auto-save):', err);
+        state.saveResultState =
+          err && err.code === 'survey-limit-reached'
+            ? { status: 'limit-reached', errorMessage: err.message }
+            : { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
       }
       state.view = 'results';
       render();
@@ -133,25 +151,64 @@ if (firebaseReady) {
   authState.ready = true;
 }
 
-// --- Firestore: save survey answers --------------------------------------
+// --- Firestore: save/rename/delete/list survey answers -------------------
 
-// One slot per user: users/{uid}/savedSurvey/current, overwritten on every
-// save. Only the raw answers and a timestamp -- never the computed
-// portfolio (scores, matched companies, allocations), which is cheap to
-// recompute from the answers and shouldn't be treated as saved fact.
-async function saveSurveyAnswers(answers) {
+const MAX_SAVED_SURVEYS = 5;
+
+function savedSurveysCollection() {
+  return firebaseDb.collection('users').doc(authState.user.uid).collection('savedSurveys');
+}
+
+function formatAutoSurveyName(date) {
+  return `Survey — ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+}
+
+// Enforces the 5-saved-survey cap client-side (an extra read before the
+// write) -- Firestore security rules can restrict WHO can write, not easily
+// COUNT a user's existing documents, so there's no server-side quota here.
+// That's an acceptable gap for a personal-quota feature bounded to a
+// user's own account (see firestore.rules): the worst a client bypassing
+// this check could do is store extra data under their own uid, not access
+// anyone else's.
+async function saveNewSurvey(answers) {
   if (!firebaseReady) throw new Error('Account features are unavailable right now.');
   if (!authState.user) throw new Error('You need to be logged in to save your survey.');
 
-  await firebaseDb
-    .collection('users')
-    .doc(authState.user.uid)
-    .collection('savedSurvey')
-    .doc('current')
-    .set({
-      answers,
-      savedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+  const coll = savedSurveysCollection();
+  const existing = await coll.get();
+  if (existing.size >= MAX_SAVED_SURVEYS) {
+    const limitErr = new Error(
+      `You've reached your limit of ${MAX_SAVED_SURVEYS} saved surveys. Delete one from My Surveys to save a new one.`
+    );
+    limitErr.code = 'survey-limit-reached';
+    throw limitErr;
+  }
+
+  await coll.add({
+    name: formatAutoSurveyName(new Date()),
+    answers,
+    savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+}
+
+async function listSavedSurveys() {
+  if (!firebaseReady || !authState.user) return [];
+  const snapshot = await savedSurveysCollection().orderBy('savedAt', 'desc').get();
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+// Renaming only ever touches `name` -- the underlying answers and the
+// original savedAt (still used for sort order after a rename) are
+// untouched, per the "does not affect the underlying answers or original
+// save timestamp" requirement.
+async function renameSavedSurvey(surveyId, newName) {
+  if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
+  await savedSurveysCollection().doc(surveyId).update({ name: newName });
+}
+
+async function deleteSavedSurvey(surveyId) {
+  if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
+  await savedSurveysCollection().doc(surveyId).delete();
 }
 
 // --- Header account widget (static markup outside #app, present on every view) --
@@ -167,11 +224,13 @@ function renderAccountWidget() {
   if (authState.user) {
     el.innerHTML = `
       <span class="account-widget-email">${escapeHtml(authState.user.email)}</span>
+      <button type="button" id="account-my-surveys-link" class="account-widget-link">My Surveys</button>
       <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
     `;
+    document.getElementById('account-my-surveys-link').addEventListener('click', openMySurveysView);
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
-      if (state.view === 'account') {
+      if (state.view === 'account' || state.view === 'surveys') {
         state.view = 'intro';
         render();
       }
@@ -297,4 +356,171 @@ function renderAccount() {
     state.view = 'intro';
     render();
   });
+}
+
+// --- My Surveys view -------------------------------------------------------
+
+async function openMySurveysView() {
+  state.view = 'surveys';
+  mySurveysViewState.loading = true;
+  mySurveysViewState.error = null;
+  mySurveysViewState.renamingId = null;
+  // A stale "limit reached" message shouldn't still be sitting on the
+  // results screen after the client comes here to make room for a new save.
+  state.saveResultState = { status: 'idle', errorMessage: null };
+  render();
+  try {
+    mySurveysViewState.surveys = await listSavedSurveys();
+  } catch (err) {
+    console.error('listSavedSurveys failed:', err);
+    mySurveysViewState.error = 'Could not load your saved surveys. Please try again.';
+  }
+  mySurveysViewState.loading = false;
+  renderInPlace();
+}
+
+function renderMySurveys() {
+  const count = mySurveysViewState.surveys.length;
+  appEl.innerHTML = `
+    <section class="card surveys-card">
+      <p class="eyebrow">Account</p>
+      <h1>My Surveys</h1>
+      <p class="lede">
+        ${mySurveysViewState.loading ? 'Your saved surveys.' : `${count} of ${MAX_SAVED_SURVEYS} saved surveys.`}
+      </p>
+      ${mySurveysViewState.loading ? '<p class="muted">Loading…</p>' : renderSurveysList()}
+      <div class="nav-row">
+        <button type="button" id="surveys-back-btn" class="btn btn-secondary">Back</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('surveys-back-btn').addEventListener('click', () => {
+    state.view = 'intro';
+    render();
+  });
+
+  wireSurveyEntryButtons();
+}
+
+function renderSurveysList() {
+  if (mySurveysViewState.error) return `<p class="error-text">${escapeHtml(mySurveysViewState.error)}</p>`;
+  if (mySurveysViewState.surveys.length === 0) {
+    return '<p class="muted">You haven\'t saved any surveys yet. Complete the questionnaire and click "Save My Survey" on your results page to see it here.</p>';
+  }
+  return `<ul class="surveys-list">${mySurveysViewState.surveys.map(renderSurveyEntry).join('')}</ul>`;
+}
+
+function renderSurveyEntry(survey) {
+  const isRenaming = mySurveysViewState.renamingId === survey.id;
+  const dateLabel =
+    survey.savedAt && typeof survey.savedAt.toDate === 'function'
+      ? survey.savedAt.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })
+      : 'Just now';
+
+  if (isRenaming) {
+    return `
+      <li class="survey-entry survey-entry-renaming" data-id="${survey.id}">
+        <form class="survey-rename-form" data-id="${survey.id}">
+          <input type="text" class="survey-rename-input" value="${escapeHtml(survey.name)}" maxlength="80" autofocus />
+          <button type="submit" class="btn-link-action survey-rename-save">Save</button>
+          <button type="button" class="btn-link-action survey-rename-cancel">Cancel</button>
+        </form>
+      </li>
+    `;
+  }
+
+  return `
+    <li class="survey-entry" data-id="${survey.id}">
+      <div class="survey-entry-info">
+        <span class="survey-entry-name">${escapeHtml(survey.name)}</span>
+        <span class="survey-entry-date">Saved ${escapeHtml(dateLabel)}</span>
+      </div>
+      <div class="survey-entry-actions">
+        <button type="button" class="btn-link-action survey-load-btn" data-id="${survey.id}" ${state.dataset ? '' : 'disabled title="Data still loading — try again in a moment"'}>Load</button>
+        <button type="button" class="btn-link-action survey-rename-btn" data-id="${survey.id}">Rename</button>
+        <button type="button" class="btn-link-action survey-delete-btn danger" data-id="${survey.id}">Delete</button>
+      </div>
+    </li>
+  `;
+}
+
+function wireSurveyEntryButtons() {
+  document.querySelectorAll('.survey-load-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const survey = mySurveysViewState.surveys.find((s) => s.id === btn.dataset.id);
+      if (survey) loadSurveyIntoResults(survey);
+    });
+  });
+
+  document.querySelectorAll('.survey-rename-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      mySurveysViewState.renamingId = btn.dataset.id;
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.survey-rename-cancel').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      mySurveysViewState.renamingId = null;
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.survey-rename-form').forEach((form) => {
+    form.addEventListener('submit', async (evt) => {
+      evt.preventDefault();
+      const surveyId = form.dataset.id;
+      const input = form.querySelector('.survey-rename-input');
+      const newName = input.value.trim();
+      if (!newName) return;
+      try {
+        await renameSavedSurvey(surveyId, newName);
+        const entry = mySurveysViewState.surveys.find((s) => s.id === surveyId);
+        if (entry) entry.name = newName;
+        mySurveysViewState.renamingId = null;
+      } catch (err) {
+        console.error('renameSavedSurvey failed:', err);
+        mySurveysViewState.error = 'Could not rename that survey. Please try again.';
+      }
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.survey-delete-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const survey = mySurveysViewState.surveys.find((s) => s.id === btn.dataset.id);
+      if (!survey) return;
+      const confirmed = window.confirm(`Delete "${survey.name}"? This can't be undone.`);
+      if (!confirmed) return;
+      try {
+        await deleteSavedSurvey(survey.id);
+        mySurveysViewState.surveys = mySurveysViewState.surveys.filter((s) => s.id !== survey.id);
+      } catch (err) {
+        console.error('deleteSavedSurvey failed:', err);
+        mySurveysViewState.error = 'Could not delete that survey. Please try again.';
+      }
+      renderInPlace();
+    });
+  });
+}
+
+// Loading is a read, not a save: it fills in this session's answers and
+// jumps straight to results, but never itself writes anything to
+// Firestore. Marking every rated question "touched" is what gives loaded
+// answers the same blue checkmark styling as ones the client picked
+// themselves (rather than the untouched-default gray) if they later visit
+// Edit My Answers / the survey view for this session. Home
+// country/industry-ties/time-horizon aren't part of what's saved (see the
+// header comment -- only answers + a name/timestamp are), so those stay
+// at their current session values rather than being reset by a load.
+function loadSurveyIntoResults(survey) {
+  if (!state.dataset) return;
+  state.answers = { ...survey.answers };
+  state.touchedQuestionIds = new Set(
+    QUESTIONS.filter((q) => q.type !== 'horizon').map((q) => q.id)
+  );
+  state.saveResultState = { status: 'idle', errorMessage: null };
+  state.view = 'results';
+  render();
 }

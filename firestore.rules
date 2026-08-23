@@ -6,18 +6,23 @@
 // truth to paste in, and should be kept in sync with whatever is live in
 // the console.
 //
-// Data model this matches (see js/auth.js saveSurveyAnswers):
-//   users/{userId}                        — no documents are read/written at this level directly
-//   users/{userId}/savedSurvey/current    — CURRENT: a user's single most recent saved survey
-//                                            (answers + timestamp only; overwritten on every save)
-//   users/{userId}/surveys/{surveyId}     — LEGACY: an earlier version of this feature saved a
-//                                            full, browsable history of survey+portfolio snapshots
-//                                            here. The app no longer reads or writes this
-//                                            collection (the save/browse flow was reworked to a
-//                                            single answers-only slot above), but any documents
-//                                            already saved here are real user data and were not
-//                                            deleted -- this rule stays so a user who saved before
-//                                            the rework isn't locked out of their own old data.
+// Data model this matches (see js/auth.js saveNewSurvey/listSavedSurveys):
+//   users/{userId}                          — no documents are read/written at this level directly
+//   users/{userId}/savedSurveys/{surveyId}  — CURRENT: up to 5 independently named saved surveys
+//                                              per user (name, answers, savedAt), each rename-able,
+//                                              loadable, and delete-able from My Surveys. The
+//                                              5-survey cap is enforced client-side (see auth.js),
+//                                              not by these rules.
+//   users/{userId}/savedSurvey/current      — LEGACY: a same-day-superseded single "most recent
+//                                              survey" slot. The app no longer reads or writes it.
+//   users/{userId}/surveys/{surveyId}       — LEGACY: an even earlier version of this feature that
+//                                              saved a full, browsable history of survey+portfolio
+//                                              snapshots. The app no longer reads or writes this
+//                                              collection either.
+//   Both legacy paths are kept here, not deleted, purely so a user who
+//   saved under either earlier design isn't locked out of their own old
+//   data -- safe to remove once you've confirmed nothing still depends on
+//   them.
 //
 // Rules:
 //   - A signed-in user may read and write ONLY documents under their own
@@ -36,14 +41,20 @@ service cloud.firestore {
 
     match /users/{userId} {
 
-      // Current: the one saved-survey slot this app actually uses now.
+      // Current: up to 5 named saved surveys this app actually uses now.
+      match /savedSurveys/{surveyId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Legacy (superseded 2026-08-23): the single-slot "most recent
+      // survey" design this replaced. Kept only so that slot's data stays
+      // readable/writable by its own owner -- see the note above.
       match /savedSurvey/{docId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
-      // Legacy: kept only so pre-rework saved data stays readable/writable
-      // by its own owner -- see the note above. Safe to remove once you've
-      // confirmed no user data still depends on it.
+      // Legacy (superseded earlier): the original full-portfolio-snapshot,
+      // browsable-history design. Same reasoning.
       match /surveys/{surveyId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
