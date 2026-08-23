@@ -469,6 +469,9 @@ function renderResults() {
       <p class="results-top-actions">
         <button type="button" class="btn btn-secondary edit-answers-btn" data-edit-answers>Edit My Answers</button>
       </p>
+      <p class="ticker-tester-cta-row">
+        <button type="button" id="ticker-tester-cta-btn" class="btn btn-primary btn-large">Test a Company in Ticker Tester</button>
+      </p>
       ${renderSaveResultsControl()}
 
       <div class="summary-grid">
@@ -608,6 +611,14 @@ function renderResults() {
       state.view = 'review';
       render();
     });
+  });
+
+  // Ticker Tester already picks up state.answers/state.hasPersonalizedAnswers
+  // on its own (see ticker-tester.js) -- reaching Results at all means
+  // hasPersonalizedAnswers is already true, so nothing extra to carry over.
+  document.getElementById('ticker-tester-cta-btn').addEventListener('click', () => {
+    state.view = 'tickerTester';
+    render();
   });
 
   document.getElementById('restart-btn').addEventListener('click', () => {

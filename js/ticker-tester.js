@@ -307,7 +307,7 @@ function renderTickerResult(company) {
   }
 
   const { entry, ctx } = scored;
-  const display = TIER_DISPLAY[entry.tier] || TIER_DISPLAY.Partial;
+  const display = tickerTierDisplay(entry.tier);
   const categoryScores = computeCategoryScores(company, entry, ctx);
 
   return `
@@ -323,11 +323,68 @@ function renderTickerResult(company) {
             ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`
             : ''
         }
+        <p class="ticker-result-explanation">${escapeHtml(buildCategoryExplanation(categoryScores))}</p>
       </div>
 
       ${renderCategorySection(company, categoryScores)}
     </div>
   `;
+}
+
+// Ticker Tester's own badge labeling only -- the shared TIER_DISPLAY object
+// (app.js) still drives the main portfolio results table unchanged, since
+// this relabeling is explicitly scoped to Ticker Tester. No change to
+// entry.tier itself or anything that decides which tier a company gets --
+// purely a display-layer rename ("Below Values Threshold" -> "Low Match",
+// gray -> red) of the exact same value already computed above.
+function tickerTierDisplay(tier) {
+  if (tier === 'Below Values Threshold') return { cssKey: 'low-match', badgeText: 'Low Match' };
+  return TIER_DISPLAY[tier] || TIER_DISPLAY.Partial;
+}
+
+// A short, plain-language paragraph naming which categories most helped or
+// hurt this company's result -- built entirely from the categoryScores
+// array already computed above (computeCategoryScores) and the same
+// red/yellow/green buckets already used for the list next to the radar
+// chart (categoryScoreBucket), not a new scoring pass. Shown for every
+// company (Strong/Partial/Low Match alike), unlike entry.rationale above
+// (which only ever names a category when it's a genuine top-2 priority
+// match) -- this always says something, even when nothing stands out.
+function buildCategoryExplanation(categoryScores) {
+  const strong = categoryScores.filter((c) => categoryScoreBucket(c.score) === 'high').sort((a, b) => b.score - a.score);
+  const weak = categoryScores.filter((c) => categoryScoreBucket(c.score) === 'low').sort((a, b) => a.score - b.score);
+
+  const strongLabels = strong.slice(0, 2).map((c) => c.label);
+  const weakEntries = weak.slice(0, 2);
+  let weakClause = joinLabels(weakEntries.map((c) => c.label));
+  if (weakEntries.length === 1 && categoryAvgImportance(weakEntries[0].key) >= 4) {
+    weakClause += ', which you rated as important to you';
+  }
+
+  if (strongLabels.length > 0 && weakEntries.length > 0) {
+    return `This company scores well because it strongly aligns with your ${joinLabels(strongLabels)} priorities, but falls short on ${weakClause}.`;
+  }
+  if (strongLabels.length > 0) {
+    return `This company scores well largely because of strong alignment with your ${joinLabels(strongLabels)} priorities, with no category scoring particularly low.`;
+  }
+  if (weakEntries.length > 0) {
+    return `This company's score is held back mainly by weak alignment on ${weakClause}, without any category standing out as a strong fit.`;
+  }
+  return 'This is a moderate, fairly even match across all of your priority categories, without any single category standing out as a strong fit or a clear weakness.';
+}
+
+function categoryAvgImportance(categoryKey) {
+  const questions = questionsForCategory(categoryKey).filter((q) => q.type !== 'horizon');
+  if (questions.length === 0) return 3;
+  const sum = questions.reduce((total, q) => total + (state.answers[q.id] || 3), 0);
+  return sum / questions.length;
+}
+
+function joinLabels(labels) {
+  if (labels.length === 0) return '';
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+  return `${labels.slice(0, -1).join(', ')}, and ${labels[labels.length - 1]}`;
 }
 
 // One 1-10 score per category, weighted-average of that category's own

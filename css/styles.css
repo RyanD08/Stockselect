@@ -268,6 +268,16 @@ select:focus-visible {
   background: #e3ddca;
 }
 
+/* Size modifier for a call-to-action that needs to stand out beyond the
+   normal .btn-primary/.btn-secondary weight -- currently just the Ticker
+   Tester button on the results screen. Navy is this site's blue accent
+   (there's no separate lighter "blue" token in the palette), so pairing
+   this with .btn-primary is what makes it read as a prominent blue CTA. */
+.btn-large {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
 .error-text {
   color: var(--danger-text);
   margin-top: 1rem;
@@ -1139,6 +1149,15 @@ h2 .category-icon {
   color: var(--neutral-text);
 }
 
+/* Ticker Tester's own relabeling of the same "Below Values Threshold" tier
+   as "Low Match" in red -- see tickerTierDisplay() in ticker-tester.js.
+   The main portfolio results table keeps .tier-below-threshold above,
+   unchanged. */
+.tier-low-match {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
 .financial-score-badge {
   display: inline-block;
   padding: 0.15rem 0.55rem;
@@ -1417,6 +1436,10 @@ h2 .category-icon {
   margin: 0 0 1.25rem;
 }
 
+.ticker-tester-cta-row {
+  margin: 0 0 1.5rem;
+}
+
 .save-results-row {
   margin: 0.75rem 0 1.25rem;
 }
@@ -1687,6 +1710,13 @@ h2 .category-icon {
 
 .ticker-result-note {
   margin: 0.3rem 0 0;
+}
+
+.ticker-result-explanation {
+  margin: 0.75rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--text);
 }
 
 .ticker-personalize-prompt {
