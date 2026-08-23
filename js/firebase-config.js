@@ -1,8 +1,9 @@
 /**
  * Firebase bootstrap. This is the only file that knows the project's
- * Firebase config — every other script talks to `firebaseAuth`/`firebaseDb`
- * (or checks `firebaseReady`), never `firebase` directly, so swapping
- * projects or SDK versions later only ever touches this one file.
+ * Firebase config — every other script talks to
+ * `firebaseAuth`/`firebaseDb`/`firebaseAnalytics` (or checks
+ * `firebaseReady`), never `firebase` directly, so swapping projects or SDK
+ * versions later only ever touches this one file.
  *
  * Uses the Firebase compat SDK (not the modular v9+ API) so it can be
  * loaded with plain <script> tags and used from the rest of the site's
@@ -16,6 +17,15 @@
  * simulation experience must keep working exactly as it does for a signed-
  * out visitor. `firebaseReady` is what the rest of the app checks before
  * touching auth/Firestore.
+ *
+ * 2026-08-23: added Analytics (basic automatic pageview/session tracking
+ * only -- no custom events). Deliberately initialized in its own try/catch,
+ * separate from Auth/Firestore and not gated behind `firebaseReady`: an ad
+ * blocker or privacy extension commonly blocks Analytics/gtag specifically
+ * without touching Auth/Firestore, and the reverse (Auth/Firestore failing
+ * for some other reason) shouldn't skip trying Analytics too. Both still
+ * share the one `app` from the single initializeApp() call below -- never a
+ * second app instance.
  */
 
 // The site's own live URL — used as the "continue" destination Firebase
@@ -43,15 +53,30 @@ const firebaseConfig = {
 let firebaseReady = false;
 let firebaseAuth = null;
 let firebaseDb = null;
+let firebaseAnalytics = null;
 
+let firebaseApp = null;
 try {
   if (typeof firebase === 'undefined') {
     throw new Error('Firebase SDK did not load (script blocked or offline).');
   }
-  firebase.initializeApp(firebaseConfig);
-  firebaseAuth = firebase.auth();
-  firebaseDb = firebase.firestore();
-  firebaseReady = true;
+  firebaseApp = firebase.initializeApp(firebaseConfig);
 } catch (err) {
-  console.warn('Firebase unavailable — account features (save/load results) are disabled; the survey itself is unaffected.', err);
+  console.warn('Firebase unavailable — account features (save/load results) and analytics are disabled; the survey itself is unaffected.', err);
+}
+
+if (firebaseApp) {
+  try {
+    firebaseAuth = firebase.auth();
+    firebaseDb = firebase.firestore();
+    firebaseReady = true;
+  } catch (err) {
+    console.warn('Firebase Auth/Firestore unavailable — account features (save/load results) are disabled; the survey itself is unaffected.', err);
+  }
+
+  try {
+    firebaseAnalytics = firebase.analytics();
+  } catch (err) {
+    console.warn('Firebase Analytics unavailable (often blocked by ad/privacy blockers) — pageview tracking is disabled; nothing else on the site is affected.', err);
+  }
 }
