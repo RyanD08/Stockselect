@@ -165,11 +165,15 @@ function wireTickerTesterBackButton() {
 
 function renderTickerSearch() {
   const results = filterCompanies(tickerTesterState.query);
-  const showDropdown = tickerTesterState.query.trim().length > 0 && !tickerTesterState.selectedTicker;
+  // No longer gated on "!selectedTicker" -- typing here works the same
+  // way whether or not a company is currently shown below, so switching
+  // companies never requires the "Choose a different company" link first;
+  // that link still exists purely to clear back to a blank search.
+  const showDropdown = tickerTesterState.query.trim().length > 0;
 
   return `
     <div class="ticker-search">
-      <label for="ticker-search-input">Search by company name or ticker</label>
+      <label for="ticker-search-input">${tickerTesterState.selectedTicker ? 'Search for a different company' : 'Search by company name or ticker'}</label>
       <input
         type="text"
         id="ticker-search-input"
