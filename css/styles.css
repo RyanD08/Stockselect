@@ -52,9 +52,56 @@ body {
   padding: 0.85rem 1.5rem;
 }
 
-.site-header .brand {
+.site-header-inner {
   max-width: 900px;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Account widget — logged-out ("Log In / Sign Up") and logged-in (email +
+   My Saved Results + Log Out) states, on the same navy header as the logo.
+   Empty (no markup) until Firebase resolves the first auth check, and
+   permanently empty if Firebase never loaded — see auth.js/renderAccountWidget. */
+.account-widget {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.account-widget-email {
+  color: #cdd3de;
+  font-size: 0.85rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-widget-link {
+  border: none;
+  background: none;
+  color: var(--gold-light);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.account-widget-link:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+@media (max-width: 560px) {
+  .account-widget-email {
+    display: none;
+  }
 }
 
 .logo-link {
@@ -1197,6 +1244,212 @@ h2 .category-icon {
 
 #restart-btn {
   margin-top: 1.75rem;
+}
+
+/* Account: login/sign-up screen, "Save these results", and the saved-
+   results list. All optional — see auth.js — so these only ever render
+   when Firebase is actually available and (for Save/Saved) the client is
+   logged in. */
+
+.auth-card {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 1.25rem;
+}
+
+.auth-form label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.6rem 0 0.3rem;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #fff;
+}
+
+.auth-form input:focus {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 1px;
+}
+
+.auth-submit-btn {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.auth-info-text {
+  color: var(--success-text);
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0;
+}
+
+.auth-link {
+  color: var(--gold);
+  font-size: 0.85rem;
+}
+
+.auth-link:hover {
+  color: var(--navy);
+}
+
+.auth-card .auth-link {
+  display: block;
+  margin-top: 1rem;
+}
+
+.auth-switch {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.auth-switch-btn {
+  border: none;
+  background: none;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.3rem;
+}
+
+.auth-switch-btn:hover {
+  text-decoration: underline;
+}
+
+/* "Save these results" (Results screen) */
+
+.save-results-row {
+  margin: 0.75rem 0 1.25rem;
+}
+
+.save-results-link {
+  border: none;
+  background: none;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.save-results-link:hover {
+  text-decoration: underline;
+}
+
+.save-results-confirm {
+  color: var(--success-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.save-results-error {
+  margin-left: 0.75rem;
+}
+
+/* Saved results list */
+
+.saved-card {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.saved-list {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+}
+
+.saved-entry {
+  border-top: 1px solid var(--border);
+}
+
+.saved-entry:first-child {
+  border-top: none;
+}
+
+.saved-entry-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0.85rem 0;
+  text-align: left;
+}
+
+.saved-entry.expanded .review-chevron {
+  transform: rotate(90deg);
+  color: var(--navy);
+}
+
+.saved-entry-date {
+  font-weight: 600;
+  color: var(--navy);
+  flex-shrink: 0;
+}
+
+.saved-risk-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 5px;
+}
+
+.saved-entry-count {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
+.saved-holdings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 1rem 1.9rem;
+}
+
+.saved-holdings-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+  border-top: 1px solid var(--bg);
+  font-size: 0.88rem;
+}
+
+.saved-holdings-list li:first-child {
+  border-top: none;
+}
+
+.saved-holding-ticker {
+  font-weight: 700;
+  color: var(--navy);
+  width: 4.5rem;
+  flex-shrink: 0;
+}
+
+.saved-holding-name {
+  flex: 1;
+  color: var(--text);
 }
 
 .site-footer {

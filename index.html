@@ -12,16 +12,19 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="brand">
-      <a href="#" id="logo-home-link" class="logo-link" aria-label="TrueNorth home">
-        <img
-          src="assets/truenorth-logo-full.png"
-          alt="TrueNorth — Values-Guided Investing"
-          class="logo-img"
-          width="209"
-          height="80"
-        />
-      </a>
+    <div class="site-header-inner">
+      <div class="brand">
+        <a href="#" id="logo-home-link" class="logo-link" aria-label="TrueNorth home">
+          <img
+            src="assets/truenorth-logo-full.png"
+            alt="TrueNorth — Values-Guided Investing"
+            class="logo-img"
+            width="209"
+            height="80"
+          />
+        </a>
+      </div>
+      <div id="account-widget" class="account-widget"></div>
     </div>
   </header>
 
@@ -64,6 +67,16 @@
       </div>
     </div>
   </footer>
+
+  <!-- Firebase (compat build — plain globals, no bundler/module system
+       needed to match how the rest of this site's scripts already work).
+       Account/save-results features degrade gracefully if these fail to
+       load; see js/firebase-config.js. -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
 
   <script src="js/data.js"></script>
   <script src="js/questions.js"></script>

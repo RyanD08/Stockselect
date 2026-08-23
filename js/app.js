@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'saved'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -12,6 +12,7 @@ const state = {
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
   expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
+  saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save these results" control (see auth.js for the actual save)
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -35,6 +36,8 @@ function renderInPlace() {
   else if (state.view === 'survey') renderSurvey();
   else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
+  else if (state.view === 'account') renderAccount(); // js/auth.js
+  else if (state.view === 'saved') renderSaved(); // js/auth.js
 }
 
 // For actual navigation (view/step changes) — re-renders and scrolls to
@@ -404,6 +407,34 @@ function chevronIcon() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
 }
 
+// Login is optional (see firebase-config.js/auth.js) — this renders nothing
+// at all if Firebase never loaded, a login prompt if signed out, and the
+// actual Save control (with its saving/saved/error states) once logged in.
+function renderSaveResultsControl() {
+  if (typeof firebaseReady === 'undefined' || !firebaseReady || !authState.ready) return '';
+
+  if (!authState.user) {
+    return `
+      <p class="save-results-row">
+        <button type="button" id="login-to-save-btn" class="save-results-link">Log in to save these results</button>
+      </p>
+    `;
+  }
+
+  const { status, errorMessage } = state.saveResultState;
+  if (status === 'saved') {
+    return '<p class="save-results-row save-results-confirm">✓ Saved — find it anytime under "My Saved Results."</p>';
+  }
+  return `
+    <p class="save-results-row">
+      <button type="button" id="save-results-btn" class="btn btn-secondary" ${status === 'saving' ? 'disabled' : ''}>
+        ${status === 'saving' ? 'Saving…' : 'Save these results'}
+      </button>
+      ${status === 'error' ? `<span class="error-text save-results-error">${escapeHtml(errorMessage)}</span>` : ''}
+    </p>
+  `;
+}
+
 function renderResults() {
   const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers, {
     homeCountry: state.homeCountry,
@@ -415,6 +446,7 @@ function renderResults() {
   appEl.innerHTML = `
     <section class="card results-card">
       <h1>Your TrueNorth Portfolio</h1>
+      ${renderSaveResultsControl()}
 
       <div class="summary-grid">
         <div class="summary-box">
@@ -493,6 +525,39 @@ function renderResults() {
     });
   });
 
+  const loginToSaveBtn = document.getElementById('login-to-save-btn');
+  if (loginToSaveBtn) {
+    loginToSaveBtn.addEventListener('click', () => {
+      authViewState.mode = 'login';
+      authViewState.error = null;
+      authViewState.info = null;
+      state.view = 'account';
+      render();
+    });
+  }
+
+  const saveResultsBtn = document.getElementById('save-results-btn');
+  if (saveResultsBtn) {
+    saveResultsBtn.addEventListener('click', async () => {
+      state.saveResultState = { status: 'saving', errorMessage: null };
+      renderInPlace();
+      try {
+        await saveSurveyResult({
+          answers: state.answers,
+          homeCountry: state.homeCountry,
+          tiesSector: state.tiesSector,
+          timeHorizon: state.timeHorizon,
+          riskProfile,
+          holdings,
+        });
+        state.saveResultState = { status: 'saved', errorMessage: null };
+      } catch (err) {
+        state.saveResultState = { status: 'error', errorMessage: 'Could not save your results. Please try again.' };
+      }
+      renderInPlace();
+    });
+  }
+
   const simulationToggleBtn = document.getElementById('simulation-toggle-btn');
   if (simulationToggleBtn) {
     simulationToggleBtn.addEventListener('click', () => {
@@ -528,6 +593,7 @@ function resetSurveyState() {
   state.timeHorizon = 'long';
   state.expandedFinancialDetails.clear();
   state.simulationBreakdownExpanded = false;
+  state.saveResultState = { status: 'idle', errorMessage: null };
   state.touchedQuestionIds.clear();
   state.reviewExpanded.clear();
   state.categoryIndex = 0;
