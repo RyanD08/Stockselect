@@ -1,9 +1,9 @@
 /**
- * Survey question definitions (v3.1 — 30 questions, restructured 2026-08-21
- * to match the canonical 27-question schema (+ women-led) defined by the
- * data-mining repo, RyanD08/stock-select-data-mine's
- * schema/company_schema.json — see data/import_schema_comparison.md for
- * the full before/after comparison and what changed in that pass.
+ * Survey question definitions (v3.2 — 29 rated questions + 1 horizon
+ * selector, 7 categories). Restructured 2026-08-21 to match the canonical
+ * 27-question schema (+ women-led) defined by the data-mining repo,
+ * RyanD08/stock-select-data-mine's schema/company_schema.json — see
+ * data/import_schema_comparison.md for that pass's full before/after.
  *
  * Kept separate from scoring.js and app.js so the questionnaire itself
  * can be edited independently of how answers are scored or rendered.
@@ -21,20 +21,30 @@
  * Changes from v2 (24 questions, 6 categories):
  *   - Removed: "Avoiding companies involved in animal testing" (no
  *     verified per-company data source exists at S&P 500 scale).
- *   - Removed as a separate question (folded into domestic-HQ, Q23):
+ *   - Removed as a separate question (folded into domestic-HQ, Q22):
  *     "preferring primarily domestic revenue".
- *   - Added: Religious Values and Political/Social as new categories
- *     (5 new questions total), plus women-led as a new Community/Identity
- *     question.
+ *   - Added: Political/Social as a new category, plus women-led as a new
+ *     Community/Identity question.
  *   - Risk Philosophy was temporarily reduced to 2 questions (stability,
  *     values-over-returns) when the data import first landed, since the
  *     imported schema's Risk Philosophy section only defines those two.
  *     Restored 2026-08-21 (post-import) at the client's explicit request:
- *     blue-chip preference (Q29) and dividend-income preference (Q30) are
- *     back, using the financial data already on every company
- *     (market_cap_tier, dividend yield_tier) which the ESG import never
- *     touched. Appended as new ids rather than reclaiming their old 23/24
- *     slots, so nothing else needed renumbering.
+ *     blue-chip preference and dividend-income preference are back, using
+ *     the financial data already on every company (market_cap_tier,
+ *     dividend yield_tier) which the ESG import never touched.
+ *
+ * 2026-08-23: removed the Religious Values category entirely. Its
+ * "religious investment compliance" (halal/kosher/faith-based screening)
+ * question had 0% real data coverage across the whole S&P 500 dataset --
+ * no comprehensive public source exists for it at this scale, so it could
+ * never contribute anything but a hardcoded-neutral score. Same reasoning,
+ * same treatment, as the animal-testing removal above: removed outright
+ * rather than left as a dead question. That category's other question,
+ * "avoiding interest-based financial products" (which does have real
+ * data), moved into Ethical / "Sin Stock" Screens rather than being
+ * removed with it. Net: 30 questions -> 29 rated + the horizon selector,
+ * renumbered gap-free start to finish. See
+ * data/import_schema_comparison.md for the full before/after mapping.
  */
 
 const QUESTIONS = [
@@ -56,44 +66,38 @@ const QUESTIONS = [
   { id: 11, category: 'governance', type: 'exclusionary', text: 'Avoiding companies with histories of fraud, corruption, or major scandals', short: 'Avoiding fraud/corruption/scandals' },
   { id: 12, category: 'governance', type: 'exclusionary', text: 'Avoiding companies with concentrated or dual/multi-class voting structures that limit shareholder rights', short: 'Avoiding concentrated/dual-class voting control' },
 
-  // Ethical / "Sin Stock" Screens
+  // Ethical / "Sin Stock" Screens (id 18, "avoiding interest-based
+  // financial products", relocated here 2026-08-23 from the now-removed
+  // Religious Values category -- same wording, same underlying field,
+  // unchanged.)
   { id: 13, category: 'ethical', type: 'exclusionary', text: 'Avoiding tobacco companies', short: 'Avoiding tobacco' },
   { id: 14, category: 'ethical', type: 'exclusionary', text: 'Avoiding alcohol producers', short: 'Avoiding alcohol producers' },
   { id: 15, category: 'ethical', type: 'exclusionary', text: 'Avoiding gambling/casino companies', short: 'Avoiding gambling/casinos' },
   { id: 16, category: 'ethical', type: 'exclusionary', text: 'Avoiding weapons/defense manufacturers', short: 'Avoiding weapons/defense' },
   { id: 17, category: 'ethical', type: 'exclusionary', text: 'Avoiding adult entertainment industries', short: 'Avoiding adult entertainment' },
+  { id: 18, category: 'ethical', type: 'exclusionary', text: 'Avoiding interest-based financial products', short: 'Avoiding interest-based financial products' },
 
-  // Religious Values (new 2026-08-21)
-  { id: 18, category: 'religious', type: 'preference', text: 'Compliance with religious investment principles (e.g., halal, kosher, faith-based screens)', short: 'Religious investment compliance' },
-  { id: 19, category: 'religious', type: 'exclusionary', text: 'Avoiding interest-based financial products', short: 'Avoiding interest-based financial products' },
-
-  // Political/Social (new 2026-08-21)
-  { id: 20, category: 'political', type: 'preference', text: 'Company political donation transparency', short: 'Political donation transparency' },
-  { id: 21, category: 'political', type: 'exclusionary', text: 'Avoiding companies operating in specific countries or regions of concern', short: 'Avoiding operations in countries of concern' },
-  { id: 22, category: 'political', type: 'preference', text: 'Companies with strong data privacy practices', short: 'Strong data privacy practices' },
+  // Political/Social
+  { id: 19, category: 'political', type: 'preference', text: 'Company political donation transparency', short: 'Political donation transparency' },
+  { id: 20, category: 'political', type: 'exclusionary', text: 'Avoiding companies operating in specific countries or regions of concern', short: 'Avoiding operations in countries of concern' },
+  { id: 21, category: 'political', type: 'preference', text: 'Companies with strong data privacy practices', short: 'Strong data privacy practices' },
 
   // Community/Identity
-  { id: 23, category: 'community', type: 'preference', text: 'Supporting locally-headquartered or domestic companies', short: 'Locally-headquartered/domestic', needsHomeCountry: true },
-  { id: 24, category: 'community', type: 'preference', text: 'Supporting founder-led or family-owned businesses', short: 'Founder-led/family-owned' },
-  { id: 25, category: 'community', type: 'preference', text: 'Supporting companies in industries I have personal/professional ties to', short: 'Personal/professional industry ties', needsTiesSector: true },
-  { id: 26, category: 'community', type: 'preference', text: 'Supporting women-led companies', short: 'Women-led companies' },
+  { id: 22, category: 'community', type: 'preference', text: 'Supporting locally-headquartered or domestic companies', short: 'Locally-headquartered/domestic', needsHomeCountry: true },
+  { id: 23, category: 'community', type: 'preference', text: 'Supporting founder-led or family-owned businesses', short: 'Founder-led/family-owned' },
+  { id: 24, category: 'community', type: 'preference', text: 'Supporting companies in industries I have personal/professional ties to', short: 'Personal/professional industry ties', needsTiesSector: true },
+  { id: 25, category: 'community', type: 'preference', text: 'Supporting women-led companies', short: 'Women-led companies' },
 
   // Risk Philosophy (combined into a derived Risk Profile, not scored per-company)
-  { id: 27, category: 'risk', type: 'risk', text: 'Long-term stability over short-term growth potential', short: 'Stability over growth' },
-  { id: 28, category: 'risk', type: 'risk', text: 'Willingness to accept lower returns for values alignment', short: 'Accept lower returns for values' },
-  // Restored 2026-08-21 (post-import) at the client's request, using the
-  // financial data already on every company (market_cap_tier, dividend
-  // yield_tier) -- untouched by the ESG-data import. Reinstated exactly as
-  // they were pre-import: same wording, same direct-scoring mechanics (see
-  // scoring.js), appended here as new ids rather than reclaiming the old
-  // 23/24 slots so nothing else needed renumbering.
-  { id: 29, category: 'risk', type: 'risk', text: 'Preference for large, established "blue-chip" companies over smaller, emerging companies', short: 'Blue-chip over emerging companies' },
-  { id: 30, category: 'risk', type: 'risk', text: 'Preference for dividend-paying income stocks over growth-focused reinvestment', short: 'Dividend income over growth reinvestment' },
+  { id: 26, category: 'risk', type: 'risk', text: 'Long-term stability over short-term growth potential', short: 'Stability over growth' },
+  { id: 27, category: 'risk', type: 'risk', text: 'Willingness to accept lower returns for values alignment', short: 'Accept lower returns for values' },
+  { id: 28, category: 'risk', type: 'risk', text: 'Preference for large, established "blue-chip" companies over smaller, emerging companies', short: 'Blue-chip over emerging companies' },
+  { id: 29, category: 'risk', type: 'risk', text: 'Preference for dividend-paying income stocks over growth-focused reinvestment', short: 'Dividend income over growth reinvestment' },
 
   // Single-select, not a 1-5 rating — picks which return field feeds the
   // financial-quality criterion (see scoring.js financialQualityAlignment).
   {
-    id: 31,
+    id: 30,
     category: 'risk',
     type: 'horizon',
     text: 'My typical investment time horizon is:',
@@ -119,8 +123,6 @@ const CATEGORY_ICONS = {
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v17"/><path d="M5 8h14"/><path d="M5 8l-3 6h6l-3-6Z"/><path d="M19 8l-3 6h6l-3-6Z"/><path d="M8 20h8"/></svg>',
   ethical:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 5-3 8-7 9-4-1-7-4-7-9V6l7-3Z"/><path d="M9 12l2 2 4-4"/></svg>',
-  religious:
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M5 8h14"/><path d="M8 4h8"/></svg>',
   political:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16"/><path d="M4 4l14 4-14 4"/><path d="M4 20h10"/></svg>',
   community:
@@ -133,7 +135,6 @@ const CATEGORIES = [
   { key: 'social_labor', label: 'Social / Labor', icon: CATEGORY_ICONS.social_labor },
   { key: 'governance', label: 'Governance', icon: CATEGORY_ICONS.governance },
   { key: 'ethical', label: 'Ethical / "Sin Stock" Screens', icon: CATEGORY_ICONS.ethical },
-  { key: 'religious', label: 'Religious Values', icon: CATEGORY_ICONS.religious },
   { key: 'political', label: 'Political/Social', icon: CATEGORY_ICONS.political },
   { key: 'community', label: 'Community/Identity', icon: CATEGORY_ICONS.community },
   { key: 'risk', label: 'Risk Philosophy', icon: CATEGORY_ICONS.risk },

@@ -445,7 +445,7 @@ function renderResults() {
     tiesSector: state.tiesSector,
     timeHorizon: state.timeHorizon,
   });
-  const topPriorities = QUESTIONS.filter((q) => q.id <= 26 && state.answers[q.id] === 5);
+  const topPriorities = QUESTIONS.filter((q) => q.id <= 25 && state.answers[q.id] === 5);
 
   appEl.innerHTML = `
     <section class="card results-card">
@@ -822,7 +822,7 @@ function riskProfileBlurb(riskProfile) {
 }
 
 function buildPortfolioRationale(answers, riskProfile, holdings) {
-  const topPriorities = QUESTIONS.filter((q) => q.id <= 26 && answers[q.id] === 5).map((q) => q.short);
+  const topPriorities = QUESTIONS.filter((q) => q.id <= 25 && answers[q.id] === 5).map((q) => q.short);
   const strongCount = holdings.filter((h) => h.tier === 'Strong').length;
   const belowThresholdCount = holdings.filter((h) => h.tier === 'Below Values Threshold').length;
   const partialCount = holdings.length - strongCount - belowThresholdCount;

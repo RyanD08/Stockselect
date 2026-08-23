@@ -11,13 +11,10 @@
  * pass only ever touched ESG/values-side scoring, per the task's explicit
  * "do not overwrite financial data" rule.
  *
- * Later the same day, blue-chip preference (Q29) and dividend-income
- * preference (Q30) were restored at the client's explicit request, using
- * the financial data (market_cap_tier, dividend yield_tier) that was never
- * touched by the ESG import in the first place — see "Risk preferences"
- * below. Net question count is 30 (not the imported schema's own 28); the
- * two extra are a deliberate, client-requested deviation from that schema,
- * not an oversight.
+ * Later the same day, blue-chip preference and dividend-income preference
+ * were restored at the client's explicit request, using the financial data
+ * (market_cap_tier, dividend yield_tier) that was never touched by the ESG
+ * import in the first place — see "Risk preferences" below.
  *
  * Still the same day: a client-requested simulation ("how many of the 502
  * companies can actually appear in a recommendation?") found only 34.7%
@@ -38,9 +35,9 @@
  * 2026-08-22: a follow-up simulation ("who keeps showing up") found that
  * fixing reachability had an unaddressed side effect -- a small group of
  * companies structurally immune to every exclusionary screen (never
- * scoring negatively on any of the 26 values questions, simply by not
- * being in a screened industry) appeared in recommended portfolios 7.4x
- * more often on average than every other company. Ford Motor Company
+ * scoring negatively on any values question they have data for, simply by
+ * not being in a screened industry) appeared in recommended portfolios
+ * 7.4x more often on average than every other company. Ford Motor Company
  * appeared in 75% of 3,000 simulated portfolios regardless of what the
  * simulated client said mattered. First fixed with a flat ranking discount
  * for zero-negative companies (parity, +5pp reachability) -- then revised
@@ -53,9 +50,25 @@
  * portfolios vs. 4, 66.3% universe reachability vs. 60.4%). Eligibility is
  * untouched either way, so the Aug-21 reachability fix is unaffected.
  *
- * Every scored question (ids 1-26 are the values screens; ids 27, 29, 30
+ * 2026-08-23: removed the "religious investment compliance"
+ * (halal/kosher/faith-based screening) question entirely -- it had 0%
+ * real data coverage across the whole live dataset (no comprehensive
+ * public source exists at S&P 500 scale, confirmed during the data-
+ * quality audit) and could never contribute anything but a hardcoded-
+ * neutral score, the same reasoning the animal-testing question was
+ * removed for during the 2026-08-21 restructure. religiousComplianceAlignment()
+ * and its questionHasData()/ALIGNMENT_FNS entries are gone, not just
+ * hidden. The Religious Values category's other question, "avoiding
+ * interest-based financial products" (which does have real data), moved
+ * into Ethical / "Sin Stock" Screens rather than being removed with it --
+ * same field, same wording, same alignment function, just re-slotted.
+ * Every question from that point on renumbered down to close the gap; see
+ * data/import_schema_comparison.md for the full old-id -> new-id mapping.
+ * Net question count: 30 -> 29 rated + the horizon selector.
+ *
+ * Every scored question (ids 1-25 are the values screens; ids 26, 28, 29
  * are risk/portfolio-construction preferences added directly to the same
- * sum, id 28 plays a dual role — see "Risk preferences" below) is either:
+ * sum, id 27 plays a dual role — see "Risk preferences" below) is either:
  *
  *   - EXCLUSIONARY: the client is rating how much they want to *avoid* a
  *     trait. A company's alignment value a_i sits in [-1, 0] — 0 if the
@@ -74,39 +87,33 @@
  *     different importance mapping than every other question here.
  *
  * Every judgment-based ESG question (environmental / social_labor /
- * governance / religious / political — everything except the objective
- * sin-stock booleans and the community/identity questions, which read
- * plain identity fields rather than a confidence-rated research field) has
- * its a_i additionally scaled by CONFIDENCE_WEIGHT, read directly from
- * that question's own underlying field, so a well-documented, High-
- * confidence finding counts more than a Low-confidence or unverified one
- * of the same nominal value. "No verifiable data found" (confidence
- * "None") always scores a neutral 0 before any confidence weighting is
- * even applied — the two mechanisms aren't redundant: the first ensures
- * missing data never penalizes or rewards a company, the second ensures a
- * *found but shaky* data point doesn't move the score as much as a solid
- * one.
+ * governance / political — everything except the objective sin-stock
+ * booleans and the community/identity questions, which read plain identity
+ * fields rather than a confidence-rated research field) has its a_i
+ * additionally scaled by CONFIDENCE_WEIGHT, read directly from that
+ * question's own underlying field, so a well-documented, High-confidence
+ * finding counts more than a Low-confidence or unverified one of the same
+ * nominal value. "No verifiable data found" (confidence "None") always
+ * scores a neutral 0 before any confidence weighting is even applied — the
+ * two mechanisms aren't redundant: the first ensures missing data never
+ * penalizes or rewards a company, the second ensures a *found but shaky*
+ * data point doesn't move the score as much as a solid one.
  *
  * Financial quality — valuation (P/E, PEG), growth, profitability (margin,
  * ROE, FCF margin), analyst sentiment, and a time-horizon-selected return
- * (Q29) weighted by beta/market-cap/dividends per the client's derived Risk
+ * weighted by beta/market-cap/dividends per the client's derived Risk
  * Profile — is folded in as one more preference-type criterion in the exact
  * same weighted sum (see financialQualityAlignment), not a separate post-hoc
- * blend. Its importance weight comes from the client's Q28 answer
- * ("willingness to accept lower returns for values alignment"), inverted,
- * so it behaves exactly like any other question: a client who rates it a
+ * blend. Its importance weight comes from the client's "willingness to
+ * accept lower returns for values alignment" answer, inverted, so it
+ * behaves exactly like any other question: a client who rates it a
  * 5-equivalent priority gets the same proportional influence as a 5/5 on
  * any values question, no more.
  *
- * Risk preferences (Q27 stability, Q29 blue-chip, Q30 dividend-income, plus
- * Q28's second role below) each have their own direct term in the same
- * weighted sum everything else uses, so they always contribute
- * proportionally to the visible score, on their own. (Q29/Q30 were briefly
- * removed when the ESG dataset import first landed, since the imported
- * schema's own Risk Philosophy section only defines 2 items -- restored
- * the same day at the client's explicit request, using financial data the
- * import never touched. See data/import_schema_comparison.md for the full
- * history.)
+ * Risk preferences (stability, blue-chip, dividend-income, plus the
+ * values-over-returns question's second role below) each have their own
+ * direct term in the same weighted sum everything else uses, so they
+ * always contribute proportionally to the visible score, on their own.
  *
  * These terms use a different importance mapping than every other question
  * in this file: importance = rating - 1 (so 1->0, 5->4), instead of the
@@ -115,17 +122,18 @@
  * doesn't care about dividends shouldn't see even a small, easy-to-miss
  * penalty applied to a strong dividend payer just for how the weighted
  * average happens to divide out. Ratings 2-5 scale up normally from there.
- * (Q1-26 don't need this: they're one-directional, so a low rating already
+ * (Q1-25 don't need this: they're one-directional, so a low rating already
  * can't push a company the "wrong" way — only trade-off-style, both-
  * directions questions have that risk.)
  *
- * Q28 plays two roles: it still sets financialImportance (how much the
- * financial-quality criterion counts overall) exactly as before, AND it
- * separately contributes its own trade-off term rewarding companies with
- * weaker financial-quality scores — a real "prioritize values over
- * financial strength" nudge, not just a smaller shrug at financials. Its
- * importance also uses the rating-1 mapping, so at Q28=1 this second term
- * is fully inert and never penalizes a strong company for being strong.
+ * The values-over-returns question plays two roles: it still sets
+ * financialImportance (how much the financial-quality criterion counts
+ * overall) exactly as before, AND it separately contributes its own
+ * trade-off term rewarding companies with weaker financial-quality scores
+ * — a real "prioritize values over financial strength" nudge, not just a
+ * smaller shrug at financials. Its importance also uses the rating-1
+ * mapping, so at a rating of 1 this second term is fully inert and never
+ * penalizes a strong company for being strong.
  *
  * The derived Risk Profile (Conservative/Balanced/Growth) still exists and
  * is still shown to the client (see deriveRiskProfile) — it just no longer
@@ -143,7 +151,7 @@
  * within a tier.
  */
 
-const SCORED_QUESTION_IDS = Array.from({ length: 26 }, (_, i) => i + 1); // 1-26
+const SCORED_QUESTION_IDS = Array.from({ length: 25 }, (_, i) => i + 1); // 1-25
 // Risk/portfolio-construction trade-off questions folded directly into the
 // score (see header comment) but deliberately NOT part of SCORED_QUESTION_IDS:
 // valuesFitScore() and classifyTier()'s conflict/tier-capping logic both
@@ -154,7 +162,7 @@ const SCORED_QUESTION_IDS = Array.from({ length: 26 }, (_, i) => i + 1); // 1-26
 // construction preferences, not ethical/values screens, so they shouldn't
 // change what counts as a genuine values match any more than a company's
 // P/E ratio should.
-const RISK_DIRECT_QUESTION_IDS = [27, 29, 30];
+const RISK_DIRECT_QUESTION_IDS = [26, 28, 29];
 
 // One "scoring unit" per scored question id. (v2 had MERGED_QUESTION_GROUPS
 // here, folding Q1/Q3 and Q8/Q9 into one term each because both members of
@@ -211,7 +219,7 @@ function unitRawRating(unit, answers) {
 // their real, answerable priorities (the same root problem unitImportance
 // above addresses, from the other side). Mirrors each ALIGNMENT_FNS
 // entry's own no-data check exactly, one case per scored question
-// (ids 1-26); ids 27+ (risk/financial terms) never call this.
+// (ids 1-25); ids 26+ (risk/financial terms) never call this.
 function questionHasData(qid, company, ctx) {
   switch (qid) {
     case 1: return !hasNoData(fieldOf(company, 'carbon_fossil_fuel_involvement'));
@@ -231,15 +239,14 @@ function questionHasData(qid, company, ctx) {
     case 15: return !hasNoData(fieldOf(company, 'gambling_casino_involvement'));
     case 16: return !hasNoData(fieldOf(company, 'weapons_defense_involvement'));
     case 17: return !hasNoData(fieldOf(company, 'adult_entertainment_involvement'));
-    case 18: return false; // religious compliance -- no comprehensive public data source exists at S&P 500 scale, always excluded
-    case 19: return !hasNoData(fieldOf(company, 'interest_based_financial_products'));
-    case 20: return !hasNoData(fieldOf(company, 'political_donation_transparency'));
-    case 21: { const f = fieldOf(company, 'countries_of_concern_operations'); return !hasNoData(f) && Array.isArray(f.value); }
-    case 22: { const f = fieldOf(company, 'data_privacy_practices'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.item_1_05_incident_count === 'number'; }
-    case 23: return true; // domestic HQ -- hq_country is always populated, real identity data
-    case 24: { const fl = fieldOf(company, 'founder_led'); const fo = fieldOf(company, 'family_owned'); return !hasNoData(fl) || !hasNoData(fo); }
-    case 25: return !!ctx.tiesSector; // inert for this question entirely when the client leaves it unset
-    case 26: return !hasNoData(fieldOf(company, 'women_led'));
+    case 18: return !hasNoData(fieldOf(company, 'interest_based_financial_products'));
+    case 19: return !hasNoData(fieldOf(company, 'political_donation_transparency'));
+    case 20: { const f = fieldOf(company, 'countries_of_concern_operations'); return !hasNoData(f) && Array.isArray(f.value); }
+    case 21: { const f = fieldOf(company, 'data_privacy_practices'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.item_1_05_incident_count === 'number'; }
+    case 22: return true; // domestic HQ -- hq_country is always populated, real identity data
+    case 23: { const fl = fieldOf(company, 'founder_led'); const fo = fieldOf(company, 'family_owned'); return !hasNoData(fl) || !hasNoData(fo); }
+    case 24: return !!ctx.tiesSector; // inert for this question entirely when the client leaves it unset
+    case 25: return !hasNoData(fieldOf(company, 'women_led'));
     default: return true;
   }
 }
@@ -447,16 +454,6 @@ function votingStructureAlignment(company) {
   return raw * confidenceWeight(f.confidence);
 }
 
-// Q18: always "No verifiable data found" -- no comprehensive free public
-// halal/kosher screening database exists at S&P 500 scale (see
-// data/import_schema_comparison.md). Kept as a real, live question
-// (per the 2026-08-21 restructure) rather than removed, since a future
-// data source could populate it -- it will simply always score neutral
-// until then, same as any other unverified field.
-function religiousComplianceAlignment() {
-  return 0;
-}
-
 function interestBasedFinanceAlignment(company) {
   return booleanFieldAlignment(company, 'interest_based_financial_products', -1);
 }
@@ -484,7 +481,7 @@ function dataPrivacyAlignment(company) {
   return raw * confidenceWeight(f.confidence);
 }
 
-// Q23 (domestic HQ): deliberately reads the site's own hq_country string
+// Q22 (domestic HQ): deliberately reads the site's own hq_country string
 // (real, address-derived data already on every company) and compares it
 // against the client's OWN chosen home-country text input, rather than the
 // imported dataset's domestic_hq boolean (which is fixed relative to the
@@ -495,7 +492,7 @@ function domesticHqAlignment(company, ctx) {
   return company.hq_country && company.hq_country.startsWith(ctx.homeCountry) ? 1 : 0;
 }
 
-// Q24 (founder-led/family-owned): per the 2026-08-21 import, sourced from
+// Q23 (founder-led/family-owned): per the 2026-08-21 import, sourced from
 // the imported dataset's founder_led/family_owned fields (a more
 // extensively-validated, name-anchored pipeline -- see
 // data/import_schema_comparison.md for why this supersedes this repo's
@@ -536,18 +533,17 @@ const ALIGNMENT_FNS = {
   15: (c) => booleanFieldAlignment(c, 'gambling_casino_involvement', -1),
   16: (c) => booleanFieldAlignment(c, 'weapons_defense_involvement', -1),
   17: (c) => booleanFieldAlignment(c, 'adult_entertainment_involvement', -1),
-  18: religiousComplianceAlignment,
-  19: interestBasedFinanceAlignment,
-  20: politicalDonationAlignment,
-  21: countriesOfConcernAlignment,
-  22: dataPrivacyAlignment,
-  23: domesticHqAlignment,
-  24: founderFamilyAlignment,
-  25: industryTieAlignment,
-  26: womenLedAlignment,
+  18: interestBasedFinanceAlignment,
+  19: politicalDonationAlignment,
+  20: countriesOfConcernAlignment,
+  21: dataPrivacyAlignment,
+  22: domesticHqAlignment,
+  23: founderFamilyAlignment,
+  24: industryTieAlignment,
+  25: womenLedAlignment,
 };
 
-// Q27 (stability-over-growth). Unchanged from v2's Q21.
+// Q26 (stability-over-growth). Unchanged from v2's Q21.
 const NEUTRAL_BETA = 1.0; // ~market-average volatility
 const BETA_SWING = 1.0; // beta this far from neutral in either direction reaches ±1
 function stabilityDirectAlignment(company) {
@@ -556,7 +552,7 @@ function stabilityDirectAlignment(company) {
   return Math.max(-1, Math.min(1, (NEUTRAL_BETA - beta) / BETA_SWING));
 }
 
-// Q30 (dividend-income preference). DIVIDEND_YIELD_RANK (defined below,
+// Q29 (dividend-income preference). DIVIDEND_YIELD_RANK (defined below,
 // reused here) treats "Low" as the neutral center: a non-payer is actively
 // penalized, a high-yield payer is actively rewarded, exactly matching the
 // "preference for dividend-paying income stocks over growth-focused
@@ -566,7 +562,7 @@ function dividendDirectAlignment(company) {
   return Math.max(-1, Math.min(1, (rank - 2) / 2));
 }
 
-// Q29 (blue-chip preference). MARKET_CAP_RANK (defined below, reused
+// Q28 (blue-chip preference). MARKET_CAP_RANK (defined below, reused
 // here): Mega/Large rewarded, Mid/Small penalized, centered between Large
 // and Mid. This is the *soft* blue-chip preference (ratings 1-4); a rating
 // of 5 is instead a hard filter -- see isBlueChipEligible. Restored
@@ -577,18 +573,19 @@ function blueChipDirectAlignment(company) {
   return Math.max(-1, Math.min(1, (rank - 1.5) / 1.5));
 }
 
-// Q29 at 5/5 is a hard pre-filter (see buildPortfolio); 1-4 don't filter
-// anything. Restored 2026-08-21, unchanged from v2's Q23/isBlueChipEligible.
+// Blue-chip question at 5/5 is a hard pre-filter (see buildPortfolio); 1-4
+// don't filter anything. Restored 2026-08-21, unchanged from v2's
+// Q23/isBlueChipEligible.
 function isBlueChipEligible(company, answers) {
-  const q29 = answers[29] || 3;
-  if (q29 < 5) return true;
+  const blueChipRating = answers[28] || 3;
+  if (blueChipRating < 5) return true;
   return company.market_profile.market_cap_tier === 'Mega';
 }
 
 const RISK_ALIGNMENT_FNS = {
-  27: stabilityDirectAlignment,
-  29: blueChipDirectAlignment,
-  30: dividendDirectAlignment,
+  26: stabilityDirectAlignment,
+  28: blueChipDirectAlignment,
+  29: dividendDirectAlignment,
 };
 
 function scoreCompany(company, answers, ctx, riskProfile) {
@@ -606,13 +603,15 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   });
 
   // Financial quality as one more weighted criterion (see header comment).
-  const financialImportance = 6 - (answers[28] || 3);
+  // Importance driven by the values-over-returns question (id 27).
+  const financialImportance = 6 - (answers[27] || 3);
   const financialAlignment = financialQualityAlignment(company, riskProfile, ctx.timeHorizon);
   numerator += financialImportance * financialAlignment;
   denominator += financialImportance;
 
-  // Risk/portfolio-construction trade-off term (Q27) — rating-1 importance
-  // mapping so a rating of 1 is a true no-op (see header comment).
+  // Risk/portfolio-construction trade-off terms (stability, blue-chip,
+  // dividend-income) — rating-1 importance mapping so a rating of 1 is a
+  // true no-op (see header comment).
   RISK_DIRECT_QUESTION_IDS.forEach((qId) => {
     const importance = Math.max(0, (answers[qId] || 3) - 1);
     const alignment = RISK_ALIGNMENT_FNS[qId](company);
@@ -621,10 +620,11 @@ function scoreCompany(company, answers, ctx, riskProfile) {
     denominator += importance;
   });
 
-  // Q28's second role: reward weaker financial-quality companies (a real
-  // "prioritize values over financial strength" nudge), same rating-1
-  // mapping so it never penalizes a strong company when Q28=1.
-  const valuesOverReturnsImportance = Math.max(0, (answers[28] || 3) - 1);
+  // The values-over-returns question's second role: reward weaker
+  // financial-quality companies (a real "prioritize values over financial
+  // strength" nudge), same rating-1 mapping so it never penalizes a strong
+  // company when that rating is 1.
+  const valuesOverReturnsImportance = Math.max(0, (answers[27] || 3) - 1);
   const valuesOverReturnsAlignment = 1 - 2 * financialAlignment;
   numerator += valuesOverReturnsImportance * valuesOverReturnsAlignment;
   denominator += valuesOverReturnsImportance;
@@ -702,13 +702,11 @@ function meetsValuesFloor(company, answers, ctx) {
 
 // Purely descriptive (see header comment "Risk preferences") — shown to
 // the client as a summary label ("Your Risk Profile") and used to shape
-// financialQualityAlignment's formula. Averages 4 inverted risk-question
-// answers (Q27 stability, Q28 values-over-returns, Q29 blue-chip, Q30
-// dividend-income) into a single growth-orientation axis, restored to this
-// original 4-input form on 2026-08-21 alongside Q29/Q30 themselves (see
-// header comment) after a brief window with only 2 inputs.
+// financialQualityAlignment's formula. Averages the 4 inverted risk-
+// question answers (stability, values-over-returns, blue-chip, dividend-
+// income; ids 26-29) into a single growth-orientation axis.
 function deriveRiskProfile(answers) {
-  const growthAxisValues = [27, 28, 29, 30].map((qId) => 6 - (answers[qId] || 3));
+  const growthAxisValues = [26, 27, 28, 29].map((qId) => 6 - (answers[qId] || 3));
   const avg = growthAxisValues.reduce((sum, v) => sum + v, 0) / growthAxisValues.length;
   if (avg <= 2.3) return 'Conservative';
   if (avg <= 3.7) return 'Balanced';
@@ -752,7 +750,7 @@ function buildRationale(alignments, answers, financialImportance, financialAlign
       alignment: alignments[qId],
     });
   });
-  candidates.push({ label: getQuestion(28).short, importance: valuesOverReturnsImportance, alignment: valuesOverReturnsAlignment });
+  candidates.push({ label: getQuestion(27).short, importance: valuesOverReturnsImportance, alignment: valuesOverReturnsAlignment });
 
   const highPriority = candidates.filter((c) => c.importance >= HIGH_PRIORITY_THRESHOLD);
   const pool = highPriority.length > 0 ? highPriority : candidates;
@@ -772,7 +770,7 @@ function noteMatches(note, regex) {
   return !!note && regex.test(note);
 }
 
-// Scans the same fields Q1/Q3, Q6, Q11-12, Q21 already score, for a
+// Scans the same fields Q1/Q3, Q6, Q11-12, Q20 already score, for a
 // company-facing "controversy" tie-breaker independent of the client's own
 // answers (see sortScoredEntries). Not a re-scoring pass -- just counts how
 // many of these distinct concern signals are actually present.
@@ -877,10 +875,10 @@ function horizonReturnValue(company, timeHorizon) {
   return company.performance_tier.five_year_annualized_return_pct_est;
 }
 
-// The client's selected time horizon (Q29) picks which return field is
-// used; the client's derived Risk Profile still decides how that return is
-// weighted against beta/cap/dividends. This is one of the 9 metrics
-// averaged into financialQualityAlignment below, not a separate score.
+// The client's selected time horizon picks which return field is used; the
+// client's derived Risk Profile still decides how that return is weighted
+// against beta/cap/dividends. This is one of the 9 metrics averaged into
+// financialQualityAlignment below, not a separate score.
 function timeHorizonReturnAlignment(company, riskProfile, timeHorizon) {
   const beta = company.market_profile.beta_est;
   const ret = horizonReturnValue(company, timeHorizon);
@@ -1072,12 +1070,11 @@ function buildPortfolio(dataset, answers, clientContext) {
   };
   const riskProfile = deriveRiskProfile(answers);
 
-  // Q29 (blue-chip preference) at 5/5 is a hard, non-negotiable pre-filter
-  // -- smaller companies are excluded outright, never backfilled/relaxed,
-  // since "only suggest blue-chip" should mean literally that. Ratings 1-4
-  // don't filter anything: they're a soft, graded preference instead (see
-  // blueChipDirectAlignment above). Restored 2026-08-21 alongside Q29
-  // itself.
+  // Blue-chip preference (id 28) at 5/5 is a hard, non-negotiable
+  // pre-filter -- smaller companies are excluded outright, never
+  // backfilled/relaxed, since "only suggest blue-chip" should mean
+  // literally that. Ratings 1-4 don't filter anything: they're a soft,
+  // graded preference instead (see blueChipDirectAlignment above).
   const blueChipEligible = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
 
   const meetsFloor = (c) => meetsValuesFloor(c, answers, ctx);

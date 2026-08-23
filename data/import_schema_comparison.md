@@ -265,3 +265,55 @@ See `data/merge_conflict_log.json`, written by `scripts/merge_incoming_esg_datas
 -- one entry per company/field where both the live ESG dataset and the
 incoming dataset had a real (non-null, non-placeholder) value, listing both
 values and which one won and why.
+
+## Religious Values category removed (2026-08-23)
+
+`religious_investment_compliance` (Q18 in the 2026-08-21 numbering above)
+was always `"No verifiable data found"` -- flagged as a known gap at
+import time (see the New fields table above) and confirmed by the data-
+quality audit to have 0% real coverage across all 502 companies in the
+live dataset, exactly like `animal_testing_exposure` before it (removed
+during the 2026-08-21 restructure, see "Question count / structure"
+above). Same treatment: removed outright, not left as a permanently-
+neutral dead question. `religiousComplianceAlignment()` and its
+`questionHasData()`/`ALIGNMENT_FNS` entries are gone from `js/scoring.js`
+entirely.
+
+The category's other question, `interest_based_financial_products` (Q19),
+does have real data (a filings-derived boolean) and was not removed --
+it relocated into Ethical / "Sin Stock" Screens instead, same field, same
+wording, same alignment function (`interestBasedFinanceAlignment`), just
+re-slotted. With no questions left, the Religious Values category itself
+is gone from `CATEGORIES`/`CATEGORY_ICONS` in `js/questions.js`.
+
+Every question from the old Q19 onward renumbered down to close the gap.
+Full old-id -> new-id mapping (old 1-17 unchanged):
+
+| Old id | New id | Question | Category change |
+|---|---|---|---|
+| 18 | -- (removed) | Religious investment compliance | -- |
+| 19 | 18 | Avoiding interest-based financial products | religious -> ethical |
+| 20 | 19 | Political donation transparency | unchanged |
+| 21 | 20 | Avoiding operations in countries of concern | unchanged |
+| 22 | 21 | Strong data privacy practices | unchanged |
+| 23 | 22 | Locally-headquartered/domestic | unchanged |
+| 24 | 23 | Founder-led/family-owned | unchanged |
+| 25 | 24 | Personal/professional industry ties | unchanged |
+| 26 | 25 | Women-led companies | unchanged |
+| 27 | 26 | Stability over growth | unchanged |
+| 28 | 27 | Accept lower returns for values | unchanged |
+| 29 | 28 | Blue-chip over emerging companies | unchanged |
+| 30 | 29 | Dividend income over growth reinvestment | unchanged |
+| 31 | 30 | Investment time horizon (not rated) | unchanged |
+
+Net: 30 questions (26 values + 4 risk, or 25 + 4 after this change) + 1
+horizon selector -> 29 rated questions (25 values + 4 risk) + 1 horizon
+selector, 8 categories -> 7. `SCORED_QUESTION_IDS` is now `1-25` (was
+`1-26`); `RISK_DIRECT_QUESTION_IDS` is now `[26, 28, 29]` (was
+`[27, 29, 30]`). Every hardcoded id reference in `js/scoring.js` and
+`js/app.js` (financial-importance/values-over-returns lookups, blue-chip
+hard-filter, `deriveRiskProfile`'s 4 risk-question ids, the "top
+priorities" `q.id <=` boundary) was updated to match -- verified with a
+direct Node test running every alignment function against all 502
+companies (0 errors) and a full Playwright pass through the renumbered
+questionnaire (all 7 category steps, results table, no `undefined`/`NaN`).
