@@ -1712,13 +1712,6 @@ h2 .category-icon {
   margin: 0.3rem 0 0;
 }
 
-.ticker-result-explanation {
-  margin: 0.75rem 0 0;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-  color: var(--text);
-}
-
 .ticker-personalize-prompt {
   padding: 0.85rem 1rem;
   background: var(--warn-bg);
