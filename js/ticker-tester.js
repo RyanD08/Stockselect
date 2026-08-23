@@ -26,6 +26,19 @@
  * whichever happened most recently is naturally what's used -- no separate
  * "which source" bookkeeping needed here.
  *
+ * 2026-08-23d: a signed-in client with saved portfolios but no in-session
+ * answers (hadn't touched the survey or explicitly opened My Portfolios
+ * this session) landed on the "log in / complete the survey" prompt despite
+ * already being logged in -- confusing, since the actual missing piece was
+ * just "which saved portfolio." Fixed with maybeAutoLoadRecentPortfolio():
+ * on entering Ticker Tester, if personalization is still unavailable and
+ * the client is signed in, it silently fetches their saved portfolios
+ * (listSavedPortfolios(), from auth.js -- already sorted newest-first) and
+ * loads the most recent one in place, the same way loadPortfolioIntoResults
+ * does, minus the navigation to Results. A client with zero saved
+ * portfolios still correctly falls through to the same prompt as before.
+ *
+
  * 2026-08-23c: replaced the full 27/29-criterion breakdown with a per-
  * category (7 categories) 1-10 score plus a Chart.js radar chart. Each
  * category's score is a weighted average of that category's own
@@ -44,6 +57,11 @@
 const tickerTesterState = {
   query: '',
   selectedTicker: null,
+  // 'idle' | 'loading' | 'done' | 'none-found' | 'error' -- see
+  // maybeAutoLoadRecentPortfolio() below. Reset to 'idle' each time the
+  // client navigates to Ticker Tester fresh (initTickerTesterNav), so a
+  // portfolio saved since their last visit gets picked up.
+  autoLoadState: 'idle',
 };
 
 // Chart.js requires destroying a previous chart bound to a <canvas> before
@@ -58,6 +76,7 @@ function initTickerTesterNav() {
   btn.addEventListener('click', () => {
     tickerTesterState.query = '';
     tickerTesterState.selectedTicker = null;
+    tickerTesterState.autoLoadState = 'idle';
     state.view = 'tickerTester';
     render();
   });
@@ -65,6 +84,38 @@ function initTickerTesterNav() {
 
 function hasPersonalizationSource() {
   return !!state.hasPersonalizedAnswers;
+}
+
+// Fires (at most once per Ticker Tester visit -- see autoLoadState) when
+// personalization isn't available yet but the client is signed in: fetches
+// their saved portfolios and loads the most recent one in place. A no-op
+// if personalization is already available, the client isn't signed in, or
+// an attempt has already started/finished this visit.
+function maybeAutoLoadRecentPortfolio() {
+  if (hasPersonalizationSource()) return;
+  if (typeof firebaseReady === 'undefined' || !firebaseReady || !authState.user) return;
+  if (tickerTesterState.autoLoadState !== 'idle') return;
+
+  tickerTesterState.autoLoadState = 'loading';
+  listSavedPortfolios()
+    .then((portfolios) => {
+      if (portfolios.length === 0) {
+        tickerTesterState.autoLoadState = 'none-found';
+        renderInPlace();
+        return;
+      }
+      const mostRecent = portfolios[0]; // listSavedPortfolios already orders newest-first
+      state.answers = { ...mostRecent.answers };
+      state.touchedQuestionIds = new Set(QUESTIONS.filter((q) => q.type !== 'horizon').map((q) => q.id));
+      state.hasPersonalizedAnswers = true;
+      tickerTesterState.autoLoadState = 'done';
+      renderInPlace();
+    })
+    .catch((err) => {
+      console.error('Ticker Tester: auto-loading the most recent saved portfolio failed:', err);
+      tickerTesterState.autoLoadState = 'error';
+      renderInPlace();
+    });
 }
 
 function tickerTesterCtx() {
@@ -125,6 +176,8 @@ function renderTickerTester() {
     wireTickerTesterBackButton();
     return;
   }
+
+  maybeAutoLoadRecentPortfolio();
 
   const company = tickerTesterState.selectedTicker
     ? state.dataset.companies.find((c) => c.ticker === tickerTesterState.selectedTicker)
@@ -270,6 +323,18 @@ function renderTickerResult(company) {
   `;
 
   if (!hasPersonalizationSource()) {
+    if (tickerTesterState.autoLoadState === 'loading') {
+      return `
+        <div class="ticker-result">
+          ${changeCompanyRow}
+          <p class="muted">Loading your most recent saved portfolio…</p>
+          ${renderRawCompanyData(company)}
+        </div>
+      `;
+    }
+    // Signed in but nothing to auto-load (no saved portfolios, or the
+    // fetch itself failed) -- same prompt as a signed-out visitor, since
+    // "Log In" is a no-op for them but "Take the Survey" still applies.
     return `
       <div class="ticker-result">
         ${changeCompanyRow}
