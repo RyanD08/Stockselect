@@ -68,6 +68,7 @@ const myPortfoliosViewState = {
   error: null,
   portfolios: [],
   renamingId: null, // id of the entry currently showing its rename input, or null
+  confirmingDeleteId: null, // id of the entry currently showing its "are you sure?" prompt, or null
 };
 
 // Set when a signed-out visitor clicks "Save My Portfolio" on the results
@@ -444,6 +445,7 @@ async function openMyPortfoliosView() {
   myPortfoliosViewState.loading = true;
   myPortfoliosViewState.error = null;
   myPortfoliosViewState.renamingId = null;
+  myPortfoliosViewState.confirmingDeleteId = null;
   // A stale "limit reached" message shouldn't still be sitting on the
   // results screen after the client comes here to make room for a new save.
   state.saveResultState = { status: 'idle', errorMessage: null };
@@ -492,6 +494,7 @@ function renderPortfoliosList() {
 
 function renderPortfolioEntry(portfolio) {
   const isRenaming = myPortfoliosViewState.renamingId === portfolio.id;
+  const isConfirmingDelete = myPortfoliosViewState.confirmingDeleteId === portfolio.id;
   const dateLabel =
     portfolio.savedAt && typeof portfolio.savedAt.toDate === 'function'
       ? portfolio.savedAt.toDate().toLocaleDateString('en-US', { dateStyle: 'medium' })
@@ -505,6 +508,23 @@ function renderPortfolioEntry(portfolio) {
           <button type="submit" class="btn-link-action portfolio-rename-save">Save</button>
           <button type="button" class="btn-link-action portfolio-rename-cancel">Cancel</button>
         </form>
+      </li>
+    `;
+  }
+
+  if (isConfirmingDelete) {
+    // An in-page confirmation instead of window.confirm(): a native
+    // browser confirm() dialog is unreliable in some mobile contexts (can
+    // be suppressed entirely, silently returning false) -- which looks
+    // indistinguishable from "the Delete button does nothing." This is
+    // always visible and its Yes/Cancel buttons are real DOM elements.
+    return `
+      <li class="portfolio-entry portfolio-entry-confirming" data-id="${portfolio.id}">
+        <p class="portfolio-delete-confirm-text">Are you sure you want to delete "${escapeHtml(portfolio.name)}"? This can't be undone.</p>
+        <div class="portfolio-delete-confirm-actions">
+          <button type="button" class="btn-link-action danger portfolio-delete-confirm" data-id="${portfolio.id}">Yes, Delete</button>
+          <button type="button" class="btn-link-action portfolio-delete-cancel">Cancel</button>
+        </div>
       </li>
     `;
   }
@@ -535,6 +555,7 @@ function wirePortfolioEntryButtons() {
   document.querySelectorAll('.portfolio-rename-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       myPortfoliosViewState.renamingId = btn.dataset.id;
+      myPortfoliosViewState.confirmingDeleteId = null;
       renderInPlace();
     });
   });
@@ -567,17 +588,32 @@ function wirePortfolioEntryButtons() {
   });
 
   document.querySelectorAll('.portfolio-delete-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      myPortfoliosViewState.confirmingDeleteId = btn.dataset.id;
+      myPortfoliosViewState.renamingId = null;
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.portfolio-delete-cancel').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      myPortfoliosViewState.confirmingDeleteId = null;
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.portfolio-delete-confirm').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const portfolio = myPortfoliosViewState.portfolios.find((p) => p.id === btn.dataset.id);
       if (!portfolio) return;
-      const confirmed = window.confirm(`Delete "${portfolio.name}"? This can't be undone.`);
-      if (!confirmed) return;
       try {
         await deleteSavedPortfolio(portfolio.id);
         myPortfoliosViewState.portfolios = myPortfoliosViewState.portfolios.filter((p) => p.id !== portfolio.id);
+        myPortfoliosViewState.confirmingDeleteId = null;
       } catch (err) {
         console.error('deleteSavedPortfolio failed:', err);
         myPortfoliosViewState.error = describeFirestoreError(err, 'Could not delete that portfolio');
+        myPortfoliosViewState.confirmingDeleteId = null;
       }
       renderInPlace();
     });

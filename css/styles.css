@@ -1519,6 +1519,26 @@ h2 .category-icon {
   outline-offset: 1px;
 }
 
+.portfolio-entry-confirming {
+  display: block;
+  padding: 0.85rem 1rem;
+  background: var(--danger-bg);
+  border: 1px solid #eecfcd;
+  border-radius: 8px;
+  margin: 0.4rem 0;
+}
+
+.portfolio-delete-confirm-text {
+  margin: 0 0 0.6rem;
+  color: var(--text);
+}
+
+.portfolio-delete-confirm-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
 .site-footer {
   text-align: center;
   color: var(--muted);
