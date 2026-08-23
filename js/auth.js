@@ -1,19 +1,27 @@
 /**
- * Account layer: Firebase Authentication + Firestore save/load of survey
- * results, plus the account-related UI (header widget, login/sign-up
- * screen, saved-results list).
+ * Account layer: Firebase Authentication + Firestore save of survey
+ * answers, plus the account-related UI (header widget, login/sign-up
+ * screen).
  *
  * Kept separate from app.js on purpose: app.js owns the survey flow
  * (intro/survey/review/results) and knows nothing about accounts beyond
  * calling the functions here; this file owns everything account-related
  * and knows nothing about scoring/questions. The two meet only at
- * `state.view` ('account'/'saved' are added here, dispatched from app.js's
- * renderInPlace()) and the "Save these results" control on the results
- * screen (in app.js, calling saveSurveyResult() below).
+ * `state.view` ('account' is added here, dispatched from app.js's
+ * renderInPlace()) and the "Save My Survey" control on the results screen
+ * (in app.js, calling saveSurveyAnswers() below).
  *
  * Login is strictly optional — see firebase-config.js's `firebaseReady`.
  * Every function here checks it first and fails softly (never touches the
  * survey/results experience for a signed-out visitor).
+ *
+ * There is no saved-results browsing screen — each user's Firestore
+ * document at users/{uid}/savedSurvey/current holds only their single most
+ * recent save (answers + timestamp), overwritten on every save. An earlier
+ * version of this feature stored a growable users/{uid}/surveys collection
+ * (full portfolio snapshots, browsable in a list); that collection is no
+ * longer written to or read by this file, but nothing in it is deleted --
+ * see firestore.rules for why its access rule is still kept around.
  */
 
 const authState = {
@@ -31,13 +39,12 @@ const authViewState = {
   info: null,
 };
 
-// UI-only state for the saved-results list.
-const savedViewState = {
-  loading: true,
-  error: null,
-  surveys: [],
-  expandedId: null,
-};
+// Set when a signed-out visitor clicks "Save My Survey" on the results
+// screen: their answers at that moment, held here until they finish
+// logging in (or signing up), at which point onAuthStateChanged below
+// saves them automatically with no second click required. Cleared as soon
+// as it's consumed, or if they back out of the login screen instead.
+let pendingSaveAnswers = null;
 
 // Firebase Auth's error codes (e.g. "auth/wrong-password") are never shown
 // to the client directly -- always translated to plain language here.
@@ -83,17 +90,38 @@ async function resetPassword(email) {
 }
 
 if (firebaseReady) {
-  firebaseAuth.onAuthStateChanged((user) => {
+  firebaseAuth.onAuthStateChanged(async (user) => {
     authState.user = user;
     authState.ready = true;
     renderAccountWidget();
+
+    if (user && pendingSaveAnswers) {
+      // A signed-out visitor clicked "Save My Survey," was redirected here
+      // to log in, and has now done so -- finish the save they started
+      // without making them click it again, then take them back to their
+      // results with the same "Saved!" confirmation the normal flow shows.
+      const answersToSave = pendingSaveAnswers;
+      pendingSaveAnswers = null;
+      try {
+        await saveSurveyAnswers(answersToSave);
+        state.saveResultState = { status: 'saved', errorMessage: null };
+        scheduleSaveResultRevert();
+      } catch (err) {
+        state.saveResultState = { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
+      }
+      state.view = 'results';
+      render();
+      return;
+    }
+
     if (state.view === 'account' && user) {
-      // Just signed in from the login screen -- head back to the intro
-      // screen rather than leaving them sitting on a login form.
+      // Just signed in from the login screen (not via the pending-save
+      // path above) -- head back to the intro screen rather than leaving
+      // them sitting on a login form.
       state.view = 'intro';
       render();
-    } else if (state.view === 'results' || state.view === 'saved') {
-      // Refresh the Save-results control / saved list for the new auth state.
+    } else if (state.view === 'results') {
+      // Refresh the Save-My-Survey control for the new auth state.
       render();
     }
   });
@@ -104,49 +132,25 @@ if (firebaseReady) {
   authState.ready = true;
 }
 
-// --- Firestore: save/load survey results --------------------------------
+// --- Firestore: save survey answers --------------------------------------
 
-// Stores a compact snapshot (not full company records) -- everything
-// needed to redisplay the holdings list on the Saved Results screen,
-// without duplicating the whole ~500-company dataset per save.
-async function saveSurveyResult({ answers, homeCountry, tiesSector, timeHorizon, riskProfile, holdings }) {
+// One slot per user: users/{uid}/savedSurvey/current, overwritten on every
+// save. Only the raw answers and a timestamp -- never the computed
+// portfolio (scores, matched companies, allocations), which is cheap to
+// recompute from the answers and shouldn't be treated as saved fact.
+async function saveSurveyAnswers(answers) {
   if (!firebaseReady) throw new Error('Account features are unavailable right now.');
-  if (!authState.user) throw new Error('You need to be logged in to save results.');
-
-  const holdingsSummary = holdings.map((h) => ({
-    ticker: h.company.ticker,
-    name: h.company.name,
-    sector: h.company.sector,
-    tier: h.tier,
-    score: h.score,
-    allocationPct: h.allocationPct,
-    rationale: h.rationale,
-  }));
+  if (!authState.user) throw new Error('You need to be logged in to save your survey.');
 
   await firebaseDb
     .collection('users')
     .doc(authState.user.uid)
-    .collection('surveys')
-    .add({
+    .collection('savedSurvey')
+    .doc('current')
+    .set({
       answers,
-      homeCountry,
-      tiesSector,
-      timeHorizon,
-      riskProfile,
-      holdings: holdingsSummary,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      savedAt: firebase.firestore.FieldValue.serverTimestamp(),
     });
-}
-
-async function loadSavedSurveys() {
-  if (!firebaseReady || !authState.user) return [];
-  const snapshot = await firebaseDb
-    .collection('users')
-    .doc(authState.user.uid)
-    .collection('surveys')
-    .orderBy('createdAt', 'desc')
-    .get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
 // --- Header account widget (static markup outside #app, present on every view) --
@@ -162,13 +166,11 @@ function renderAccountWidget() {
   if (authState.user) {
     el.innerHTML = `
       <span class="account-widget-email">${escapeHtml(authState.user.email)}</span>
-      <button type="button" id="account-saved-link" class="account-widget-link">My Saved Results</button>
       <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
     `;
-    document.getElementById('account-saved-link').addEventListener('click', openSavedView);
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
-      if (state.view === 'saved' || state.view === 'account') {
+      if (state.view === 'account') {
         state.view = 'intro';
         render();
       }
@@ -197,8 +199,8 @@ function renderAccount() {
       <p class="lede">
         ${
           isSignup
-            ? 'Save your survey answers and portfolio results so you can revisit them later.'
-            : 'Log in to save or view your TrueNorth results.'
+            ? 'Save your survey answers so you can pick up where you left off.'
+            : 'Log in to save your TrueNorth survey.'
         }
       </p>
 
@@ -246,8 +248,9 @@ function renderAccount() {
       if (isSignup) await signUp(email, password);
       else await logIn(email, password);
       authViewState.loading = false;
-      // onAuthStateChanged (above) handles navigating back to the intro
-      // screen once the user resolves.
+      // onAuthStateChanged (above) handles navigating away -- either
+      // finishing an interrupted "Save My Survey," or back to the intro
+      // screen -- once the user resolves.
     } catch (err) {
       authViewState.loading = false;
       authViewState.error = friendlyAuthError(err);
@@ -289,99 +292,8 @@ function renderAccount() {
   document.getElementById('auth-back-btn').addEventListener('click', () => {
     authViewState.error = null;
     authViewState.info = null;
+    pendingSaveAnswers = null; // abandon any interrupted "Save My Survey" too
     state.view = 'intro';
     render();
   });
-}
-
-// --- Saved-results view ---------------------------------------------------
-
-async function openSavedView() {
-  state.view = 'saved';
-  savedViewState.loading = true;
-  savedViewState.error = null;
-  savedViewState.expandedId = null;
-  render();
-  try {
-    savedViewState.surveys = await loadSavedSurveys();
-  } catch (err) {
-    savedViewState.error = 'Could not load your saved results. Please try again.';
-  }
-  savedViewState.loading = false;
-  renderInPlace();
-}
-
-function renderSaved() {
-  appEl.innerHTML = `
-    <section class="card saved-card">
-      <p class="eyebrow">Account</p>
-      <h1>My Saved Results</h1>
-      <p class="lede">Past TrueNorth surveys you've saved while logged in.</p>
-      ${savedViewState.loading ? '<p class="muted">Loading…</p>' : renderSavedList()}
-      <div class="nav-row">
-        <button type="button" id="saved-back-btn" class="btn btn-secondary">Back</button>
-      </div>
-    </section>
-  `;
-
-  document.getElementById('saved-back-btn').addEventListener('click', () => {
-    state.view = 'intro';
-    render();
-  });
-
-  document.querySelectorAll('.saved-entry-toggle').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      savedViewState.expandedId = savedViewState.expandedId === id ? null : id;
-      renderInPlace();
-    });
-  });
-}
-
-function renderSavedList() {
-  if (savedViewState.error) return `<p class="error-text">${escapeHtml(savedViewState.error)}</p>`;
-  if (savedViewState.surveys.length === 0) {
-    return '<p class="muted">You haven\'t saved any results yet. Complete the survey and click "Save these results" on your results page to see them here.</p>';
-  }
-  return `<ul class="saved-list">${savedViewState.surveys.map(renderSavedEntry).join('')}</ul>`;
-}
-
-function renderSavedEntry(survey) {
-  const isExpanded = savedViewState.expandedId === survey.id;
-  const dateLabel =
-    survey.createdAt && typeof survey.createdAt.toDate === 'function'
-      ? survey.createdAt.toDate().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
-      : 'Just now';
-  const riskKey = (survey.riskProfile || '').toLowerCase();
-
-  return `
-    <li class="saved-entry ${isExpanded ? 'expanded' : ''}">
-      <button type="button" class="saved-entry-toggle" data-id="${survey.id}">
-        <span class="review-chevron">${chevronIcon()}</span>
-        <span class="saved-entry-date">${escapeHtml(dateLabel)}</span>
-        ${survey.riskProfile ? `<span class="saved-risk-badge risk-${riskKey}">${escapeHtml(survey.riskProfile)}</span>` : ''}
-        <span class="saved-entry-count">${survey.holdings.length} holdings</span>
-      </button>
-      ${isExpanded ? renderSavedHoldings(survey.holdings) : ''}
-    </li>
-  `;
-}
-
-function renderSavedHoldings(holdings) {
-  return `
-    <ul class="saved-holdings-list">
-      ${holdings
-        .map((h) => {
-          const tierInfo = TIER_DISPLAY[h.tier] || TIER_DISPLAY.Partial;
-          return `
-          <li>
-            <span class="saved-holding-ticker">${escapeHtml(h.ticker)}</span>
-            <span class="saved-holding-name">${escapeHtml(h.name)}</span>
-            <span class="tier-badge tier-${tierInfo.cssKey}">${tierInfo.badgeText}</span>
-          </li>
-        `;
-        })
-        .join('')}
-    </ul>
-  `;
 }

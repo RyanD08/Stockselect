@@ -62,9 +62,9 @@ body {
 }
 
 /* Account widget — logged-out ("Log In / Sign Up") and logged-in (email +
-   My Saved Results + Log Out) states, on the same navy header as the logo.
-   Empty (no markup) until Firebase resolves the first auth check, and
-   permanently empty if Firebase never loaded — see auth.js/renderAccountWidget. */
+   Log Out) states, on the same navy header as the logo. Empty (no markup)
+   until Firebase resolves the first auth check, and permanently empty if
+   Firebase never loaded — see auth.js/renderAccountWidget. */
 .account-widget {
   display: flex;
   align-items: center;
@@ -533,6 +533,22 @@ h2 .category-icon {
 .scale-btn.selected svg {
   width: 22px;
   height: 22px;
+}
+
+/* Every question starts on 3 (neutral default) with this checkmark shown
+   in gray, distinguishing "untouched default" from a real answer — even
+   when the real answer turns out to be 3 too. The moment a question is
+   interacted with at all, app.js adds .touched to its .question-row
+   (tracked per-question via state.touchedQuestionIds, independent of
+   which value was clicked), and this rule stops applying — the ordinary
+   navy .scale-btn.selected styling above takes over from then on. Purely
+   visual: state.answers[q.id] is set to the real value either way, so
+   this has no effect on scoring. */
+.question-row:not(.touched) .scale-btn.selected {
+  background: var(--neutral-bg);
+  border-color: var(--border);
+  color: var(--neutral-text);
+  box-shadow: none;
 }
 
 .scale-labels {
@@ -1246,10 +1262,9 @@ h2 .category-icon {
   margin-top: 1.75rem;
 }
 
-/* Account: login/sign-up screen, "Save these results", and the saved-
-   results list. All optional — see auth.js — so these only ever render
-   when Firebase is actually available and (for Save/Saved) the client is
-   logged in. */
+/* Account: login/sign-up screen and "Save My Survey". All optional — see
+   auth.js — so these only ever render when Firebase is actually
+   available. */
 
 .auth-card {
   max-width: 420px;
@@ -1332,124 +1347,16 @@ h2 .category-icon {
   text-decoration: underline;
 }
 
-/* "Save these results" (Results screen) */
+/* "Save My Survey" (Results screen) — a single button; its own label
+   carries every state, so there's no separate confirmation/link variant
+   to style. */
 
 .save-results-row {
   margin: 0.75rem 0 1.25rem;
 }
 
-.save-results-link {
-  border: none;
-  background: none;
-  color: var(--gold);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0;
-}
-
-.save-results-link:hover {
-  text-decoration: underline;
-}
-
-.save-results-confirm {
-  color: var(--success-text);
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
 .save-results-error {
   margin-left: 0.75rem;
-}
-
-/* Saved results list */
-
-.saved-card {
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-.saved-list {
-  list-style: none;
-  margin: 1.25rem 0 0;
-  padding: 0;
-}
-
-.saved-entry {
-  border-top: 1px solid var(--border);
-}
-
-.saved-entry:first-child {
-  border-top: none;
-}
-
-.saved-entry-toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 0.85rem 0;
-  text-align: left;
-}
-
-.saved-entry.expanded .review-chevron {
-  transform: rotate(90deg);
-  color: var(--navy);
-}
-
-.saved-entry-date {
-  font-weight: 600;
-  color: var(--navy);
-  flex-shrink: 0;
-}
-
-.saved-risk-badge {
-  display: inline-flex;
-  align-items: center;
-  font-weight: 600;
-  font-size: 0.78rem;
-  padding: 0.15rem 0.55rem;
-  border-radius: 5px;
-}
-
-.saved-entry-count {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-left: auto;
-}
-
-.saved-holdings-list {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 1rem 1.9rem;
-}
-
-.saved-holdings-list li {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.35rem 0;
-  border-top: 1px solid var(--bg);
-  font-size: 0.88rem;
-}
-
-.saved-holdings-list li:first-child {
-  border-top: none;
-}
-
-.saved-holding-ticker {
-  font-weight: 700;
-  color: var(--navy);
-  width: 4.5rem;
-  flex-shrink: 0;
-}
-
-.saved-holding-name {
-  flex: 1;
-  color: var(--text);
 }
 
 .site-footer {

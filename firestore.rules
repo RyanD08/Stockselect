@@ -1,14 +1,23 @@
 // TrueNorth — Firestore Security Rules
 //
 // HOW TO APPLY: Firebase Console → Firestore Database → Rules tab → replace
-// the current (test-mode) rules with everything below → Publish.
+// the current rules with everything below → Publish.
 // Claude Code cannot deploy these for you — this file is the source of
 // truth to paste in, and should be kept in sync with whatever is live in
 // the console.
 //
-// Data model this matches (see js/auth.js saveSurveyResult/loadSavedSurveys):
-//   users/{userId}                     — no documents are read/written at this level directly
-//   users/{userId}/surveys/{surveyId}  — one saved survey+portfolio snapshot per document
+// Data model this matches (see js/auth.js saveSurveyAnswers):
+//   users/{userId}                        — no documents are read/written at this level directly
+//   users/{userId}/savedSurvey/current    — CURRENT: a user's single most recent saved survey
+//                                            (answers + timestamp only; overwritten on every save)
+//   users/{userId}/surveys/{surveyId}     — LEGACY: an earlier version of this feature saved a
+//                                            full, browsable history of survey+portfolio snapshots
+//                                            here. The app no longer reads or writes this
+//                                            collection (the save/browse flow was reworked to a
+//                                            single answers-only slot above), but any documents
+//                                            already saved here are real user data and were not
+//                                            deleted -- this rule stays so a user who saved before
+//                                            the rework isn't locked out of their own old data.
 //
 // Rules:
 //   - A signed-in user may read and write ONLY documents under their own
@@ -27,8 +36,14 @@ service cloud.firestore {
 
     match /users/{userId} {
 
-      // A user's own saved surveys: full read/write, but only for the
-      // signed-in user whose uid matches this path segment.
+      // Current: the one saved-survey slot this app actually uses now.
+      match /savedSurvey/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Legacy: kept only so pre-rework saved data stays readable/writable
+      // by its own owner -- see the note above. Safe to remove once you've
+      // confirmed no user data still depends on it.
       match /surveys/{surveyId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }

@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'saved'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -12,7 +12,7 @@ const state = {
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
   expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
-  saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save these results" control (see auth.js for the actual save)
+  saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Survey" control (see auth.js for the actual save)
   answers: {},
   homeCountry: 'United States',
   tiesSector: '',
@@ -37,7 +37,6 @@ function renderInPlace() {
   else if (state.view === 'review') renderReview();
   else if (state.view === 'results') renderResults();
   else if (state.view === 'account') renderAccount(); // js/auth.js
-  else if (state.view === 'saved') renderSaved(); // js/auth.js
 }
 
 // For actual navigation (view/step changes) — re-renders and scrolls to
@@ -407,32 +406,37 @@ function chevronIcon() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
 }
 
-// Login is optional (see firebase-config.js/auth.js) — this renders nothing
-// at all if Firebase never loaded, a login prompt if signed out, and the
-// actual Save control (with its saving/saved/error states) once logged in.
+// Login is optional (see firebase-config.js/auth.js) — this renders
+// nothing at all if Firebase never loaded. One button always: its own
+// label carries every state ("Save My Survey" / "Saving…" / "Saved!"), and
+// a signed-out click redirects to login rather than swapping in a
+// different control (see the click handler in renderResults() below).
 function renderSaveResultsControl() {
   if (typeof firebaseReady === 'undefined' || !firebaseReady || !authState.ready) return '';
 
-  if (!authState.user) {
-    return `
-      <p class="save-results-row">
-        <button type="button" id="login-to-save-btn" class="save-results-link">Log in to save these results</button>
-      </p>
-    `;
-  }
-
   const { status, errorMessage } = state.saveResultState;
-  if (status === 'saved') {
-    return '<p class="save-results-row save-results-confirm">✓ Saved — find it anytime under "My Saved Results."</p>';
-  }
+  const label = status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved!' : 'Save My Survey';
   return `
     <p class="save-results-row">
       <button type="button" id="save-results-btn" class="btn btn-secondary" ${status === 'saving' ? 'disabled' : ''}>
-        ${status === 'saving' ? 'Saving…' : 'Save these results'}
+        ${escapeHtml(label)}
       </button>
       ${status === 'error' ? `<span class="error-text save-results-error">${escapeHtml(errorMessage)}</span>` : ''}
     </p>
   `;
+}
+
+// Purely cosmetic: after a successful save, the button's label reverts
+// from "Saved!" back to "Save My Survey" on its own after a couple of
+// seconds, rather than staying changed forever or requiring a click to
+// dismiss. Guards against a stale timer firing after the client has since
+// saved again, hit an error, or navigated away from the results screen.
+function scheduleSaveResultRevert() {
+  setTimeout(() => {
+    if (state.saveResultState.status !== 'saved') return;
+    state.saveResultState = { status: 'idle', errorMessage: null };
+    if (state.view === 'results') renderInPlace();
+  }, 2500);
 }
 
 function renderResults() {
@@ -525,34 +529,29 @@ function renderResults() {
     });
   });
 
-  const loginToSaveBtn = document.getElementById('login-to-save-btn');
-  if (loginToSaveBtn) {
-    loginToSaveBtn.addEventListener('click', () => {
-      authViewState.mode = 'login';
-      authViewState.error = null;
-      authViewState.info = null;
-      state.view = 'account';
-      render();
-    });
-  }
-
   const saveResultsBtn = document.getElementById('save-results-btn');
   if (saveResultsBtn) {
     saveResultsBtn.addEventListener('click', async () => {
+      if (!authState.user) {
+        // Not logged in -- stash the answers as they are right now, send
+        // them to log in, and let auth.js's onAuthStateChanged finish this
+        // save automatically the moment they succeed. No second click.
+        pendingSaveAnswers = { ...state.answers };
+        authViewState.mode = 'login';
+        authViewState.error = null;
+        authViewState.info = null;
+        state.view = 'account';
+        render();
+        return;
+      }
       state.saveResultState = { status: 'saving', errorMessage: null };
       renderInPlace();
       try {
-        await saveSurveyResult({
-          answers: state.answers,
-          homeCountry: state.homeCountry,
-          tiesSector: state.tiesSector,
-          timeHorizon: state.timeHorizon,
-          riskProfile,
-          holdings,
-        });
+        await saveSurveyAnswers(state.answers);
         state.saveResultState = { status: 'saved', errorMessage: null };
+        scheduleSaveResultRevert();
       } catch (err) {
-        state.saveResultState = { status: 'error', errorMessage: 'Could not save your results. Please try again.' };
+        state.saveResultState = { status: 'error', errorMessage: 'Could not save your survey. Please try again.' };
       }
       renderInPlace();
     });
