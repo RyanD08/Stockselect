@@ -1776,11 +1776,38 @@ h2 .category-icon {
   border-radius: 4px;
 }
 
+/* 1-3 red, 4-6 yellow, 7-10 green -- same danger/warn/success tokens used
+   for tier badges and risk badges elsewhere, so a "bad" category score
+   reads the same as everywhere else on the site. */
+.ticker-category-fill-low {
+  background: var(--danger-text);
+}
+
+.ticker-category-fill-mid {
+  background: var(--warn-text);
+}
+
+.ticker-category-fill-high {
+  background: var(--success-text);
+}
+
 .ticker-category-score {
   color: var(--navy);
   font-weight: 700;
   text-align: right;
   white-space: nowrap;
+}
+
+.ticker-category-score-low {
+  color: var(--danger-text);
+}
+
+.ticker-category-score-mid {
+  color: var(--warn-text);
+}
+
+.ticker-category-score-high {
+  color: var(--success-text);
 }
 
 .ticker-raw-data {

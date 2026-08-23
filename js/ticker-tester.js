@@ -360,6 +360,14 @@ function computeCategoryScores(company, entry, ctx) {
   });
 }
 
+// 1-3 red, 4-6 yellow, 7-10 green -- purely a display bucket for the score
+// list below; doesn't touch computeCategoryScores' own math at all.
+function categoryScoreBucket(score) {
+  if (score <= 3) return 'low';
+  if (score <= 6) return 'mid';
+  return 'high';
+}
+
 function renderCategorySection(company, categoryScores) {
   return `
     <div class="ticker-categories">
@@ -372,15 +380,16 @@ function renderCategorySection(company, categoryScores) {
         </div>
         <ul class="ticker-category-list">
           ${categoryScores
-            .map(
-              (c) => `
+            .map((c) => {
+              const bucket = categoryScoreBucket(c.score);
+              return `
             <li class="ticker-category-row">
               <span class="ticker-category-label">${escapeHtml(c.label)}</span>
-              <span class="ticker-category-track"><span class="ticker-category-fill" style="width:${(c.score / 10) * 100}%"></span></span>
-              <span class="ticker-category-score">${c.score}/10</span>
+              <span class="ticker-category-track"><span class="ticker-category-fill ticker-category-fill-${bucket}" style="width:${(c.score / 10) * 100}%"></span></span>
+              <span class="ticker-category-score ticker-category-score-${bucket}">${c.score}/10</span>
             </li>
-          `
-            )
+          `;
+            })
             .join('')}
         </ul>
       </div>
