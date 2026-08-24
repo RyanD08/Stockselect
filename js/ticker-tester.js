@@ -421,9 +421,25 @@ function tickerTierDisplay(tier) {
 // average entirely rather than counted as a false "neutral," so it can't
 // silently drag a category toward the middle. Risk questions (26/28/29)
 // have no such data-gate in the main engine either, so none is applied
-// here. Alignment values span roughly [-1, +1]; rescaled onto [1, 10]
-// with 5.5 (not 1) as the neutral midpoint, matching the main engine's own
-// "50 is neutral" convention on its 0-100 scale.
+// here.
+//
+// 2026-08-24: rescaled from a "5.5 is neutral" midpoint onto "10 is the
+// starting point, only penalties pull it down" -- Ticker Tester's own
+// display choice, not a change to entry.score/tier/rationale or anything
+// scoring.js computes. Several categories (Ethical Screens most visibly)
+// are made entirely of exclusionary-type questions, whose alignment can
+// only ever be 0 (no violation) or negative (a real one) -- never
+// positive, since there's no "reward" for merely not selling tobacco. A
+// company with zero violations averaged to exactly 0 alignment under the
+// old midpoint formula, which rounded up to a flat, uninformative 6/10
+// every time, regardless of the actual answers -- that category could
+// never show green for any company. Under score = 10 + 9*avgAlignment,
+// clamped to [1,10], the same zero-violations company now reads a clean
+// 10/10, and only actual negative alignment pulls it down from there,
+// proportionally. Categories that mix in preference-type questions
+// (Environmental, etc.) already capped at 10 for their best case, so this
+// only changes what "no negatives" looks like -- it no longer needs a
+// literal reward signal to reach the top of the scale.
 function computeCategoryScores(company, entry, ctx) {
   const financialAlignment = financialQualityAlignment(company, deriveRiskProfile(state.answers), ctx.timeHorizon);
 
@@ -441,7 +457,7 @@ function computeCategoryScores(company, entry, ctx) {
     });
 
     const avgAlignment = weightTotal > 0 ? weightedSum / weightTotal : 0;
-    const score = Math.round(Math.min(10, Math.max(1, 5.5 + 4.5 * avgAlignment)));
+    const score = Math.round(Math.min(10, Math.max(1, 10 + 9 * avgAlignment)));
     return { key: category.key, label: category.label, score };
   });
 }
