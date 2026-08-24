@@ -412,76 +412,52 @@ function tickerTierDisplay(tier) {
   return TIER_DISPLAY[tier] || TIER_DISPLAY.Partial;
 }
 
-// How hard a single fully-weighted (importance 5/5), full-severity
-// (alignment -1, e.g. a High-confidence sin-stock flag) violation knocks a
-// category down from its 10/10 starting point: 10 * (1 - 0.65) = 3.5,
-// rounds to 4 -- deliberately landing in the "3-4/10" range asked for. A
-// lower-importance or lower-confidence violation scales down from there
-// (see the penalty formula below); it does not change how many violations
-// stack.
-const VIOLATION_PENALTY_SCALE = 0.65;
-
-// One 1-10 score per category, starting every category at a clean 10 and
-// multiplying in a penalty only for each question the company actually
-// violates -- not a weighted average of every question's alignment
-// (including all the ones with nothing wrong), which is what silently
-// diluted a single real violation into an unnoticeable dent under both
-// prior formulas here.
+// One 1-10 score per category, weighted-average of that category's own
+// per-question alignment values (already computed by scoreCompany/
+// buildScoredEntry above -- see entry.alignments) by the client's raw 1-5
+// importance rating on each question. A question with no verifiable data
+// for this company (questionHasData -- values questions 1-25 only, same
+// as scoreCompany's own unitImportance gating) is excluded from the
+// average entirely rather than counted as a false "neutral," so it can't
+// silently drag a category toward the middle. Risk questions (26/28/29)
+// have no such data-gate in the main engine either, so none is applied
+// here.
 //
-// 2026-08-24 (second pass): earlier today this used
-// score = 10 + 9*avgAlignment, averaging a category's violations in with
-// every clean (alignment 0) question it contains. That fixed "clean
-// companies always show 6/10" (see the prior paragraph below, kept for
-// history), but a category with e.g. six exclusionary questions still
-// diluted one real violation down to a barely-visible dent (avgAlignment
-// only -0.17 for one flagged question out of six equally-weighted ones),
-// which isn't what "only get penalized" was meant to feel like once there
-// actually is something wrong. Per explicit follow-up request: one
-// violation should cut significantly (3-4/10 at max importance), multiple
-// violations should cut further, and severity should scale with how
-// important the client said that question was.
-//
-// Formula: for each question with alignment < 0 (a real violation --
-// exclusionary questions are the common case, since they can only ever be
-// 0 or negative, never positive), multiply the running score by
-// (1 - penalty), where penalty = importanceWeight * severity * 0.65:
-//   - importanceWeight = the client's 1-5 importance rating / 5, so a
-//     "this barely matters" (1/5) violation is heavily discounted and a
-//     "this is a hard requirement" (5/5) violation hits at full strength.
-//   - severity = min(1, -alignment) -- already carries the data source's
-//     own confidence weighting from scoring.js (High/Medium/Low/None
-//     confidence -> 1.0/0.7/0.4/0 magnitude), so a shakier data source
-//     produces a proportionally softer penalty, not a full one.
-// Violations multiply together rather than add, so a second violation
-// compounds on what the first already took off (further off an already
-// -reduced score) instead of just summing linearly -- matching "multiple
-// violations cutting it down even further." A company with zero
-// violations never enters the penalty branch at all, so it stays exactly
-// 10 regardless of how many clean questions the category has -- no
-// dilution possible in either direction. Positive alignment (the
-// preference-type questions that can mix into categories like
-// Environmental) still does nothing to raise the score above its 10
-// starting point, unchanged from the prior pass -- this is still "only
-// get penalized," never rewarded.
+// 2026-08-24: rescaled from a "5.5 is neutral" midpoint onto "10 is the
+// starting point, only penalties pull it down" -- Ticker Tester's own
+// display choice, not a change to entry.score/tier/rationale or anything
+// scoring.js computes. Several categories (Ethical Screens most visibly)
+// are made entirely of exclusionary-type questions, whose alignment can
+// only ever be 0 (no violation) or negative (a real one) -- never
+// positive, since there's no "reward" for merely not selling tobacco. A
+// company with zero violations averaged to exactly 0 alignment under the
+// old midpoint formula, which rounded up to a flat, uninformative 6/10
+// every time, regardless of the actual answers -- that category could
+// never show green for any company. Under score = 10 + 9*avgAlignment,
+// clamped to [1,10], the same zero-violations company now reads a clean
+// 10/10, and only actual negative alignment pulls it down from there,
+// proportionally. Categories that mix in preference-type questions
+// (Environmental, etc.) already capped at 10 for their best case, so this
+// only changes what "no negatives" looks like -- it no longer needs a
+// literal reward signal to reach the top of the scale.
 function computeCategoryScores(company, entry, ctx) {
   const financialAlignment = financialQualityAlignment(company, deriveRiskProfile(state.answers), ctx.timeHorizon);
 
   return CATEGORIES.map((category) => {
     const questions = questionsForCategory(category.key).filter((q) => q.type !== 'horizon');
-    let multiplier = 1;
+    let weightedSum = 0;
+    let weightTotal = 0;
 
     questions.forEach((q) => {
       if (q.id <= 25 && !questionHasData(q.id, company, ctx)) return;
-      const alignment = q.id === 27 ? 1 - 2 * financialAlignment : entry.alignments[q.id];
-      if (alignment >= 0) return;
       const importance = state.answers[q.id] || 3;
-      const importanceWeight = importance / 5;
-      const severity = Math.min(1, -alignment);
-      const penalty = importanceWeight * severity * VIOLATION_PENALTY_SCALE;
-      multiplier *= 1 - penalty;
+      const alignment = q.id === 27 ? 1 - 2 * financialAlignment : entry.alignments[q.id];
+      weightedSum += importance * alignment;
+      weightTotal += importance;
     });
 
-    const score = Math.round(Math.min(10, Math.max(1, 10 * multiplier)));
+    const avgAlignment = weightTotal > 0 ? weightedSum / weightTotal : 0;
+    const score = Math.round(Math.min(10, Math.max(1, 10 + 9 * avgAlignment)));
     return { key: category.key, label: category.label, score };
   });
 }
