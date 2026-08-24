@@ -736,7 +736,14 @@ function lowerFirst(str) {
   return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
-function buildRationale(alignments, answers, financialImportance, financialAlignment, valuesOverReturnsImportance, valuesOverReturnsAlignment) {
+// Q27 ("willingness to accept lower returns for values alignment") is
+// deliberately excluded from the candidate pool below -- it still
+// contributes to the actual numeric score (see its dual role in
+// scoreCompany), but naming it as a reason in the rationale sentence reads
+// as circular ("this company scores well because you're willing to accept
+// a lower score for it") rather than a real, legible reason the way every
+// other candidate here is.
+function buildRationale(alignments, answers, financialImportance, financialAlignment) {
   const candidates = SCORING_UNITS.map((unit) => ({
     label: unitLabel(unit),
     importance: unitRawRating(unit, answers),
@@ -750,7 +757,6 @@ function buildRationale(alignments, answers, financialImportance, financialAlign
       alignment: alignments[qId],
     });
   });
-  candidates.push({ label: getQuestion(27).short, importance: valuesOverReturnsImportance, alignment: valuesOverReturnsAlignment });
 
   const highPriority = candidates.filter((c) => c.importance >= HIGH_PRIORITY_THRESHOLD);
   const pool = highPriority.length > 0 ? highPriority : candidates;
@@ -1002,14 +1008,7 @@ const BELOW_VALUES_THRESHOLD_NOTE =
   'Shown only to fill out your 15-company portfolio because not enough companies met that bar within your other preferences.';
 
 function buildScoredEntry(company, answers, ctx, riskProfile) {
-  const {
-    score,
-    alignments,
-    financialImportance,
-    financialAlignment,
-    valuesOverReturnsImportance,
-    valuesOverReturnsAlignment,
-  } = scoreCompany(company, answers, ctx, riskProfile);
+  const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
   const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
   const cautionFlags = detectCautionFlags(company);
   // Tier cap: a caution flag overrides an otherwise-Strong values match —
@@ -1027,7 +1026,7 @@ function buildScoredEntry(company, answers, ctx, riskProfile) {
     tier,
     conflicts,
     cautionFlags,
-    rationale: buildRationale(alignments, answers, financialImportance, financialAlignment, valuesOverReturnsImportance, valuesOverReturnsAlignment),
+    rationale: buildRationale(alignments, answers, financialImportance, financialAlignment),
     note: conflicts.length > 0 ? buildPartialMatchNote(conflicts) : null,
     controversyCount: controversyCount(company),
   };
