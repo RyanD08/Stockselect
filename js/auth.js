@@ -1149,3 +1149,153 @@ function loadPortfolioIntoResults(portfolio) {
   state.view = 'results';
   render();
 }
+
+// --- Shareable results link (state.view = 'sharedResult') ---------------
+//
+// Public, permanent snapshots created by the Results screen's "Share My
+// Results" button (see the click handler in app.js's renderResults) --
+// unlike everything else in this file, deliberately NOT login-gated: the
+// Results screen itself doesn't require an account to reach, so sharing it
+// shouldn't either. Each snapshot holds only ticker/name/sector/tier per
+// holding -- never the detailed rationale, financial-caution text, or the
+// sharer's actual survey answers -- so opening a shared link never exposes
+// more than a tier badge per holding implies. See firestore.rules for the
+// matching public-create/no-update/no-list rule.
+
+function sharedCollection() {
+  return firebaseDb.collection('shared');
+}
+
+async function createSharedResult({ riskProfile, topPriorities, holdings }) {
+  if (!firebaseReady) throw new Error('Sharing is unavailable right now.');
+  const doc = await sharedCollection().add({
+    riskProfile,
+    topPriorities: topPriorities.slice(0, 5),
+    holdings: holdings.slice(0, 20).map((entry) => ({
+      ticker: entry.company.ticker,
+      name: entry.company.name,
+      sector: entry.company.sector,
+      tier: entry.tier,
+    })),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+  });
+  return doc.id;
+}
+
+const sharedResultViewState = {
+  loading: true,
+  error: null,
+  data: null, // { riskProfile, topPriorities, holdings } once loaded
+};
+
+// Entered via index.html's own ?shared=<id> query param, checked once at
+// startup in app.js's init() -- see there for how a visitor lands here in
+// the first place. No dataset/login dependency at all: everything needed
+// to render is already baked into the snapshot doc itself.
+async function openSharedResultView(shareId) {
+  state.view = 'sharedResult';
+  sharedResultViewState.loading = true;
+  sharedResultViewState.error = null;
+  sharedResultViewState.data = null;
+  render();
+  try {
+    if (!firebaseReady) throw new Error('Sharing is unavailable right now.');
+    const doc = await sharedCollection().doc(shareId).get();
+    if (!doc.exists) {
+      sharedResultViewState.error = "This shared portfolio link doesn't exist, or has been removed.";
+    } else {
+      sharedResultViewState.data = doc.data();
+    }
+  } catch (err) {
+    console.error('openSharedResultView failed:', err);
+    sharedResultViewState.error = describeFirestoreError(err, 'Could not load this shared portfolio');
+  }
+  sharedResultViewState.loading = false;
+  renderInPlace();
+}
+
+function renderSharedResult() {
+  if (sharedResultViewState.loading) {
+    appEl.innerHTML = `
+      <section class="card shared-result-card">
+        <p class="eyebrow">Shared Portfolio</p>
+        <h1>Loading…</h1>
+      </section>
+    `;
+    return;
+  }
+
+  if (sharedResultViewState.error) {
+    appEl.innerHTML = `
+      <section class="card shared-result-card">
+        <p class="eyebrow">Shared Portfolio</p>
+        <h1>Link not found</h1>
+        <p class="error-text">${escapeHtml(sharedResultViewState.error)}</p>
+        <div class="nav-row">
+          <button type="button" id="shared-result-cta-btn" class="btn btn-primary">Take the TrueNorth Survey</button>
+        </div>
+      </section>
+    `;
+    wireSharedResultButtons();
+    return;
+  }
+
+  const { riskProfile, topPriorities, holdings } = sharedResultViewState.data;
+  appEl.innerHTML = `
+    <section class="card shared-result-card">
+      <p class="eyebrow">Shared Portfolio</p>
+      <h1>A TrueNorth Portfolio</h1>
+      <p class="lede">Someone built this values-guided portfolio with TrueNorth — here's a summary of what it includes.</p>
+
+      <div class="summary-grid">
+        <div class="summary-box">
+          <h3>Top Priorities</h3>
+          ${
+            topPriorities.length > 0
+              ? `<ul class="priority-list">${topPriorities.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
+              : '<p class="muted">Priorities were evenly balanced across categories.</p>'
+          }
+        </div>
+        <div class="summary-box">
+          <h3><span class="compass-motif">${compassMotifIcon()}</span>Risk Profile</h3>
+          <p class="risk-badge risk-${riskProfile.toLowerCase()}"><span class="risk-icon">${riskProfileIcon(riskProfile)}</span>${escapeHtml(riskProfile)}</p>
+        </div>
+      </div>
+
+      <h2>Holdings</h2>
+      <ul class="shared-result-holdings">
+        ${holdings.map(renderSharedResultHolding).join('')}
+      </ul>
+
+      <div class="nav-row">
+        <button type="button" id="shared-result-cta-btn" class="btn btn-primary btn-large">Build Your Own TrueNorth Portfolio</button>
+      </div>
+    </section>
+  `;
+  wireSharedResultButtons();
+}
+
+function renderSharedResultHolding(holding) {
+  const display = TIER_DISPLAY[holding.tier] || TIER_DISPLAY.Partial; // js/app.js
+  return `
+    <li class="shared-result-holding">
+      <span class="shared-result-ticker">${escapeHtml(holding.ticker)}</span>
+      <span class="shared-result-name">${escapeHtml(holding.name)}</span>
+      <span class="shared-result-sector">${escapeHtml(holding.sector)}</span>
+      <span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span>
+    </li>
+  `;
+}
+
+// One button either way (error state or loaded state) -- both just clear
+// the ?shared= param and land on the intro screen, same destination a
+// first-time visitor would start from, ready to take the survey themselves.
+function wireSharedResultButtons() {
+  const btn = document.getElementById('shared-result-cta-btn');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    history.replaceState(null, '', location.pathname);
+    state.view = 'intro';
+    render();
+  });
+}

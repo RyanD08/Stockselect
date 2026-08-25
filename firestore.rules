@@ -40,11 +40,28 @@
 //   saved under an earlier design isn't locked out of their own old data --
 //   safe to remove once you've confirmed nothing still depends on them.
 //
+//   shared/{shareId}                          — CURRENT (2026-08-25): public, permanent snapshots
+//                                              created by the Results screen's "Share My Results"
+//                                              button (see createSharedResult in auth.js).
+//                                              Deliberately NOT under users/{userId} and NOT
+//                                              login-gated -- the Results screen itself doesn't
+//                                              require an account, so sharing it doesn't either.
+//                                              Each doc holds only { riskProfile, topPriorities,
+//                                              holdings: [{ticker,name,sector,tier}], createdAt } --
+//                                              never the detailed rationale, financial-caution
+//                                              text, or the sharer's actual survey answers, so a
+//                                              shared link never exposes more than a tier badge per
+//                                              holding implies.
+//
 // Rules:
 //   - A signed-in user may read and write ONLY documents under their own
 //     users/{userId} (matched against request.auth.uid, not anything
 //     client-supplied) — never another user's data.
-//   - Signed-out requests are rejected outright.
+//   - Signed-out requests are rejected outright, EXCEPT reading or creating
+//     a shared/{shareId} snapshot (see above) — those are intentionally
+//     public. Even there, no one can update or delete an existing snapshot
+//     (immutable once created), and the collection can't be listed/browsed
+//     — a doc is only reachable by someone who already has its exact link.
 //   - Everything not explicitly matched below is denied by the final
 //     catch-all rule (default-deny), so a future collection added to this
 //     database without a matching rule here is inaccessible rather than
@@ -94,6 +111,26 @@ service cloud.firestore {
       match /surveys/{surveyId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
+    }
+
+    // Public, permanent share snapshots -- see the data-model note at the
+    // top of this file. No auth check on get/create (that's the point),
+    // but validated: only the exact fields the app writes, sane size caps
+    // so this can't be abused as free-form public storage, and a
+    // server-set timestamp (request.time, not client-supplied) so a
+    // snapshot's creation time can't be spoofed. `list` is never granted,
+    // so the collection can't be enumerated/browsed even though individual
+    // docs are public -- only reachable via its own exact link.
+    match /shared/{shareId} {
+      allow get: if true;
+      allow create: if request.resource.data.keys().hasAll(['riskProfile', 'topPriorities', 'holdings', 'createdAt'])
+                    && request.resource.data.riskProfile in ['Conservative', 'Balanced', 'Growth']
+                    && request.resource.data.topPriorities is list
+                    && request.resource.data.topPriorities.size() <= 5
+                    && request.resource.data.holdings is list
+                    && request.resource.data.holdings.size() <= 20
+                    && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
     }
 
     // Default-deny: anything not matched above (including the bare

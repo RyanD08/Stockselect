@@ -1564,6 +1564,79 @@ h2 .category-icon {
   text-decoration: underline;
 }
 
+.share-results-row {
+  margin: 0.75rem 0 1.25rem;
+}
+
+.share-results-error {
+  margin-left: 0.75rem;
+}
+
+.share-results-done {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.share-results-link-input {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 26rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+/* Shared-result recipient screen (?shared=<id>) */
+
+.shared-result-card {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.shared-result-holdings {
+  list-style: none;
+  margin: 1rem 0 1.75rem;
+  padding: 0;
+}
+
+.shared-result-holding {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.shared-result-holding:first-child {
+  border-top: none;
+}
+
+.shared-result-ticker {
+  font-weight: 700;
+  color: var(--navy);
+  min-width: 3.2rem;
+}
+
+.shared-result-name {
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shared-result-sector {
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
 /* My Portfolios list */
 
 .portfolios-card {

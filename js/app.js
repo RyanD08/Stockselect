@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare' | 'sharedResult'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -13,6 +13,7 @@ const state = {
   expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
   saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Portfolio" control (see auth.js for the actual save)
+  shareResultState: { status: 'idle', url: null, errorMessage: null }, // 'idle' | 'sharing' | 'shared' | 'error' — the Results screen's "Share My Results" control (see createSharedResult in auth.js)
   hasPersonalizedAnswers: false, // true once this session has real answers to score against: finished the survey (set below) or loaded a saved portfolio (see auth.js loadPortfolioIntoResults) — read by ticker-tester.js
   answers: {},
   homeCountry: 'United States',
@@ -42,6 +43,7 @@ function renderInPlace() {
   else if (state.view === 'watchlist') renderMyWatchlist(); // js/auth.js
   else if (state.view === 'tickerTester') renderTickerTester(); // js/ticker-tester.js
   else if (state.view === 'tickerCompare') renderTickerCompare(); // js/ticker-tester.js
+  else if (state.view === 'sharedResult') renderSharedResult(); // js/auth.js
 
   // Unconditional, regardless of which view just rendered: the ☆/★
   // watchlist toggle button (js/auth.js) can appear on several different
@@ -466,6 +468,35 @@ function scheduleSaveResultRevert() {
   }, 2500);
 }
 
+// Unlike renderSaveResultsControl above, no login check at all -- sharing
+// works the same whether or not this visitor is signed in, matching how
+// the Results screen itself is already reachable without an account (see
+// createSharedResult/firestore.rules for why this is intentionally public).
+// Only gated on Firestore actually being available.
+function renderShareResultsControl() {
+  if (typeof firebaseReady === 'undefined' || !firebaseReady) return '';
+
+  const { status, url, errorMessage } = state.shareResultState;
+
+  if (status === 'shared') {
+    return `
+      <div class="share-results-row share-results-done">
+        <input type="text" class="share-results-link-input" value="${escapeHtml(url)}" readonly />
+        <button type="button" id="copy-share-link-btn" class="btn-link-action">Copy Link</button>
+      </div>
+    `;
+  }
+
+  return `
+    <p class="share-results-row">
+      <button type="button" id="share-results-btn" class="btn btn-secondary" ${status === 'sharing' ? 'disabled' : ''}>
+        ${status === 'sharing' ? 'Creating link…' : 'Share My Results'}
+      </button>
+      ${status === 'error' ? `<span class="error-text share-results-error">${escapeHtml(errorMessage)}</span>` : ''}
+    </p>
+  `;
+}
+
 function renderResults() {
   const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers, {
     homeCountry: state.homeCountry,
@@ -484,6 +515,7 @@ function renderResults() {
         <button type="button" id="ticker-tester-cta-btn" class="btn btn-primary btn-large">Test a Company in Ticker Tester</button>
       </p>
       ${renderSaveResultsControl()}
+      ${renderShareResultsControl()}
 
       <div class="summary-grid">
         <div class="summary-box">
@@ -601,6 +633,45 @@ function renderResults() {
     });
   }
 
+  const shareResultsBtn = document.getElementById('share-results-btn');
+  if (shareResultsBtn) {
+    shareResultsBtn.addEventListener('click', async () => {
+      state.shareResultState = { status: 'sharing', url: null, errorMessage: null };
+      renderInPlace();
+      try {
+        const shareId = await createSharedResult({
+          riskProfile,
+          topPriorities: topPriorities.map((q) => q.short),
+          holdings,
+        }); // js/auth.js
+        const url = `${location.origin}${location.pathname}?shared=${shareId}`;
+        state.shareResultState = { status: 'shared', url, errorMessage: null };
+        logAnalyticsEvent('share_created', { holdings_count: holdings.length }); // js/firebase-config.js
+      } catch (err) {
+        console.error('createSharedResult failed:', err);
+        state.shareResultState = { status: 'error', url: null, errorMessage: describeFirestoreError(err, 'Could not create a share link') };
+      }
+      renderInPlace();
+    });
+  }
+
+  const copyShareLinkBtn = document.getElementById('copy-share-link-btn');
+  if (copyShareLinkBtn) {
+    copyShareLinkBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(state.shareResultState.url);
+        copyShareLinkBtn.textContent = 'Copied!';
+        setTimeout(() => {
+          copyShareLinkBtn.textContent = 'Copy Link';
+        }, 2000);
+      } catch (err) {
+        // Clipboard API can fail (permissions, non-secure context) -- the
+        // link is already visible and selectable in the input field
+        // either way, so this is a soft failure, not worth its own message.
+      }
+    });
+  }
+
   const goToMyPortfoliosBtn = document.getElementById('go-to-my-portfolios-btn');
   if (goToMyPortfoliosBtn) {
     goToMyPortfoliosBtn.addEventListener('click', openMyPortfoliosView);
@@ -655,6 +726,7 @@ function resetSurveyState() {
   state.expandedFinancialDetails.clear();
   state.simulationBreakdownExpanded = false;
   state.saveResultState = { status: 'idle', errorMessage: null };
+  state.shareResultState = { status: 'idle', url: null, errorMessage: null };
   state.hasPersonalizedAnswers = false;
   state.touchedQuestionIds.clear();
   state.reviewExpanded.clear();
@@ -1104,7 +1176,18 @@ async function init() {
   initLogoHomeLink();
   initSiteDisclaimerToggle();
   initSiteNavMenu();
-  render();
+
+  // A ?shared=<id> link (see createSharedResult/renderShareResultsControl)
+  // lands here before the usual intro screen -- doesn't need state.dataset
+  // at all, since everything to render is already baked into the snapshot
+  // doc itself, so it's checked first rather than waiting on the load below.
+  const sharedId = new URLSearchParams(location.search).get('shared');
+  if (sharedId) {
+    openSharedResultView(sharedId); // js/auth.js -- handles its own render()
+  } else {
+    render();
+  }
+
   try {
     state.dataset = await loadDataset();
   } catch (err) {
