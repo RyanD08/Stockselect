@@ -1649,6 +1649,34 @@ h2 .category-icon {
   width: 100%;
 }
 
+/* Password field with an inline Show/Hide toggle -- used for both the
+   password and retype-password inputs on the login/signup screen. */
+.password-field-wrap {
+  position: relative;
+}
+
+.password-field-wrap input {
+  padding-right: 3.6rem;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+}
+
+.password-toggle-btn:hover {
+  color: var(--navy);
+}
+
 /* Sign-up-only "I have read the Terms of Service" checkbox row -- required
    before account creation (see the submit handler in renderAccount(),
    js/auth.js). The Terms of Service words themselves open the modal below
