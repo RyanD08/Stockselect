@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare' | 'sharedResult' | 'learn' | 'learnLesson'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare' | 'sharedResult' | 'learn' | 'learnLesson' | 'myBadges'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -46,6 +46,7 @@ function renderInPlace() {
   else if (state.view === 'sharedResult') renderSharedResult(); // js/auth.js
   else if (state.view === 'learn') renderLearnHub(); // js/learn.js
   else if (state.view === 'learnLesson') renderLearnLesson(); // js/learn.js
+  else if (state.view === 'myBadges') renderMyBadges(); // js/badges.js
 
   // Unconditional, regardless of which view just rendered: the ☆/★
   // watchlist toggle button (js/auth.js) can appear on several different
@@ -1184,6 +1185,17 @@ function navigateToLearn() {
   }, 'learn');
 }
 
+function navigateToMyBadges() {
+  closeHamburgerDropdown();
+  if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+    openMyBadgesView(); // js/badges.js
+    return;
+  }
+  redirectGatedNavItemToLogin(() => {
+    pendingMyBadgesRedirect = true; // js/badges.js
+  }, 'my_badges');
+}
+
 // Rebuilt (not just re-wired) on init and every auth-state change -- see
 // its two call sites -- since the one auth-dependent piece of its content
 // (the signed-in client's email, shown as a non-interactive line at the
@@ -1200,6 +1212,7 @@ function renderSiteNavMenu() {
     <button type="button" id="nav-menu-portfolios" class="hamburger-item" role="menuitem">My Portfolios</button>
     <button type="button" id="nav-menu-watchlist" class="hamburger-item" role="menuitem">My Watchlist</button>
     <button type="button" id="nav-menu-learn" class="hamburger-item" role="menuitem">Learn</button>
+    <button type="button" id="nav-menu-my-badges" class="hamburger-item" role="menuitem">My Badges</button>
   `;
 
   document.getElementById('nav-menu-tickertester').addEventListener('click', navigateToTickerTester);
@@ -1207,6 +1220,7 @@ function renderSiteNavMenu() {
   document.getElementById('nav-menu-portfolios').addEventListener('click', navigateToPortfolios);
   document.getElementById('nav-menu-watchlist').addEventListener('click', navigateToWatchlist);
   document.getElementById('nav-menu-learn').addEventListener('click', navigateToLearn);
+  document.getElementById('nav-menu-my-badges').addEventListener('click', navigateToMyBadges);
 }
 
 function initSiteNavMenu() {
@@ -1240,6 +1254,7 @@ function initDesktopNavBar() {
   document.getElementById('nav-bar-portfolios').addEventListener('click', navigateToPortfolios);
   document.getElementById('nav-bar-watchlist').addEventListener('click', navigateToWatchlist);
   document.getElementById('nav-bar-learn').addEventListener('click', navigateToLearn);
+  document.getElementById('nav-bar-my-badges').addEventListener('click', navigateToMyBadges);
 }
 
 async function init() {

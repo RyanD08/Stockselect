@@ -448,6 +448,8 @@ async function openLearnHub() {
   render();
   if (!learnState.progressLoaded) {
     await loadLearnProgress();
+    if (!badgeState.loaded) await loadBadgeState(); // js/badges.js
+    await checkAndAwardBadges(false); // js/badges.js -- silent backfill, see that function's own comment
     renderInPlace();
   }
 }
@@ -455,6 +457,13 @@ async function openLearnHub() {
 function renderLearnHub() {
   const completedCount = LESSONS.filter((l) => learnState.progress[l.id] && learnState.progress[l.id].completed).length;
   const pct = LESSONS.length > 0 ? Math.round((completedCount / LESSONS.length) * 100) : 0;
+  const allComplete = completedCount === LESSONS.length;
+  // Consumed here, once: 'opening' plays the gift-box CSS animation this
+  // one render, then the flag is cleared so every render after this one
+  // (including a re-render from the exact same click) shows the plain
+  // 'open' resting state instead of replaying it -- see badges.js.
+  const giftLidState = allComplete ? (badgeState.hubAnimationPending ? 'opening' : 'open') : 'closed';
+  badgeState.hubAnimationPending = false;
 
   appEl.innerHTML = `
     <section class="card learn-hub-card">
@@ -462,9 +471,12 @@ function renderLearnHub() {
       <h1>Values-Investing Lessons</h1>
       <p class="lede">Short lessons on the concepts behind TrueNorth’s scoring, each with a quick quiz to check your understanding. Optional -- nothing else on the site requires finishing these.</p>
 
-      <div class="learn-progress-summary">
-        <div class="learn-progress-track"><div class="learn-progress-fill" style="width:${pct}%"></div></div>
-        <span class="learn-progress-label">${completedCount} of ${LESSONS.length} lessons complete</span>
+      <div class="learn-progress-wrap">
+        <div class="learn-progress-bar-row">
+          <div class="learn-progress-track"><div class="learn-progress-fill" style="width:${pct}%"></div></div>
+          <div class="learn-progress-giftbox">${giftBoxIcon(giftLidState)}</div>
+        </div>
+        <p class="learn-progress-label">${completedCount} of ${LESSONS.length} lessons complete</p>
       </div>
 
       <ul class="learn-lesson-list">
@@ -620,6 +632,8 @@ async function handleQuizSubmit(lesson) {
   render();
 
   await recordLessonCompletion(lesson.id, score, total);
+  if (!badgeState.loaded) await loadBadgeState(); // js/badges.js -- defensive; openLearnHub already loads this on the normal path
+  await checkAndAwardBadges(true); // js/badges.js -- the real trigger: pops up a badge earned this attempt
 }
 
 function renderLearnLessonResult(lesson) {

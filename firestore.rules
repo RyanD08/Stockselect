@@ -32,6 +32,15 @@
 //                                              { completed, lastScore, bestScore, total, updatedAt }
 //                                              -- never the lesson content itself, which is static
 //                                              and ships with the app.
+//   users/{userId}/badges/{badgeId}          — CURRENT (2026-08-25): which achievement badges this
+//                                              user has earned (see checkAndAwardBadges in
+//                                              js/badges.js). One doc per EARNED badge only, id
+//                                              matching the badge's own id (e.g.
+//                                              "values-literacy-certified"), holding just
+//                                              { earned, earnedAt }. Which badge (if any) is
+//                                              currently equipped is a separate field on the
+//                                              existing users/{userId}/meta/badges doc below, not
+//                                              stored here.
 //   users/{userId}/savedSurveys/{surveyId}   — LEGACY (superseded 2026-08-23b): the same feature
 //                                              under its old "survey" naming, before saved results
 //                                              were renamed to "portfolios." Its data is copied into
@@ -101,6 +110,14 @@ service cloud.firestore {
       // Current: the Learn section's per-lesson completion tracking (see
       // js/learn.js). Same per-owner access rule as everything else here.
       match /learnProgress/{lessonId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Current: which achievement badges this user has earned (see
+      // js/badges.js). Same per-owner access rule as everything else here
+      // -- the equipped-badge pointer itself lives in meta/badges above,
+      // not in this collection.
+      match /badges/{badgeId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
