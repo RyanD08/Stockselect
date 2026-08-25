@@ -52,6 +52,25 @@
  * Chart.js is loaded via CDN (see index.html) and degrades to just the
  * numeric list (no crash, no blank space) if it fails to load, matching
  * this site's existing pattern for every other optional external SDK.
+ *
+ * 2026-08-25: added Compare Two Companies -- a login-gated second mode of
+ * this same screen (state.view = 'tickerCompare', see enterTickerCompare
+ * below) that puts two companies side by side with one overlaid radar
+ * chart and a plain-language verdict on which better fits the client's
+ * values. Reuses every existing building block (buildCompanyScoreEntry,
+ * computeCategoryScores, tickerTierDisplay, renderRawCompanyData,
+ * hasPersonalizationSource) with zero duplicate scoring logic -- see the
+ * comment above renderCompareVerdict for the one genuinely new piece (a
+ * head-to-head financial tiebreaker), since sortScoredEntries only ever
+ * ranks one company against the field, never compares two specific
+ * companies to each other, so there was nothing existing to call into for
+ * that specific step. Gating: the "Compare Two Companies" button is
+ * always visible to a logged-out visitor, but clicking it shows an inline
+ * login-required prompt in place of entering compare mode (never a silent
+ * redirect) -- logging in from that prompt uses the same pendingSaveAnswers-
+ * style pattern as "Save My Portfolio" (see pendingCompareRedirect in
+ * auth.js) to land the client straight in compare mode with no second
+ * click required.
  */
 
 const tickerTesterState = {
@@ -62,6 +81,24 @@ const tickerTesterState = {
   // client navigates to Ticker Tester fresh (initTickerTesterNav), so a
   // portfolio saved since their last visit gets picked up.
   autoLoadState: 'idle',
+  // Whether the inline "Compare Two Companies requires an account" prompt
+  // is showing in place of the Compare CTA button -- see
+  // renderTickerCompareCta/wireTickerCompareCta below.
+  showCompareLoginPrompt: false,
+};
+
+// State for Compare Two Companies (state.view = 'tickerCompare') -- reset
+// fresh every time enterTickerCompare() runs, same convention as
+// tickerTesterState's own reset in initTickerTesterNav below.
+const tickerCompareState = {
+  queryA: '',
+  queryB: '',
+  tickerA: null,
+  tickerB: null,
+  // True right after the client tries to pick the same company already in
+  // the other slot -- shows a message instead of allowing the duplicate;
+  // see wireCompareSearchSlot.
+  duplicateAttempted: false,
 };
 
 // Chart.js requires destroying a previous chart bound to a <canvas> before
@@ -70,6 +107,10 @@ const tickerTesterState = {
 // canvas id) replaces the chart cleanly instead of erroring.
 let tickerRadarChartInstance = null;
 
+// Same reasoning as tickerRadarChartInstance above, for Compare's own
+// separate two-dataset chart/canvas (see renderCompareRadarChartIfPresent).
+let tickerCompareRadarChartInstance = null;
+
 function initTickerTesterNav() {
   const btn = document.getElementById('ticker-tester-nav-btn');
   if (!btn) return;
@@ -77,9 +118,27 @@ function initTickerTesterNav() {
     tickerTesterState.query = '';
     tickerTesterState.selectedTicker = null;
     tickerTesterState.autoLoadState = 'idle';
+    tickerTesterState.showCompareLoginPrompt = false;
     state.view = 'tickerTester';
     render();
   });
+}
+
+// Shared entry point into Compare Two Companies -- called both when an
+// already-logged-in client clicks the Compare CTA directly, and by
+// auth.js's onAuthStateChanged once a client who saw the login-required
+// prompt finishes logging in (see pendingCompareRedirect there). Always
+// starts from a blank slate (no carried-over selections from a previous
+// compare session), same convention as initTickerTesterNav above.
+function enterTickerCompare() {
+  tickerCompareState.queryA = '';
+  tickerCompareState.queryB = '';
+  tickerCompareState.tickerA = null;
+  tickerCompareState.tickerB = null;
+  tickerCompareState.duplicateAttempted = false;
+  tickerTesterState.showCompareLoginPrompt = false;
+  state.view = 'tickerCompare';
+  render();
 }
 
 function hasPersonalizationSource() {
@@ -189,6 +248,8 @@ function renderTickerTester() {
       <h1>Ticker Tester</h1>
       <p class="lede">Look up a single company from our sample dataset and see how it stacks up against your own values priorities.</p>
 
+      ${renderTickerCompareCta()}
+
       ${renderTickerSearch()}
 
       ${company ? renderTickerResult(company) : ''}
@@ -200,12 +261,75 @@ function renderTickerTester() {
   `;
 
   wireTickerTesterBackButton();
+  wireTickerCompareCta();
   wireTickerSearch();
   if (company) {
     wireTickerResultActions();
     renderTickerRadarChartIfPresent(company);
   } else {
     destroyTickerRadarChart();
+  }
+}
+
+// Always-visible entry point into Compare Two Companies, above the
+// single-company search box. Logged-in visitors go straight into compare
+// mode; logged-out visitors see this swap for an inline login-required
+// message instead (never a silent navigation away) -- see
+// wireTickerCompareCta for the click handling and pendingCompareRedirect
+// in auth.js for what happens once they actually log in from here.
+function renderTickerCompareCta() {
+  if (tickerTesterState.showCompareLoginPrompt) {
+    return `
+      <div class="ticker-personalize-prompt ticker-compare-login-prompt">
+        <p>Comparing two companies requires an account. Log in (or create one for free) to unlock Compare Two Companies.</p>
+        <p class="ticker-personalize-actions">
+          <button type="button" id="ticker-compare-login-btn" class="btn btn-primary">Log In</button>
+          <button type="button" id="ticker-compare-login-dismiss-btn" class="btn-link-inline">Never mind</button>
+        </p>
+      </div>
+    `;
+  }
+  return `
+    <p class="ticker-compare-cta-row">
+      <button type="button" id="ticker-compare-cta-btn" class="btn btn-primary btn-large">Compare Two Companies</button>
+    </p>
+  `;
+}
+
+function wireTickerCompareCta() {
+  const ctaBtn = document.getElementById('ticker-compare-cta-btn');
+  if (ctaBtn) {
+    ctaBtn.addEventListener('click', () => {
+      if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+        enterTickerCompare();
+        return;
+      }
+      tickerTesterState.showCompareLoginPrompt = true;
+      renderInPlace();
+    });
+  }
+
+  const loginBtn = document.getElementById('ticker-compare-login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      // Consumed by auth.js's onAuthStateChanged once login succeeds --
+      // same "stash intent, finish automatically post-login" pattern as
+      // pendingSaveAnswers for "Save My Portfolio".
+      pendingCompareRedirect = true;
+      authViewState.mode = 'login';
+      authViewState.error = null;
+      authViewState.info = null;
+      state.view = 'account';
+      render();
+    });
+  }
+
+  const dismissBtn = document.getElementById('ticker-compare-login-dismiss-btn');
+  if (dismissBtn) {
+    dismissBtn.addEventListener('click', () => {
+      tickerTesterState.showCompareLoginPrompt = false;
+      renderInPlace();
+    });
   }
 }
 
@@ -486,6 +610,25 @@ function categoryScoreBucket(score) {
   return 'high';
 }
 
+// Shared by the single-company category list (renderCategorySection below)
+// and each side of Compare Two Companies' side-by-side columns
+// (renderCompareColumn) -- one markup source for the category-row list so
+// the two views can't silently drift apart.
+function renderCategoryListItems(categoryScores) {
+  return categoryScores
+    .map((c) => {
+      const bucket = categoryScoreBucket(c.score);
+      return `
+        <li class="ticker-category-row">
+          <span class="ticker-category-label">${escapeHtml(c.label)}</span>
+          <span class="ticker-category-track"><span class="ticker-category-fill ticker-category-fill-${bucket}" style="width:${(c.score / 10) * 100}%"></span></span>
+          <span class="ticker-category-score ticker-category-score-${bucket}">${c.score}/10</span>
+        </li>
+      `;
+    })
+    .join('');
+}
+
 function renderCategorySection(company, categoryScores) {
   return `
     <div class="ticker-categories">
@@ -497,18 +640,7 @@ function renderCategorySection(company, categoryScores) {
           <p id="ticker-radar-unavailable" class="muted ticker-radar-unavailable" hidden>Chart unavailable — see the scores below.</p>
         </div>
         <ul class="ticker-category-list">
-          ${categoryScores
-            .map((c) => {
-              const bucket = categoryScoreBucket(c.score);
-              return `
-            <li class="ticker-category-row">
-              <span class="ticker-category-label">${escapeHtml(c.label)}</span>
-              <span class="ticker-category-track"><span class="ticker-category-fill ticker-category-fill-${bucket}" style="width:${(c.score / 10) * 100}%"></span></span>
-              <span class="ticker-category-score ticker-category-score-${bucket}">${c.score}/10</span>
-            </li>
-          `;
-            })
-            .join('')}
+          ${renderCategoryListItems(categoryScores)}
         </ul>
       </div>
     </div>
@@ -609,6 +741,546 @@ function renderRawCompanyData(company) {
         <li><span>Dividend yield tier</span><span>${escapeHtml((company.dividend_policy && company.dividend_policy.yield_tier) || 'None')}</span></li>
         <li><span>Sin-stock flags</span><span>${sinFlags.length > 0 ? escapeHtml(sinFlags.join(', ')) : 'None on record'}</span></li>
       </ul>
+    </div>
+  `;
+}
+
+// --- Compare Two Companies (state.view = 'tickerCompare') ----------------
+//
+// Reuses buildCompanyScoreEntry/computeCategoryScores/tickerTierDisplay/
+// renderRawCompanyData/hasPersonalizationSource exactly as the single-
+// company view above does -- every number shown here is the same number
+// that view would show for either company individually, just placed side
+// by side. See the top-of-file header comment (2026-08-25) for how this
+// mode is reached (always login-gated) and renderCompareVerdict below for
+// the one piece of genuinely new logic this mode needed.
+
+function renderTickerCompare() {
+  if (!state.dataset) {
+    appEl.innerHTML = `
+      <section class="card ticker-compare-card">
+        <p class="eyebrow">Ticker Tester</p>
+        <h1>Compare Two Companies</h1>
+        <p class="muted">Loading company data…</p>
+        <div class="nav-row">
+          <button type="button" id="ticker-compare-back-btn" class="btn btn-secondary">Back to Ticker Tester</button>
+        </div>
+      </section>
+    `;
+    wireTickerCompareBackButton();
+    return;
+  }
+
+  maybeAutoLoadRecentPortfolio();
+
+  const companyA = tickerCompareState.tickerA
+    ? state.dataset.companies.find((c) => c.ticker === tickerCompareState.tickerA)
+    : null;
+  const companyB = tickerCompareState.tickerB
+    ? state.dataset.companies.find((c) => c.ticker === tickerCompareState.tickerB)
+    : null;
+
+  appEl.innerHTML = `
+    <section class="card ticker-compare-card">
+      <p class="eyebrow">Ticker Tester</p>
+      <h1>Compare Two Companies</h1>
+      <p class="lede">Select two companies from our sample dataset to compare side by side against your values priorities.</p>
+
+      <div class="ticker-compare-pickers">
+        ${renderCompareSearchSlot('A', companyA)}
+        ${renderCompareSearchSlot('B', companyB)}
+      </div>
+
+      ${tickerCompareState.duplicateAttempted ? '<p class="error-text">Choose two different companies to compare.</p>' : ''}
+
+      ${companyA && companyB ? renderCompareResults(companyA, companyB) : ''}
+
+      <div class="nav-row">
+        <button type="button" id="ticker-compare-back-btn" class="btn btn-secondary">Back to Ticker Tester</button>
+      </div>
+    </section>
+  `;
+
+  wireTickerCompareBackButton();
+  wireCompareSearchSlot('A');
+  wireCompareSearchSlot('B');
+  if (companyA && companyB) {
+    wireCompareResultActions();
+    renderCompareRadarChartIfPresent(companyA, companyB);
+  } else {
+    destroyTickerCompareRadarChart();
+  }
+}
+
+function wireTickerCompareBackButton() {
+  document.getElementById('ticker-compare-back-btn').addEventListener('click', () => {
+    state.view = 'tickerTester';
+    render();
+  });
+}
+
+// One searchable dropdown "slot" (A or B) -- same filterCompanies() dataset
+// restriction and dropdown behavior as the single-company search above,
+// parameterized so both slots share one implementation. A company already
+// picked in the OTHER slot is left selectable in the dropdown (simpler
+// than disabling it, and the click handler below catches the duplicate
+// attempt and shows a message either way -- see wireCompareSearchSlot).
+function renderCompareSearchSlot(slot, selectedCompany) {
+  const query = slot === 'A' ? tickerCompareState.queryA : tickerCompareState.queryB;
+  const results = filterCompanies(query);
+  const showDropdown = query.trim().length > 0;
+
+  if (selectedCompany) {
+    return `
+      <div class="ticker-compare-slot">
+        <span class="ticker-compare-slot-label">Company ${slot}</span>
+        <div class="ticker-compare-selected">
+          <span class="ticker-compare-selected-name">${escapeHtml(selectedCompany.name)} (${escapeHtml(selectedCompany.ticker)})</span>
+          <button type="button" class="btn-link-inline ticker-compare-change-btn" data-slot="${slot}">Change</button>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="ticker-compare-slot">
+      <label for="ticker-compare-search-${slot}">Company ${slot}</label>
+      <input
+        type="text"
+        id="ticker-compare-search-${slot}"
+        class="ticker-compare-search-input"
+        data-slot="${slot}"
+        autocomplete="off"
+        placeholder="e.g. Apple or AAPL"
+        value="${escapeHtml(query)}"
+      />
+      ${
+        showDropdown
+          ? `
+        <ul class="ticker-search-results">
+          ${
+            results.length > 0
+              ? results
+                  .map(
+                    (c) => `
+              <li>
+                <button type="button" class="ticker-compare-search-result" data-slot="${slot}" data-ticker="${escapeHtml(c.ticker)}">
+                  <span class="ticker-search-result-ticker">${escapeHtml(c.ticker)}</span>
+                  <span class="ticker-search-result-name">${escapeHtml(c.name)}</span>
+                  <span class="ticker-search-result-sector">${escapeHtml(c.sector)}</span>
+                </button>
+              </li>
+            `
+                  )
+                  .join('')
+              : '<li class="ticker-search-empty">No matching companies found.</li>'
+          }
+        </ul>
+      `
+          : ''
+      }
+    </div>
+  `;
+}
+
+function wireCompareSearchSlot(slot) {
+  const input = document.getElementById(`ticker-compare-search-${slot}`);
+  if (input) {
+    input.addEventListener('input', () => {
+      if (slot === 'A') tickerCompareState.queryA = input.value;
+      else tickerCompareState.queryB = input.value;
+      tickerCompareState.duplicateAttempted = false;
+      renderInPlace();
+      const refocused = document.getElementById(`ticker-compare-search-${slot}`);
+      if (refocused) {
+        refocused.focus();
+        refocused.setSelectionRange(refocused.value.length, refocused.value.length);
+      }
+    });
+  }
+
+  document.querySelectorAll(`.ticker-compare-search-result[data-slot="${slot}"]`).forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const ticker = btn.dataset.ticker;
+      const otherTicker = slot === 'A' ? tickerCompareState.tickerB : tickerCompareState.tickerA;
+      if (ticker === otherTicker) {
+        tickerCompareState.duplicateAttempted = true;
+        renderInPlace();
+        return;
+      }
+      if (slot === 'A') {
+        tickerCompareState.tickerA = ticker;
+        tickerCompareState.queryA = '';
+      } else {
+        tickerCompareState.tickerB = ticker;
+        tickerCompareState.queryB = '';
+      }
+      tickerCompareState.duplicateAttempted = false;
+      renderInPlace();
+    });
+  });
+
+  const changeBtn = document.querySelector(`.ticker-compare-change-btn[data-slot="${slot}"]`);
+  if (changeBtn) {
+    changeBtn.addEventListener('click', () => {
+      if (slot === 'A') {
+        tickerCompareState.tickerA = null;
+        tickerCompareState.queryA = '';
+      } else {
+        tickerCompareState.tickerB = null;
+        tickerCompareState.queryB = '';
+      }
+      tickerCompareState.duplicateAttempted = false;
+      renderInPlace();
+    });
+  }
+}
+
+function renderCompareResults(companyA, companyB) {
+  if (!hasPersonalizationSource()) {
+    if (tickerTesterState.autoLoadState === 'loading') {
+      return `
+        <div class="ticker-compare-results">
+          <p class="muted">Loading your most recent saved portfolio…</p>
+          <div class="ticker-compare-columns">
+            <div class="ticker-compare-column">${renderRawCompanyData(companyA)}</div>
+            <div class="ticker-compare-column">${renderRawCompanyData(companyB)}</div>
+          </div>
+        </div>
+      `;
+    }
+    // Same fallback principle as the single-company view: no verdict, no
+    // chart, no category scores without real personalization data -- just
+    // both companies' raw sourced data, plus a prompt to unlock scoring.
+    // "Log In" isn't offered here (unlike the single-company prompt) since
+    // reaching Compare at all already requires being logged in.
+    return `
+      <div class="ticker-compare-results">
+        <div class="ticker-personalize-prompt">
+          <p>Complete the survey or load a saved portfolio to see how these two companies match your personal values.</p>
+          <p class="ticker-personalize-actions">
+            <button type="button" id="ticker-compare-take-survey-btn" class="btn btn-secondary">Take the Survey</button>
+          </p>
+        </div>
+        <div class="ticker-compare-columns">
+          <div class="ticker-compare-column">${renderRawCompanyData(companyA)}</div>
+          <div class="ticker-compare-column">${renderRawCompanyData(companyB)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  const scoredA = buildCompanyScoreEntry(companyA);
+  const scoredB = buildCompanyScoreEntry(companyB);
+  const bothScored = !scoredA.blueChipExcluded && !scoredB.blueChipExcluded;
+
+  return `
+    <div class="ticker-compare-results">
+      <div class="ticker-compare-columns">
+        ${renderCompareColumn(companyA, scoredA)}
+        ${renderCompareColumn(companyB, scoredB)}
+      </div>
+
+      ${
+        bothScored
+          ? `
+        <div class="ticker-categories ticker-compare-chart-section">
+          <h3>Category Match Scores</h3>
+          <div class="ticker-radar-wrap ticker-compare-radar-wrap">
+            <canvas id="ticker-compare-radar-chart" role="img" aria-label="Radar chart comparing both companies' category match scores"></canvas>
+            <p id="ticker-compare-radar-unavailable" class="muted ticker-radar-unavailable" hidden>Chart unavailable — see the scores above.</p>
+          </div>
+        </div>
+      `
+          : ''
+      }
+
+      ${renderCompareVerdict(companyA, companyB, scoredA, scoredB)}
+    </div>
+  `;
+}
+
+function wireCompareResultActions() {
+  const takeSurveyBtn = document.getElementById('ticker-compare-take-survey-btn');
+  if (takeSurveyBtn) {
+    takeSurveyBtn.addEventListener('click', () => {
+      state.view = 'survey';
+      render();
+    });
+  }
+}
+
+// One company's half of the side-by-side comparison -- same three states
+// as the single-company view's own result (blue-chip-excluded / scored),
+// same tier badge, rationale, note, caution flags, and category list, just
+// without the search/change-company row (that's handled once by the
+// shared pickers above, not per column).
+function renderCompareColumn(company, scored) {
+  if (scored.blueChipExcluded) {
+    return `
+      <div class="ticker-compare-column">
+        <h2>${escapeHtml(company.name)} (${escapeHtml(company.ticker)})</h2>
+        <div class="ticker-personalize-prompt">
+          <p>
+            You rated "large, established blue-chip companies" a 5/5 -- your hardest requirement. ${escapeHtml(company.name)}
+            (${escapeHtml(company.market_profile.market_cap_tier)} cap) doesn't meet that bar, so it would never
+            appear in your recommended portfolio regardless of how well it otherwise matches your values.
+          </p>
+        </div>
+        ${renderRawCompanyData(company)}
+      </div>
+    `;
+  }
+
+  const { entry, ctx } = scored;
+  const display = tickerTierDisplay(entry.tier);
+  const categoryScores = computeCategoryScores(company, entry, ctx);
+  const showNote = entry.note && entry.tier !== 'Below Values Threshold';
+
+  return `
+    <div class="ticker-compare-column">
+      <h2>${escapeHtml(company.name)} (${escapeHtml(company.ticker)})</h2>
+      <p><span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span></p>
+      <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
+      ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
+      ${
+        entry.cautionFlags && entry.cautionFlags.length > 0
+          ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`
+          : ''
+      }
+      <ul class="ticker-category-list ticker-compare-category-list">
+        ${renderCategoryListItems(categoryScores)}
+      </ul>
+    </div>
+  `;
+}
+
+function destroyTickerCompareRadarChart() {
+  if (tickerCompareRadarChartInstance) {
+    tickerCompareRadarChartInstance.destroy();
+    tickerCompareRadarChartInstance = null;
+  }
+}
+
+// Same pattern as renderTickerRadarChartIfPresent (single-company view):
+// runs after the DOM already has the canvas, degrades to "chart
+// unavailable" if Chart.js never loaded, no-ops (destroying any prior
+// chart) if either company is blue-chip-excluded since renderCompareResults
+// doesn't emit a canvas in that case. The only real difference is two
+// overlaid datasets (gold for Company A, navy for Company B -- this site's
+// only two brand colors, same pairing the single chart already uses) with
+// a visible legend, since here the two shapes need to be told apart.
+function renderCompareRadarChartIfPresent(companyA, companyB) {
+  const canvas = document.getElementById('ticker-compare-radar-chart');
+  if (!canvas) {
+    destroyTickerCompareRadarChart();
+    return;
+  }
+
+  if (typeof Chart === 'undefined') {
+    canvas.hidden = true;
+    const unavailable = document.getElementById('ticker-compare-radar-unavailable');
+    if (unavailable) unavailable.hidden = false;
+    return;
+  }
+
+  const scoredA = buildCompanyScoreEntry(companyA);
+  const scoredB = buildCompanyScoreEntry(companyB);
+  if (!scoredA.entry || !scoredB.entry) return;
+
+  const categoryScoresA = computeCategoryScores(companyA, scoredA.entry, scoredA.ctx);
+  const categoryScoresB = computeCategoryScores(companyB, scoredB.entry, scoredB.ctx);
+
+  destroyTickerCompareRadarChart();
+  tickerCompareRadarChartInstance = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: categoryScoresA.map((c) => c.label),
+      datasets: [
+        {
+          label: `${companyA.ticker} match`,
+          data: categoryScoresA.map((c) => c.score),
+          backgroundColor: 'rgba(201, 150, 47, 0.25)', // --gold, translucent fill
+          borderColor: '#c9962f', // --gold
+          borderWidth: 2,
+          pointBackgroundColor: '#c9962f',
+          pointBorderColor: '#0f1f3d',
+        },
+        {
+          label: `${companyB.ticker} match`,
+          data: categoryScoresB.map((c) => c.score),
+          backgroundColor: 'rgba(15, 31, 61, 0.18)', // --navy, translucent fill
+          borderColor: '#0f1f3d', // --navy
+          borderWidth: 2,
+          pointBackgroundColor: '#0f1f3d',
+          pointBorderColor: '#c9962f',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 1,
+          max: 10,
+          ticks: { stepSize: 1, showLabelBackdrop: false, color: '#6b675c' },
+          pointLabels: { color: '#1c2530', font: { size: 12 } },
+          grid: { color: '#e1ddd3' },
+          angleLines: { color: '#e1ddd3' },
+        },
+      },
+      // Unlike the single-company chart (legend hidden -- only one shape,
+      // nothing to distinguish), this one needs a legend since there are
+      // two overlaid shapes to tell apart.
+      plugins: { legend: { display: true, position: 'bottom', labels: { color: '#1c2530' } } },
+    },
+  });
+}
+
+// How many points apart two companies' valuesFitScore (0-100) needs to be
+// before treating it as a real difference rather than noise -- both scores
+// are already rounded integers built from many small weighted terms, so a
+// gap of a couple points can come from rounding/discretization alone
+// rather than a genuine values difference. Documented judgment call, not
+// a value pulled from existing code (no prior feature ever had to decide
+// "how different is different enough" between two specific companies).
+const VALUES_TIE_THRESHOLD = 3;
+
+// How many of the client's own 1-5 importance ratings a category's
+// questions average to -- used only to decide which categories are worth
+// naming in the verdict's plain-language reason (topDifferentiatingCategories
+// below), not part of any score itself.
+function categoryImportance(category) {
+  const questions = questionsForCategory(category.key).filter((q) => q.type !== 'horizon');
+  if (questions.length === 0) return 3;
+  const sum = questions.reduce((total, q) => total + (state.answers[q.id] || 3), 0);
+  return sum / questions.length;
+}
+
+// Picks up to maxCount categories where the winner leads the loser,
+// ranked by (score gap) * (how heavily the client weighted that category)
+// -- so the verdict names categories that are both a real gap AND
+// something the client said mattered, rather than just the single
+// numerically largest gap regardless of whether it was a category the
+// client was indifferent to.
+function topDifferentiatingCategories(winnerScores, loserScores, maxCount) {
+  const diffs = winnerScores.map((c, i) => ({
+    label: c.label,
+    diff: c.score - loserScores[i].score,
+    importance: categoryImportance(CATEGORIES.find((cat) => cat.key === c.key)),
+  }));
+  return diffs
+    .filter((d) => d.diff > 0)
+    .sort((a, b) => b.diff * b.importance - a.diff * a.importance)
+    .slice(0, maxCount)
+    .map((d) => d.label);
+}
+
+// Low/Medium/High -> a sortable rank, for compareRiskTiebreak below.
+const PERFORMANCE_TIER_RANK = { Low: 0, Medium: 1, High: 2 };
+
+// The verdict's tiebreaker, used only when the two companies' values-fit
+// scores are within VALUES_TIE_THRESHOLD of each other. Growth risk
+// profiles favor the company with the higher growth_potential tier,
+// Conservative favors the higher stability tier, Balanced applies no
+// adjustment at all -- the same three-way Conservative/Balanced/Growth
+// split deriveRiskProfile() already produces and financialQualityAlignment
+// (scoring.js) already branches on elsewhere in this codebase, just
+// applied here as a direct head-to-head comparison between two specific
+// companies' own dataset performance_tier fields (growth_potential/
+// stability, Low/Medium/High) rather than folded into one company's
+// absolute blended score. This exact head-to-head comparison is new code
+// -- sortScoredEntries (scoring.js) only ever ranks one company against
+// the whole field, it never had a reason to compare two named companies
+// against each other, so there was no existing function to call into for
+// this specific step. Returns the winning company, or null if the risk
+// profile is Balanced (no adjustment, per spec) or both companies land on
+// the same tier (a genuine tie even after the tiebreaker).
+function compareRiskTiebreak(companyA, companyB, riskProfile) {
+  if (riskProfile === 'Balanced') return null;
+  const field = riskProfile === 'Conservative' ? 'stability' : 'growth_potential';
+  const rankA = PERFORMANCE_TIER_RANK[companyA.performance_tier[field]];
+  const rankB = PERFORMANCE_TIER_RANK[companyB.performance_tier[field]];
+  if (rankA === undefined || rankB === undefined || rankA === rankB) return null;
+  return rankA > rankB ? companyA : companyB;
+}
+
+// The verdict shown below the side-by-side comparison. Primary factor is
+// valuesFitScore() (scoring.js) -- the same values-only formula
+// meetsValuesFloor() already uses to decide Low Match, deliberately not
+// entry.score (which has financial quality and risk preferences already
+// blended in -- using that here would let financial data quietly
+// override a values difference before the tiebreaker step ever ran,
+// exactly what this verdict must not do). Financial data only enters via
+// compareRiskTiebreak, and only once the values-fit scores are within
+// VALUES_TIE_THRESHOLD of each other.
+function renderCompareVerdict(companyA, companyB, scoredA, scoredB) {
+  if (scoredA.blueChipExcluded && scoredB.blueChipExcluded) {
+    return `
+      <div class="ticker-compare-verdict">
+        <p>
+          Neither company meets your hard requirement for large, established blue-chip companies (rated 5/5) --
+          neither would ever appear in your recommended portfolio, so there's no meaningful values-fit comparison
+          to make here.
+        </p>
+      </div>
+    `;
+  }
+  if (scoredA.blueChipExcluded || scoredB.blueChipExcluded) {
+    const excluded = scoredA.blueChipExcluded ? companyA : companyB;
+    const winner = scoredA.blueChipExcluded ? companyB : companyA;
+    return `
+      <div class="ticker-compare-verdict">
+        <p>
+          <strong>${escapeHtml(winner.name)} (${escapeHtml(winner.ticker)})</strong> is the better fit by default --
+          ${escapeHtml(excluded.name)} doesn't meet your hard requirement for large, established blue-chip
+          companies (rated 5/5), so it would never appear in your recommended portfolio regardless of how well it
+          otherwise matches your values.
+        </p>
+      </div>
+    `;
+  }
+
+  const ctx = scoredA.ctx;
+  const scoreA = valuesFitScore(companyA, state.answers, ctx);
+  const scoreB = valuesFitScore(companyB, state.answers, ctx);
+  const diff = scoreA - scoreB;
+
+  if (Math.abs(diff) > VALUES_TIE_THRESHOLD) {
+    const winner = diff > 0 ? companyA : companyB;
+    const winnerScored = diff > 0 ? scoredA : scoredB;
+    const loserScored = diff > 0 ? scoredB : scoredA;
+    const winnerCategoryScores = computeCategoryScores(winner, winnerScored.entry, winnerScored.ctx);
+    const loserCategoryScores = computeCategoryScores(diff > 0 ? companyB : companyA, loserScored.entry, loserScored.ctx);
+    const topCategories = topDifferentiatingCategories(winnerCategoryScores, loserCategoryScores, 2);
+    const reason =
+      topCategories.length > 0
+        ? `it scores notably higher on ${topCategories.join(' and ')}, ${topCategories.length > 1 ? 'the categories' : 'a category'} you weighted most heavily`
+        : 'it scores higher across your priorities overall';
+    return `
+      <div class="ticker-compare-verdict">
+        <p><strong>${escapeHtml(winner.name)} (${escapeHtml(winner.ticker)})</strong> is the better fit for your values -- ${reason}.</p>
+      </div>
+    `;
+  }
+
+  const riskProfile = deriveRiskProfile(state.answers);
+  const tiebreakWinner = compareRiskTiebreak(companyA, companyB, riskProfile);
+  if (tiebreakWinner) {
+    const factorLabel = riskProfile === 'Conservative' ? 'stability' : 'growth potential';
+    return `
+      <div class="ticker-compare-verdict">
+        <p>
+          Both companies fit your values almost equally; <strong>${escapeHtml(tiebreakWinner.name)} (${escapeHtml(tiebreakWinner.ticker)})</strong>
+          edges ahead due to stronger ${factorLabel}, which matches your ${escapeHtml(riskProfile)} risk profile.
+        </p>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="ticker-compare-verdict">
+      <p>Both companies fit your values and financial profile about equally based on what you've told us -- this one's a genuine toss-up.</p>
     </div>
   `;
 }

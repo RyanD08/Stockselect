@@ -78,6 +78,16 @@ const myPortfoliosViewState = {
 // as it's consumed, or if they back out of the login screen instead.
 let pendingSaveAnswers = null;
 
+// Same pattern as pendingSaveAnswers above, for a signed-out visitor who
+// clicked "Log In" from Ticker Tester's Compare-Two-Companies login
+// prompt (see ticker-tester.js) -- no answers to stash here, just intent:
+// once they finish logging in, onAuthStateChanged below sends them
+// straight into Compare Two Companies (enterTickerCompare) instead of the
+// usual "back to intro" landing, so they never have to click Compare a
+// second time. Cleared as soon as it's consumed, or if they back out of
+// the login screen instead.
+let pendingCompareRedirect = false;
+
 // Firebase Auth's error codes (e.g. "auth/wrong-password") are never shown
 // to the client directly -- always translated to plain language here.
 const AUTH_ERROR_MESSAGES = {
@@ -163,6 +173,16 @@ if (firebaseReady) {
       }
       state.view = 'results';
       render();
+      return;
+    }
+
+    if (user && pendingCompareRedirect) {
+      // A signed-out visitor clicked "Log In" from the Compare-Two-
+      // Companies prompt and has now done so -- take them straight into
+      // compare mode instead of the usual intro landing below, no second
+      // click on the Compare button required.
+      pendingCompareRedirect = false;
+      enterTickerCompare(); // js/ticker-tester.js
       return;
     }
 
@@ -433,6 +453,7 @@ function renderAccount() {
     authViewState.error = null;
     authViewState.info = null;
     pendingSaveAnswers = null; // abandon any interrupted "Save My Portfolio" too
+    pendingCompareRedirect = false; // ...and any interrupted Compare-Two-Companies redirect
     state.view = 'intro';
     render();
   });

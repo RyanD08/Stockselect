@@ -1870,6 +1870,134 @@ h2 .category-icon {
   text-align: right;
 }
 
+/* Compare Two Companies */
+
+.ticker-compare-cta-row {
+  margin: 0 0 1.5rem;
+}
+
+.ticker-compare-login-prompt {
+  margin-bottom: 1.5rem;
+}
+
+.ticker-compare-card {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.ticker-compare-pickers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  margin: 1.25rem 0;
+}
+
+@media (max-width: 640px) {
+  .ticker-compare-pickers {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ticker-compare-slot {
+  position: relative;
+}
+
+.ticker-compare-slot-label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.ticker-compare-slot label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.ticker-compare-slot input {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #fff;
+}
+
+.ticker-compare-slot input:focus {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 1px;
+}
+
+.ticker-compare-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+}
+
+.ticker-compare-selected-name {
+  font-weight: 600;
+  color: var(--navy);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticker-compare-results {
+  margin-top: 1.5rem;
+}
+
+.ticker-compare-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+}
+
+@media (max-width: 640px) {
+  .ticker-compare-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ticker-compare-column h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.ticker-compare-category-list {
+  margin-top: 1rem;
+}
+
+.ticker-compare-chart-section {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.ticker-compare-radar-wrap {
+  max-width: 460px;
+}
+
+.ticker-compare-verdict {
+  margin-top: 1.75rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+}
+
+.ticker-compare-verdict p {
+  margin: 0;
+  color: var(--text);
+}
+
 .site-footer {
   text-align: center;
   color: var(--muted);
