@@ -506,14 +506,10 @@ function renderLearnHub() {
     </section>
   `;
 
-  document.querySelectorAll('.learn-lesson-item').forEach((el) => {
-    el.addEventListener('click', () => openLearnLesson(el.dataset.lessonId));
-    el.addEventListener('keydown', (evt) => {
-      if (evt.key === 'Enter' || evt.key === ' ') {
-        evt.preventDefault();
-        openLearnLesson(el.dataset.lessonId);
-      }
-    });
+  // A real <button> (see renderLearnLessonListItem) gets Enter/Space
+  // activation for free -- no separate keydown handler needed.
+  document.querySelectorAll('.learn-lesson-item-btn').forEach((btn) => {
+    btn.addEventListener('click', () => openLearnLesson(btn.dataset.lessonId));
   });
 
   document.getElementById('learn-back-btn').addEventListener('click', () => {
@@ -526,12 +522,14 @@ function renderLearnLessonListItem(lesson) {
   const progress = learnState.progress[lesson.id];
   const completed = !!(progress && progress.completed);
   return `
-    <li class="learn-lesson-item" data-lesson-id="${lesson.id}" role="button" tabindex="0">
-      <div class="learn-lesson-item-info">
-        <span class="learn-lesson-item-title">${escapeHtml(lesson.title)}</span>
-        <span class="learn-lesson-item-desc">${escapeHtml(lesson.description)}</span>
-      </div>
-      <span class="tier-badge ${completed ? 'tier-strong' : 'tier-below-threshold'}">${completed ? '✓ Completed' : 'Not started'}</span>
+    <li class="learn-lesson-item">
+      <button type="button" class="learn-lesson-item-btn" data-lesson-id="${lesson.id}">
+        <span class="learn-lesson-item-info">
+          <span class="learn-lesson-item-title">${escapeHtml(lesson.title)}</span>
+          <span class="learn-lesson-item-desc">${escapeHtml(lesson.description)}</span>
+        </span>
+        <span class="tier-badge ${completed ? 'tier-strong' : 'tier-below-threshold'}">${completed ? '✓ Completed' : 'Not started'}</span>
+      </button>
     </li>
   `;
 }
