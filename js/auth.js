@@ -1067,17 +1067,32 @@ function renderAccount() {
         <input id="auth-email" type="email" autocomplete="email" required />
 
         <label for="auth-password">Password</label>
-        <input
-          id="auth-password"
-          type="password"
-          autocomplete="${isSignup ? 'new-password' : 'current-password'}"
-          minlength="6"
-          required
-        />
+        <div class="password-field-wrap">
+          <input
+            id="auth-password"
+            type="password"
+            autocomplete="${isSignup ? 'new-password' : 'current-password'}"
+            minlength="6"
+            required
+          />
+          <button type="button" class="password-toggle-btn" data-password-toggle-for="auth-password">Show</button>
+        </div>
 
         ${
           isSignup
             ? `
+              <label for="auth-password-confirm">Retype Password</label>
+              <div class="password-field-wrap">
+                <input
+                  id="auth-password-confirm"
+                  type="password"
+                  autocomplete="new-password"
+                  minlength="6"
+                  required
+                />
+                <button type="button" class="password-toggle-btn" data-password-toggle-for="auth-password-confirm">Show</button>
+              </div>
+
               <label class="terms-checkbox-row">
                 <input type="checkbox" id="terms-checkbox" />
                 <span>I have read the <button type="button" id="terms-open-btn" class="terms-link-btn">Terms of Service</button></span>
@@ -1109,6 +1124,11 @@ function renderAccount() {
     evt.preventDefault();
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
+    if (isSignup && password !== document.getElementById('auth-password-confirm').value) {
+      authViewState.error = 'Passwords do not match. Please retype them.';
+      renderInPlace();
+      return;
+    }
     if (isSignup && !document.getElementById('terms-checkbox').checked) {
       authViewState.error = "Please confirm you've read the Terms of Service before creating an account.";
       renderInPlace();
@@ -1134,6 +1154,15 @@ function renderAccount() {
 
   const termsOpenBtn = document.getElementById('terms-open-btn');
   if (termsOpenBtn) termsOpenBtn.addEventListener('click', openTermsModal);
+
+  document.querySelectorAll('.password-toggle-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.passwordToggleFor);
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Show' : 'Hide';
+    });
+  });
 
   const forgotBtn = document.getElementById('forgot-password-btn');
   if (forgotBtn) {

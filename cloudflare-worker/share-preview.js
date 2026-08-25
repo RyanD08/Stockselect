@@ -16,10 +16,10 @@
  *      already embedded in js/firebase-config.js -- the shared/{shareId}
  *      Firestore rule already allows anyone to `get` it, this is just a
  *      server calling the same public endpoint the browser SDK would).
- *   2. Returns a tiny real HTML page with og:title "Check Out My
- *      Portfolio in TrueNorth" and an og:description summarizing the
- *      risk profile, holding count, and a few tickers -- built at request
- *      time, so it's per-link, not one static tag.
+ *   2. Returns a tiny real HTML page with og:title "Check Out My New
+ *      Portfolio Built by True North" and an og:description summarizing
+ *      the risk profile, holding count, and a few tickers -- built at
+ *      request time, so it's per-link, not one static tag.
  *   3. Immediately redirects a real visitor (both a <meta refresh> and a
  *      JS location.replace, so it works whether or not the client runs
  *      JS) into the real interactive app at
@@ -39,7 +39,7 @@ const SITE_URL = 'https://ryand08.github.io/Stockselect/';
 const FIREBASE_PROJECT_ID = 'truenorth-a93e7';
 const FIREBASE_API_KEY = 'AIzaSyDwwUO4RwXYDP-x6r5L5pea3vEbX7qrWZI'; // public client key, already shipped in js/firebase-config.js -- not a secret
 const OG_IMAGE_URL = SITE_URL + 'assets/og-image.png';
-const PREVIEW_TITLE = 'Check Out My Portfolio in TrueNorth';
+const PREVIEW_TITLE = 'Check Out My New Portfolio Built by True North';
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
