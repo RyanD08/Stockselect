@@ -128,10 +128,11 @@ let pendingWatchlistReturnView = null; // state.view to restore once the add com
 // "just open the My Watchlist screen."
 let pendingPortfoliosRedirect = false;
 let pendingWatchlistViewRedirect = false;
-// pendingLearnRedirect itself is declared in js/learn.js (that feature owns
-// it, same reasoning as watchlistState/watchlistViewState living in this
-// file even though app.js's nav code reads them) -- handled below
-// alongside the two flags above.
+// pendingLearnRedirect and pendingMyBadgesRedirect are declared in
+// js/learn.js and js/badges.js respectively (each feature owns its own,
+// same reasoning as watchlistState/watchlistViewState living in this file
+// even though app.js's nav code reads them) -- handled below alongside the
+// two flags above.
 
 // Firebase Auth's error codes (e.g. "auth/wrong-password") are never shown
 // to the client directly -- always translated to plain language here.
@@ -199,7 +200,7 @@ async function resetPassword(email) {
 // Auth user last: if the Firestore pass fails partway, the account (and
 // the ability to retry) still exists, rather than leaving a deleted
 // account with undeletable leftover data.
-const ALL_USER_SUBCOLLECTIONS = ['savedPortfolios', 'watchlist', 'meta', 'savedSurveys', 'savedSurvey', 'surveys', 'learnProgress'];
+const ALL_USER_SUBCOLLECTIONS = ['savedPortfolios', 'watchlist', 'meta', 'savedSurveys', 'savedSurvey', 'surveys', 'learnProgress', 'badges'];
 
 async function deleteAccount(password) {
   if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
@@ -238,9 +239,22 @@ if (firebaseReady) {
       // everywhere rather than plumbing a "have I checked yet" flag through
       // every render call site that can show a toggle button.
       loadWatchlistTickers();
+      // Same fire-and-forget reasoning, for the header's equipped-badge
+      // slot (js/badges.js) -- loaded here so it's correct immediately on
+      // sign-in/page-load, not only after a visit to Learn or My Badges.
+      loadBadgeState().then(renderAccountWidget);
     } else {
       watchlistState.tickers = new Set();
       watchlistState.loaded = false;
+      // js/learn.js and js/badges.js -- same reset-on-logout reasoning as
+      // watchlistState above: without this, a second client signing in on
+      // the same browser session would otherwise see the first client's
+      // already-cached Learn progress and badge state instead of their own.
+      learnState.progress = {};
+      learnState.progressLoaded = false;
+      badgeState.loaded = false;
+      badgeState.earnedIds = new Set();
+      badgeState.equippedId = null;
     }
 
     if (user && pendingSaveAnswers) {
@@ -321,6 +335,13 @@ if (firebaseReady) {
       // Same, for the nav's "Learn" (js/learn.js).
       pendingLearnRedirect = false;
       openLearnHub(); // js/learn.js
+      return;
+    }
+
+    if (user && pendingMyBadgesRedirect) {
+      // Same, for the nav's "My Badges" (js/badges.js).
+      pendingMyBadgesRedirect = false;
+      openMyBadgesView(); // js/badges.js
       return;
     }
 
@@ -859,6 +880,7 @@ function renderAccountWidget() {
 
   if (authState.user) {
     el.innerHTML = `
+      ${renderEquippedBadgeHtml()}
       <button type="button" id="account-delete-btn" class="account-widget-link account-widget-link-danger">Delete Account</button>
       <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
     `;
@@ -1216,6 +1238,7 @@ function renderAccount() {
     pendingPortfoliosRedirect = false; // ...and any interrupted hamburger-nav redirect
     pendingWatchlistViewRedirect = false;
     pendingLearnRedirect = false; // js/learn.js
+    pendingMyBadgesRedirect = false; // js/badges.js
     state.view = 'intro';
     render();
   });
