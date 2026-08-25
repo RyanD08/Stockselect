@@ -13,6 +13,13 @@
 //                                              rename-able, loadable, and delete-able from My
 //                                              Portfolios. The 5-saved-portfolio cap is enforced
 //                                              client-side (see auth.js), not by these rules.
+//   users/{userId}/watchlist/{ticker}        — CURRENT (2026-08-25): up to 20 individually
+//                                              tracked tickers per user (see addToWatchlist/
+//                                              listWatchlist in auth.js). The ticker itself is the
+//                                              document id, not an auto-generated one -- each doc
+//                                              is just { ticker, addedAt }. The 20-ticker cap is
+//                                              enforced client-side, same reasoning as
+//                                              savedPortfolios' own cap above.
 //   users/{userId}/meta/migration            — CURRENT: a single marker doc recording whether this
 //                                              user's old savedSurveys data has already been copied
 //                                              into savedPortfolios (see
@@ -52,6 +59,11 @@ service cloud.firestore {
 
       // Current: up to 5 named saved portfolios this app actually uses now.
       match /savedPortfolios/{portfolioId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Current: up to 20 individually tracked tickers (My Watchlist).
+      match /watchlist/{ticker} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 

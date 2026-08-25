@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'tickerTester' | 'tickerCompare'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -39,8 +39,17 @@ function renderInPlace() {
   else if (state.view === 'results') renderResults();
   else if (state.view === 'account') renderAccount(); // js/auth.js
   else if (state.view === 'portfolios') renderMyPortfolios(); // js/auth.js
+  else if (state.view === 'watchlist') renderMyWatchlist(); // js/auth.js
   else if (state.view === 'tickerTester') renderTickerTester(); // js/ticker-tester.js
   else if (state.view === 'tickerCompare') renderTickerCompare(); // js/ticker-tester.js
+
+  // Unconditional, regardless of which view just rendered: the ☆/★
+  // watchlist toggle button (js/auth.js) can appear on several different
+  // screens (Ticker Tester, Compare, Results, My Watchlist itself), so
+  // wiring it once here -- rather than requiring every render function
+  // above to remember to call it -- means it's never accidentally missed.
+  // A no-op on any view that doesn't happen to render one.
+  wireWatchlistToggleButtons(); // js/auth.js
 }
 
 // For actual navigation (view/step changes) — re-renders and scrolls to
@@ -666,7 +675,7 @@ function renderHoldingRow(entry) {
   const isFinDetailsOpen = state.expandedFinancialDetails.has(ticker);
   return `
     <tr class="${rowClass}">
-      <td data-label="Ticker">${escapeHtml(ticker)}</td>
+      <td data-label="Ticker">${escapeHtml(ticker)}${renderWatchlistToggleButton(ticker)}</td>
       <td data-label="Company">${escapeHtml(entry.company.name)}</td>
       <td data-label="Sector">${escapeHtml(entry.company.sector)}</td>
       <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${display.badgeText}</span></td>

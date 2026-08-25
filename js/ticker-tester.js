@@ -510,6 +510,7 @@ function renderTickerResult(company) {
       ${changeCompanyRow}
       <div class="ticker-result-summary">
         <h2>${escapeHtml(company.name)} (${escapeHtml(company.ticker)})</h2>
+        ${renderWatchlistToggleButton(company.ticker)}
         <p><span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span></p>
         <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
         ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
@@ -730,6 +731,7 @@ function renderRawCompanyData(company) {
   return `
     <div class="ticker-raw-data">
       <h3>${escapeHtml(company.name)} (${escapeHtml(company.ticker)})</h3>
+      ${renderWatchlistToggleButton(company.ticker)}
       <ul class="ticker-raw-data-list">
         <li><span>Sector</span><span>${escapeHtml(company.sector)}</span></li>
         <li><span>Headquarters</span><span>${escapeHtml(company.hq_country || 'Unknown')}</span></li>
@@ -1040,6 +1042,7 @@ function renderCompareColumn(company, scored) {
   return `
     <div class="ticker-compare-column">
       <h2>${escapeHtml(company.name)} (${escapeHtml(company.ticker)})</h2>
+      ${renderWatchlistToggleButton(company.ticker)}
       <p><span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span></p>
       <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
       ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}

@@ -71,6 +71,27 @@ const myPortfoliosViewState = {
   confirmingDeleteId: null, // id of the entry currently showing its "are you sure?" prompt, or null
 };
 
+// Watchlist membership + the shared ☆/★ toggle button's own state -- kept
+// separate from watchlistViewState below (the dedicated My Watchlist
+// screen's own display state) since `tickers` needs to be known everywhere
+// a toggle button can appear (Ticker Tester, Compare Two Companies, the
+// main Results table), not just on the My Watchlist screen itself.
+const watchlistState = {
+  tickers: new Set(), // every ticker currently on this user's watchlist -- loaded eagerly, see loadWatchlistTickers
+  loaded: false,
+  pendingTicker: null, // ticker currently mid add/remove -- disables just that one button
+  error: null, // most recent add/remove failure message, or null
+  errorTicker: null, // which ticker's button should show `error` next to it
+};
+
+// UI-only state for the My Watchlist screen.
+const watchlistViewState = {
+  loading: true,
+  error: null,
+  entries: [], // [{ ticker, addedAt }], newest-first
+  expandedTickers: new Set(), // tickers whose compact scoring detail is currently expanded
+};
+
 // Set when a signed-out visitor clicks "Save My Portfolio" on the results
 // screen: their answers at that moment, held here until they finish
 // logging in (or signing up), at which point onAuthStateChanged below
@@ -87,6 +108,15 @@ let pendingSaveAnswers = null;
 // second time. Cleared as soon as it's consumed, or if they back out of
 // the login screen instead.
 let pendingCompareRedirect = false;
+
+// Same pattern again, for a signed-out visitor who clicked ☆ Add to
+// Watchlist somewhere (Ticker Tester, Compare Two Companies, or a Results
+// table row -- see renderWatchlistToggleButton). Unlike the two above,
+// this one can be triggered from several different screens, so the screen
+// to return to once login finishes is stashed alongside it rather than
+// being a fixed destination.
+let pendingWatchlistAdd = null; // ticker, or null
+let pendingWatchlistReturnView = null; // state.view to restore once the add completes
 
 // Firebase Auth's error codes (e.g. "auth/wrong-password") are never shown
 // to the client directly -- always translated to plain language here.
@@ -152,6 +182,20 @@ if (firebaseReady) {
     authState.ready = true;
     renderAccountWidget();
 
+    if (user) {
+      // Fire-and-forget: populates watchlistState.tickers so every ☆/★
+      // toggle button (Ticker Tester, Compare, Results table) shows the
+      // right state as soon as possible, not just once My Watchlist is
+      // opened. One small read of this user's (<= 20-doc) watchlist per
+      // sign-in/page-load -- an accepted, deliberate cost for correctness
+      // everywhere rather than plumbing a "have I checked yet" flag through
+      // every render call site that can show a toggle button.
+      loadWatchlistTickers();
+    } else {
+      watchlistState.tickers = new Set();
+      watchlistState.loaded = false;
+    }
+
     if (user && pendingSaveAnswers) {
       // A signed-out visitor clicked "Save My Portfolio," was redirected
       // here to log in, and has now done so -- finish the save they
@@ -183,6 +227,30 @@ if (firebaseReady) {
       // click on the Compare button required.
       pendingCompareRedirect = false;
       enterTickerCompare(); // js/ticker-tester.js
+      return;
+    }
+
+    if (user && pendingWatchlistAdd) {
+      // A signed-out visitor clicked ☆ Add to Watchlist somewhere, was
+      // redirected here to log in, and has now done so -- finish that add
+      // automatically (no second click), then return them to whichever
+      // screen they were actually on (Ticker Tester, Compare, or Results),
+      // not a fixed destination like the two pending flows above.
+      const ticker = pendingWatchlistAdd;
+      const returnView = pendingWatchlistReturnView || 'intro';
+      pendingWatchlistAdd = null;
+      pendingWatchlistReturnView = null;
+      try {
+        await addToWatchlist(ticker);
+        watchlistState.tickers.add(ticker);
+      } catch (err) {
+        console.error('addToWatchlist failed (post-login auto-add):', err);
+        watchlistState.error =
+          err && err.code === 'watchlist-limit-reached' ? err.message : describeFirestoreError(err, 'Could not add to your watchlist');
+        watchlistState.errorTicker = ticker;
+      }
+      state.view = returnView;
+      render();
       return;
     }
 
@@ -311,6 +379,303 @@ async function deleteSavedPortfolio(portfolioId) {
   await savedPortfoliosCollection().doc(portfolioId).delete();
 }
 
+// --- Firestore: watchlist (individual tracked tickers) -----------------
+//
+// A lighter-weight sibling of savedPortfolios above: just tracked tickers,
+// no survey answers. The ticker itself is the document id (rather than an
+// auto-generated one) -- Firestore doc ids allow any string except one
+// containing "/" or equal to "." or "..", which every real ticker in this
+// dataset satisfies (including ones with a literal period, e.g. "BRK.B").
+// Using the ticker as the id makes "is this already watchlisted" and
+// "add if not present" both a single doc reference, no query needed, and
+// makes a duplicate add naturally idempotent instead of needing its own
+// existence check race-condition-free.
+
+const MAX_WATCHLIST_SIZE = 20;
+
+function watchlistCollection() {
+  return firebaseDb.collection('users').doc(authState.user.uid).collection('watchlist');
+}
+
+// Same client-side cap enforcement and reasoning as saveNewPortfolio's own
+// MAX_SAVED_PORTFOLIOS check above -- see that function's comment.
+async function addToWatchlist(ticker) {
+  if (!firebaseReady) throw new Error('Account features are unavailable right now.');
+  if (!authState.user) throw new Error('You need to be logged in to add to your watchlist.');
+
+  const coll = watchlistCollection();
+  const docRef = coll.doc(ticker);
+  const existing = await docRef.get();
+  if (existing.exists) return; // already watchlisted -- idempotent no-op, not an error
+
+  const snapshot = await coll.get();
+  if (snapshot.size >= MAX_WATCHLIST_SIZE) {
+    const limitErr = new Error(
+      `You've reached your limit of ${MAX_WATCHLIST_SIZE} watchlisted companies. Remove one from My Watchlist to add another.`
+    );
+    limitErr.code = 'watchlist-limit-reached';
+    throw limitErr;
+  }
+
+  await docRef.set({ ticker, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+}
+
+async function removeFromWatchlist(ticker) {
+  if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
+  await watchlistCollection().doc(ticker).delete();
+}
+
+async function listWatchlist() {
+  if (!firebaseReady || !authState.user) return [];
+  const snapshot = await watchlistCollection().orderBy('addedAt', 'desc').get();
+  return snapshot.docs.map((doc) => ({ ticker: doc.id, ...doc.data() }));
+}
+
+// Populates watchlistState.tickers (just the membership set, for toggle-
+// button display everywhere) -- called on every sign-in, see
+// onAuthStateChanged above. The dedicated My Watchlist screen
+// (openMyWatchlistView below) does its own separate fetch for the ordered,
+// full-detail list it actually displays.
+async function loadWatchlistTickers() {
+  if (!firebaseReady || !authState.user) return;
+  try {
+    const entries = await listWatchlist();
+    watchlistState.tickers = new Set(entries.map((e) => e.ticker));
+    watchlistState.loaded = true;
+  } catch (err) {
+    console.error('loadWatchlistTickers failed:', err);
+  }
+  renderInPlace();
+}
+
+// The shared ☆/★ toggle button -- rendered next to a company's name
+// everywhere one can appear (Ticker Tester, each Compare Two Companies
+// column, raw-data fallback views, each Results table row, and each My
+// Watchlist entry's own row). One implementation, wired generically by
+// wireWatchlistToggleButtons (called unconditionally at the end of
+// app.js's renderInPlace, so no render call site has to remember to wire
+// it itself).
+function renderWatchlistToggleButton(ticker) {
+  const isWatching = watchlistState.tickers.has(ticker);
+  const isPending = watchlistState.pendingTicker === ticker;
+  const showError = watchlistState.error && watchlistState.errorTicker === ticker;
+  return `
+    <span class="watchlist-toggle-wrap">
+      <button
+        type="button"
+        class="btn-link-action watchlist-toggle-btn ${isWatching ? 'watchlist-toggle-btn-active' : ''}"
+        data-ticker="${escapeHtml(ticker)}"
+        ${isPending ? 'disabled' : ''}
+      >
+        ${isPending ? 'Updating…' : isWatching ? '★ Watching' : '☆ Add to Watchlist'}
+      </button>
+      ${showError ? `<span class="error-text watchlist-toggle-error">${escapeHtml(watchlistState.error)}</span>` : ''}
+    </span>
+  `;
+}
+
+function wireWatchlistToggleButtons() {
+  document.querySelectorAll('.watchlist-toggle-btn').forEach((btn) => {
+    btn.addEventListener('click', () => handleWatchlistToggleClick(btn.dataset.ticker));
+  });
+}
+
+async function handleWatchlistToggleClick(ticker) {
+  if (!firebaseReady || !authState.user) {
+    // Not logged in -- same "stash intent, send to login, finish
+    // automatically once signed in" pattern as Save My Portfolio and
+    // Compare Two Companies (see pendingSaveAnswers/pendingCompareRedirect
+    // above), just remembering which screen to come back to since this
+    // button can be clicked from several different ones.
+    pendingWatchlistAdd = ticker;
+    pendingWatchlistReturnView = state.view;
+    authViewState.mode = 'login';
+    authViewState.error = null;
+    authViewState.info = null;
+    state.view = 'account';
+    render();
+    return;
+  }
+
+  watchlistState.error = null;
+  watchlistState.errorTicker = null;
+  watchlistState.pendingTicker = ticker;
+  renderInPlace();
+
+  try {
+    if (watchlistState.tickers.has(ticker)) {
+      await removeFromWatchlist(ticker);
+      watchlistState.tickers.delete(ticker);
+      watchlistViewState.entries = watchlistViewState.entries.filter((e) => e.ticker !== ticker);
+    } else {
+      await addToWatchlist(ticker);
+      watchlistState.tickers.add(ticker);
+      if (state.view === 'watchlist') {
+        // Keep the My Watchlist screen's own ordered list in sync without
+        // a full refetch -- addedAt.toDate() is only ever read for display
+        // (renderWatchlistEntry's dateLabel-equivalent, if added later), so
+        // a plain Date stand-in is fine until the next real fetch.
+        watchlistViewState.entries.unshift({ ticker, addedAt: { toDate: () => new Date() } });
+      }
+    }
+  } catch (err) {
+    console.error('Watchlist toggle failed:', err);
+    watchlistState.error =
+      err && err.code === 'watchlist-limit-reached' ? err.message : describeFirestoreError(err, 'Could not update your watchlist');
+    watchlistState.errorTicker = ticker;
+  }
+  watchlistState.pendingTicker = null;
+  renderInPlace();
+}
+
+// --- My Watchlist view ---------------------------------------------------
+
+async function openMyWatchlistView() {
+  state.view = 'watchlist';
+  watchlistViewState.loading = true;
+  watchlistViewState.error = null;
+  watchlistViewState.expandedTickers = new Set();
+  render();
+  try {
+    watchlistViewState.entries = await listWatchlist();
+    watchlistState.tickers = new Set(watchlistViewState.entries.map((e) => e.ticker));
+  } catch (err) {
+    console.error('listWatchlist failed:', err);
+    watchlistViewState.error = describeFirestoreError(err, 'Could not load your watchlist');
+  }
+  watchlistViewState.loading = false;
+  renderInPlace();
+}
+
+function renderMyWatchlist() {
+  const count = watchlistViewState.entries.length;
+  appEl.innerHTML = `
+    <section class="card watchlist-card">
+      <p class="eyebrow">Account</p>
+      <h1>My Watchlist</h1>
+      <p class="lede">
+        ${watchlistViewState.loading ? "Companies you're tracking." : `${count} of ${MAX_WATCHLIST_SIZE} watchlisted companies.`}
+      </p>
+      ${watchlistViewState.loading ? '<p class="muted">Loading…</p>' : renderWatchlistEntries()}
+      <div class="nav-row">
+        <button type="button" id="watchlist-back-btn" class="btn btn-secondary">Back</button>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('watchlist-back-btn').addEventListener('click', () => {
+    state.view = 'intro';
+    render();
+  });
+
+  wireWatchlistEntryToggles();
+}
+
+function renderWatchlistEntries() {
+  if (watchlistViewState.error) return `<p class="error-text">${escapeHtml(watchlistViewState.error)}</p>`;
+  if (watchlistViewState.entries.length === 0) {
+    return '<p class="muted">You haven\'t watchlisted any companies yet. Look up a company in Ticker Tester (or anywhere else you see a ☆ Add to Watchlist button) to track it here.</p>';
+  }
+  if (!state.dataset) return '<p class="muted">Loading company data…</p>';
+  return `<ul class="watchlist-list">${watchlistViewState.entries.map(renderWatchlistEntry).join('')}</ul>`;
+}
+
+// Each entry is a compact one-line summary (ticker, name, sector, tier
+// badge if personalized data is available) that expands, on click, into a
+// compact version of the same scoring Ticker Tester itself would show --
+// reusing renderCategoryListItems/renderRawCompanyData/tickerTierDisplay/
+// buildCompanyScoreEntry from ticker-tester.js exactly, not a re-derived
+// summary. Deliberately no radar chart here (that's what "compact" means
+// per the brief) -- just the rationale, note/caution flags, and the
+// category score list.
+function renderWatchlistEntry(entry) {
+  const company = state.dataset.companies.find((c) => c.ticker === entry.ticker);
+  if (!company) {
+    // Watchlisted ticker no longer present in the current dataset --
+    // handled explicitly rather than crashing on a null lookup.
+    return `
+      <li class="watchlist-entry" data-ticker="${escapeHtml(entry.ticker)}">
+        <div class="watchlist-entry-row">
+          <span class="watchlist-entry-ticker">${escapeHtml(entry.ticker)}</span>
+          <span class="muted">No longer in the current dataset.</span>
+        </div>
+        ${renderWatchlistToggleButton(entry.ticker)}
+      </li>
+    `;
+  }
+
+  const isExpanded = watchlistViewState.expandedTickers.has(entry.ticker);
+  const scored = hasPersonalizationSource() ? buildCompanyScoreEntry(company) : null; // js/ticker-tester.js
+  const display = scored && scored.entry ? tickerTierDisplay(scored.entry.tier) : null; // js/ticker-tester.js
+
+  return `
+    <li class="watchlist-entry" data-ticker="${escapeHtml(entry.ticker)}">
+      <button type="button" class="watchlist-entry-row watchlist-entry-toggle" data-ticker="${escapeHtml(entry.ticker)}">
+        <span class="financial-toggle-chevron ${isExpanded ? 'open' : ''}">${chevronIcon()}</span>
+        <span class="watchlist-entry-ticker">${escapeHtml(company.ticker)}</span>
+        <span class="watchlist-entry-name">${escapeHtml(company.name)}</span>
+        <span class="watchlist-entry-sector">${escapeHtml(company.sector)}</span>
+        ${display ? `<span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span>` : ''}
+      </button>
+      ${renderWatchlistToggleButton(entry.ticker)}
+      ${isExpanded ? renderWatchlistEntryDetail(company, scored) : ''}
+    </li>
+  `;
+}
+
+function renderWatchlistEntryDetail(company, scored) {
+  if (!hasPersonalizationSource()) {
+    // js/ticker-tester.js
+    return `
+      <div class="watchlist-entry-detail">
+        <p class="muted">Complete the survey or load a saved portfolio to see how ${escapeHtml(company.name)} matches your values.</p>
+        ${renderRawCompanyData(company)}
+      </div>
+    `;
+  }
+  if (scored.blueChipExcluded) {
+    return `
+      <div class="watchlist-entry-detail">
+        <p class="muted">
+          You rated "large, established blue-chip companies" a 5/5 -- ${escapeHtml(company.name)} doesn't meet that
+          bar, so it would never appear in your recommended portfolio regardless of how well it otherwise matches
+          your values.
+        </p>
+        ${renderRawCompanyData(company)}
+      </div>
+    `;
+  }
+
+  const { entry, ctx } = scored;
+  const categoryScores = computeCategoryScores(company, entry, ctx); // js/ticker-tester.js
+  const showNote = entry.note && entry.tier !== 'Below Values Threshold';
+  return `
+    <div class="watchlist-entry-detail">
+      <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
+      ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
+      ${
+        entry.cautionFlags && entry.cautionFlags.length > 0
+          ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`
+          : ''
+      }
+      <ul class="ticker-category-list">
+        ${renderCategoryListItems(categoryScores)}
+      </ul>
+    </div>
+  `;
+}
+
+function wireWatchlistEntryToggles() {
+  document.querySelectorAll('.watchlist-entry-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const ticker = btn.dataset.ticker;
+      if (watchlistViewState.expandedTickers.has(ticker)) watchlistViewState.expandedTickers.delete(ticker);
+      else watchlistViewState.expandedTickers.add(ticker);
+      renderInPlace();
+    });
+  });
+}
+
 // --- Header account widget (static markup outside #app, present on every view) --
 
 function renderAccountWidget() {
@@ -325,12 +690,14 @@ function renderAccountWidget() {
     el.innerHTML = `
       <span class="account-widget-email">${escapeHtml(authState.user.email)}</span>
       <button type="button" id="account-my-portfolios-link" class="account-widget-link">My Portfolios</button>
+      <button type="button" id="account-my-watchlist-link" class="account-widget-link">My Watchlist</button>
       <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
     `;
     document.getElementById('account-my-portfolios-link').addEventListener('click', openMyPortfoliosView);
+    document.getElementById('account-my-watchlist-link').addEventListener('click', openMyWatchlistView);
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
-      if (state.view === 'account' || state.view === 'portfolios') {
+      if (state.view === 'account' || state.view === 'portfolios' || state.view === 'watchlist') {
         state.view = 'intro';
         render();
       }
@@ -454,6 +821,8 @@ function renderAccount() {
     authViewState.info = null;
     pendingSaveAnswers = null; // abandon any interrupted "Save My Portfolio" too
     pendingCompareRedirect = false; // ...and any interrupted Compare-Two-Companies redirect
+    pendingWatchlistAdd = null; // ...and any interrupted watchlist add
+    pendingWatchlistReturnView = null;
     state.view = 'intro';
     render();
   });
