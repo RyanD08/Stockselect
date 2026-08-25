@@ -146,7 +146,7 @@ function renderSurvey() {
       </div>
       <div class="survey-sticky-header">
         <p class="step-label">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
-        <h2><span class="category-icon">${category.icon}</span>${escapeHtml(category.label)}</h2>
+        <h1><span class="category-icon">${category.icon}</span>${escapeHtml(category.label)}</h1>
       </div>
       <p class="scale-hint">For each item, rate how important it is to you: 1 = not important, 5 = very important.</p>
       <div class="questions-list">
@@ -271,7 +271,13 @@ function renderQuestionRow(q) {
         ${[1, 2, 3, 4, 5]
           .map(
             (v) => `
-          <button type="button" class="scale-btn ${v === current ? 'selected' : ''}" data-question="${q.id}" data-value="${v}">
+          <button
+            type="button"
+            class="scale-btn ${v === current ? 'selected' : ''}"
+            data-question="${q.id}"
+            data-value="${v}"
+            aria-label="${v}${v === current ? ' (selected)' : ''}"
+          >
             ${v === current ? checkmarkIcon() : v}
           </button>
         `
@@ -533,7 +539,7 @@ function renderResults() {
 
       <div class="summary-grid">
         <div class="summary-box">
-          <h3>Your Top Priorities</h3>
+          <h2>Your Top Priorities</h2>
           ${
             topPriorities.length > 0
               ? `<ul class="priority-list">${topPriorities.map((q) => `<li>${escapeHtml(q.short)}</li>`).join('')}</ul>`
@@ -541,7 +547,7 @@ function renderResults() {
           }
         </div>
         <div class="summary-box">
-          <h3><span class="compass-motif">${compassMotifIcon()}</span>Your Risk Profile</h3>
+          <h2><span class="compass-motif">${compassMotifIcon()}</span>Your Risk Profile</h2>
           <p class="risk-badge risk-${riskProfile.toLowerCase()}"><span class="risk-icon">${riskProfileIcon(riskProfile)}</span>${riskProfile}</p>
           <p class="muted">${riskProfileBlurb(riskProfile)}</p>
         </div>
@@ -1075,6 +1081,95 @@ function initSiteDisclaimerToggle() {
   });
 }
 
+// --- Privacy Policy modal -------------------------------------------------
+//
+// Drafted as a reasonable, accurate starting point for this specific tool
+// (matches what the code actually collects, as of 2026-08-25 -- Firebase
+// Auth for email/password, the Firestore subcollections under users/{uid}
+// listed in firestore.rules, and the Analytics events logged via
+// logAnalyticsEvent, js/firebase-config.js). Same reasoning as
+// TERMS_OF_SERVICE_HTML (auth.js): deliberately omits a Contact section and
+// any jurisdiction-specific language for now -- add them back once there's
+// real contact info to put in, and get this reviewed before relying on it
+// for actual users. Reachable from the site footer on every screen (unlike
+// the Terms of Service, which is only surfaced during signup), since privacy
+// information isn't tied to any one action the way agreeing to terms is.
+const PRIVACY_POLICY_HTML = `
+  <h3>1. Overview</h3>
+  <p>This page explains what information TrueNorth collects, why, and what you can do about it. TrueNorth doesn't sell your information, and doesn't show ads.</p>
+
+  <h3>2. Using TrueNorth Without an Account</h3>
+  <p>You can take the survey, view your results, use Ticker Tester, and compare companies without creating an account. Your answers live only in your browser's memory for that visit -- nothing is sent to us or saved anywhere, and it's gone if you refresh the page.</p>
+
+  <h3>3. Information We Collect With an Account</h3>
+  <p>Creating an account requires an email address and password, handled by Firebase Authentication (a Google service) -- we never see or store your password ourselves. Once signed in, the following is saved so it's there the next time you visit:</p>
+  <ul>
+    <li><strong>Saved portfolios:</strong> the name you give a saved portfolio and the survey answers behind it.</li>
+    <li><strong>Watchlist:</strong> the tickers you choose to track.</li>
+    <li><strong>Learn progress:</strong> which lessons you've completed and your quiz scores.</li>
+    <li><strong>Badges:</strong> which achievement badges you've earned and which one (if any) you have equipped.</li>
+  </ul>
+
+  <h3>4. Sharing Your Results Publicly</h3>
+  <p>If you use "Share My Results," we create a public snapshot containing your risk profile, top priorities, and holdings (ticker, name, sector, and match tier) -- never your detailed rationale or your actual survey answers. This snapshot isn't linked to your account or identity in any way, and it can't be browsed or listed -- only someone with the exact link can view it. Because it's disconnected from your account, a shared snapshot isn't affected by later deleting your account, and it can't be un-shared once created.</p>
+
+  <h3>5. Analytics</h3>
+  <p>We use Firebase Analytics (also a Google service) to understand overall usage -- things like which pages get visited and which features get used (e.g. that a survey was completed, or a company comparison was run). This is aggregate usage data, not tied to any specific action you take with your saved data.</p>
+
+  <h3>6. Staying Signed In</h3>
+  <p>TrueNorth uses your browser's local storage to keep you signed in between visits. We don't use third-party advertising cookies or trackers.</p>
+
+  <h3>7. Deleting Your Data</h3>
+  <p>The "Delete Account" option removes your saved portfolios, watchlist, Learn progress, badges, and account itself, immediately and permanently. As noted above, any results you previously shared publicly are not tied to your account and are not removed by this.</p>
+
+  <h3>8. Children's Privacy</h3>
+  <p>TrueNorth is not directed at children under 13, and we don't knowingly collect information from them.</p>
+
+  <h3>9. Changes to This Policy</h3>
+  <p>We may update this policy as the Service changes. Continued use of TrueNorth after a change means you accept the updated policy.</p>
+`;
+
+function handlePrivacyModalKeydown(evt) {
+  if (evt.key === 'Escape') closePrivacyModal();
+}
+
+// Same document.body-append pattern as the Terms of Service/Delete-Account
+// modals (auth.js) -- independent of whatever screen #app is currently
+// showing, so opening it from the footer never disturbs it.
+function openPrivacyModal() {
+  if (document.getElementById('privacy-modal-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'privacy-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+      <div class="modal-header">
+        <h2 id="privacy-modal-title">Privacy Policy</h2>
+        <button type="button" id="privacy-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" tabindex="0">${PRIVACY_POLICY_HTML}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('privacy-modal-close-btn').addEventListener('click', closePrivacyModal);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) closePrivacyModal();
+  });
+  document.addEventListener('keydown', handlePrivacyModalKeydown);
+}
+
+function closePrivacyModal() {
+  const overlay = document.getElementById('privacy-modal-overlay');
+  if (overlay) overlay.remove();
+  document.removeEventListener('keydown', handlePrivacyModalKeydown);
+}
+
+function initPrivacyPolicyLink() {
+  const link = document.getElementById('privacy-policy-link');
+  if (!link) return;
+  link.addEventListener('click', openPrivacyModal);
+}
+
 // --- Hamburger site nav (static markup outside #app, present on every view) --
 //
 // 2026-08-25: replaced the old header nav (a single "Ticker Tester" text
@@ -1260,6 +1355,7 @@ function initDesktopNavBar() {
 async function init() {
   initLogoHomeLink();
   initSiteDisclaimerToggle();
+  initPrivacyPolicyLink();
   initSiteNavMenu();
   initDesktopNavBar();
 

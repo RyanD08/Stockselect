@@ -962,7 +962,7 @@ function openTermsModal() {
         <h2 id="terms-modal-title">Terms of Service</h2>
         <button type="button" id="terms-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
       </div>
-      <div class="modal-body">${TERMS_OF_SERVICE_HTML}</div>
+      <div class="modal-body" tabindex="0">${TERMS_OF_SERVICE_HTML}</div>
     </div>
   `;
   document.body.appendChild(overlay);
@@ -1546,7 +1546,7 @@ function renderSharedResult() {
 
       <div class="summary-grid">
         <div class="summary-box">
-          <h3>Top Priorities</h3>
+          <h2>Top Priorities</h2>
           ${
             topPriorities.length > 0
               ? `<ul class="priority-list">${topPriorities.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
@@ -1554,7 +1554,7 @@ function renderSharedResult() {
           }
         </div>
         <div class="summary-box">
-          <h3><span class="compass-motif">${compassMotifIcon()}</span>Risk Profile</h3>
+          <h2><span class="compass-motif">${compassMotifIcon()}</span>Risk Profile</h2>
           <p class="risk-badge risk-${riskProfile.toLowerCase()}"><span class="risk-icon">${riskProfileIcon(riskProfile)}</span>${escapeHtml(riskProfile)}</p>
         </div>
       </div>

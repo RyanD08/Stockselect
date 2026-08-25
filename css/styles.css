@@ -7,6 +7,18 @@
   --navy-light: #193664;
   --gold: #c9962f;
   --gold-light: #d9ac55;
+  /* --gold itself only passes WCAG AA text contrast (4.5:1) against the
+     navy header background (6.14:1 there) -- against the white/cream card
+     backgrounds it's used as TEXT on (link-style buttons: disclaimer
+     toggle, watchlist/financial toggles, Terms link, auth switch links,
+     etc.), it only reaches ~2.4-2.7:1. This darker variant is for exactly
+     those text-on-light-background cases; --gold itself is unchanged and
+     still correct for anything on the navy header/nav. Same darkening
+     already applied to --warn-text/--score-below-text below, which are
+     this same gold family lightened into a bg + darkened into a text
+     color, at ~5.2:1 -- gold-text matches that established pattern rather
+     than inventing a new one. */
+  --gold-text: #8a6008;
   --bg: #f5f1e8;
   --card-bg: #ffffff;
   --text: #1c2530;
@@ -23,7 +35,7 @@
   --score-above-bg: #cdead9;
   --score-above-text: #145c37;
   --score-average-bg: #e9f6ef;
-  --score-average-text: #4c9270;
+  --score-average-text: #2f6b4d; /* darkened from #4c9270 -- the original only hit 3.34:1 against its own bg, below WCAG AA's 4.5:1 for text; this hits 5.67:1, in line with --score-above-text/--success-text's own contrast against their similar backgrounds */
   --score-below-bg: #fdf3b8;
   --score-below-text: #7a6300;
   --font-serif: Georgia, 'Times New Roman', Times, serif;
@@ -790,11 +802,11 @@ select:focus-visible {
   margin: 0 0 0.2rem;
 }
 
-.survey-sticky-header h2 {
+.survey-sticky-header h1 {
   margin: 0;
 }
 
-h2 .category-icon {
+h1 .category-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1054,7 +1066,7 @@ h2 .category-icon {
 .review-edit-btn {
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
@@ -1115,6 +1127,20 @@ h2 .category-icon {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem 1.25rem;
+}
+
+/* Marked up as <h2> (not <h3>) so the heading level correctly follows the
+   page's own <h1> without a gap -- these two boxes are the first heading
+   after the page title, not nested three levels under it. Kept at the
+   same visual size/layout as the rest of the site's h3s (small, flex-
+   aligned for the optional icon) since heading LEVEL is a document-
+   structure/accessibility concern, not a font-size one. */
+.summary-box h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .priority-list {
@@ -1491,7 +1517,7 @@ h2 .category-icon {
   margin-top: 0.5rem;
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.8rem;
   cursor: pointer;
@@ -1589,7 +1615,7 @@ h2 .category-icon {
 
 .simulation-toggle-btn:hover {
   border-color: var(--gold);
-  color: var(--gold);
+  color: var(--gold-text);
 }
 
 .simulation-table-wrap {
@@ -1698,7 +1724,7 @@ h2 .category-icon {
   transform: translateY(-50%);
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;
@@ -1735,7 +1761,7 @@ h2 .category-icon {
   display: inline;
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   cursor: pointer;
   padding: 0;
@@ -1841,7 +1867,7 @@ h2 .category-icon {
 }
 
 .auth-link {
-  color: var(--gold);
+  color: var(--gold-text);
   font-size: 0.85rem;
 }
 
@@ -1865,7 +1891,7 @@ h2 .category-icon {
 .auth-switch-btn {
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.88rem;
   cursor: pointer;
@@ -1921,7 +1947,7 @@ h2 .category-icon {
 .save-results-link {
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
@@ -2061,7 +2087,7 @@ h2 .category-icon {
 .btn-link-action {
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
@@ -2729,24 +2755,37 @@ h2 .category-icon {
 }
 
 .learn-lesson-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.9rem 0;
   border-top: 1px solid var(--border);
-  cursor: pointer;
 }
 
 .learn-lesson-item:first-child {
   border-top: none;
 }
 
-.learn-lesson-item:hover .learn-lesson-item-title {
+/* The actual clickable row -- a real <button> (not a <li role="button">,
+   which is invalid ARIA: a role of "button" isn't allowed on a list item,
+   and it stops the <li> counting as a real list item to the accessibility
+   tree, breaking the enclosing <ul>'s own list semantics too). */
+.learn-lesson-item-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.9rem 0;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.learn-lesson-item-btn:hover .learn-lesson-item-title {
   text-decoration: underline;
 }
 
-.learn-lesson-item:focus-visible {
+.learn-lesson-item-btn:focus-visible {
   outline: 2px solid var(--gold-light);
   outline-offset: 2px;
 }
@@ -2960,7 +2999,7 @@ h2 .category-icon {
 .site-disclaimer-toggle {
   border: none;
   background: none;
-  color: var(--gold);
+  color: var(--gold-text);
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
@@ -2970,7 +3009,15 @@ h2 .category-icon {
 }
 
 .site-disclaimer-toggle:hover {
-  color: var(--gold-light);
+  color: var(--navy);
+}
+
+.site-footer-links {
+  margin: 0.6rem 0 0;
+}
+
+.site-footer-links .site-disclaimer-toggle {
+  margin-left: 0;
 }
 
 .site-disclaimer-full {
