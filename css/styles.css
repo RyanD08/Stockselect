@@ -293,10 +293,42 @@ body {
   }
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
 .logo-link {
   display: inline-block;
   line-height: 0;
   border-radius: 6px;
+}
+
+/* Explicit "Home" link next to the logo -- the logo image itself already
+   navigates home (see initLogoHomeLink, js/app.js), but that's only
+   discoverable if a visitor already knows to click a logo; this makes the
+   same action visible as its own labeled control. Shares the click
+   handler with the logo link (see wireBackHomeLinks, js/app.js). */
+.back-home-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--gold-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.back-home-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .back-home-link {
+    display: none;
+  }
 }
 
 .logo-img {

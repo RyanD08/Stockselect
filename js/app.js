@@ -1035,20 +1035,25 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// The header logo is static markup (outside the #app render cycle), so its
-// listener is wired once here rather than re-attached on every render().
-// Navigating home never resets answers/progress — Patch v5's state object
-// is reused as-is, so the survey resumes from where the client left off if
-// they click back into it (see renderIntro's hasProgress handling).
+// The header logo and the "Home" text link beside it are both static
+// markup (outside the #app render cycle), so their listeners are wired
+// once here rather than re-attached on every render(). Navigating home
+// never resets answers/progress — Patch v5's state object is reused as-is,
+// so the survey resumes from where the client left off if they click back
+// into it (see renderIntro's hasProgress handling). Both links do the
+// exact same thing -- the text link exists purely so returning home is
+// discoverable without already knowing the logo itself is clickable.
 function initLogoHomeLink() {
-  const logoLink = document.getElementById('logo-home-link');
-  if (!logoLink) return;
-  logoLink.addEventListener('click', (event) => {
+  const goHome = (event) => {
     event.preventDefault();
     state.view = 'intro';
     state.editOrigin = null;
     render();
-  });
+  };
+  const logoLink = document.getElementById('logo-home-link');
+  if (logoLink) logoLink.addEventListener('click', goHome);
+  const backHomeLink = document.getElementById('back-home-link');
+  if (backHomeLink) backHomeLink.addEventListener('click', goHome);
 }
 
 // The consolidated site disclaimer in the footer is static markup (outside
