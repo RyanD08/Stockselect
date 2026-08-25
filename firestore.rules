@@ -25,6 +25,13 @@
 //                                              into savedPortfolios (see
 //                                              migrateLegacySurveysIfNeeded in auth.js). Not survey
 //                                              or portfolio data itself.
+//   users/{userId}/learnProgress/{lessonId}  — CURRENT (2026-08-25): the Learn section's per-lesson
+//                                              completion tracking (see recordLessonCompletion in
+//                                              js/learn.js). One doc per lesson, id matching the
+//                                              lesson's own id (e.g. "ceo-pay-ratio"), holding just
+//                                              { completed, lastScore, bestScore, total, updatedAt }
+//                                              -- never the lesson content itself, which is static
+//                                              and ships with the app.
 //   users/{userId}/savedSurveys/{surveyId}   — LEGACY (superseded 2026-08-23b): the same feature
 //                                              under its old "survey" naming, before saved results
 //                                              were renamed to "portfolios." Its data is copied into
@@ -88,6 +95,12 @@ service cloud.firestore {
       // marker (see auth.js). Same per-owner access rule as everything
       // else here, even though it isn't survey/portfolio data.
       match /meta/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Current: the Learn section's per-lesson completion tracking (see
+      // js/learn.js). Same per-owner access rule as everything else here.
+      match /learnProgress/{lessonId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 

@@ -4,7 +4,7 @@
  */
 
 const state = {
-  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare' | 'sharedResult'
+  view: 'intro', // 'intro' | 'survey' | 'review' | 'results' | 'account' | 'portfolios' | 'watchlist' | 'tickerTester' | 'tickerCompare' | 'sharedResult' | 'learn' | 'learnLesson'
   categoryIndex: 0,
   furthestCategoryIndex: 0, // highest category index reached in the normal forward flow — governs which chips are jumpable
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
@@ -44,6 +44,8 @@ function renderInPlace() {
   else if (state.view === 'tickerTester') renderTickerTester(); // js/ticker-tester.js
   else if (state.view === 'tickerCompare') renderTickerCompare(); // js/ticker-tester.js
   else if (state.view === 'sharedResult') renderSharedResult(); // js/auth.js
+  else if (state.view === 'learn') renderLearnHub(); // js/learn.js
+  else if (state.view === 'learnLesson') renderLearnLesson(); // js/learn.js
 
   // Unconditional, regardless of which view just rendered: the ☆/★
   // watchlist toggle button (js/auth.js) can appear on several different
@@ -1171,6 +1173,17 @@ function navigateToWatchlist() {
   }, 'my_watchlist');
 }
 
+function navigateToLearn() {
+  closeHamburgerDropdown();
+  if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+    openLearnHub(); // js/learn.js
+    return;
+  }
+  redirectGatedNavItemToLogin(() => {
+    pendingLearnRedirect = true; // js/learn.js
+  }, 'learn');
+}
+
 // Rebuilt (not just re-wired) on init and every auth-state change -- see
 // its two call sites -- since the one auth-dependent piece of its content
 // (the signed-in client's email, shown as a non-interactive line at the
@@ -1186,12 +1199,14 @@ function renderSiteNavMenu() {
     <button type="button" id="nav-menu-compare" class="hamburger-item" role="menuitem">Compare Two Companies</button>
     <button type="button" id="nav-menu-portfolios" class="hamburger-item" role="menuitem">My Portfolios</button>
     <button type="button" id="nav-menu-watchlist" class="hamburger-item" role="menuitem">My Watchlist</button>
+    <button type="button" id="nav-menu-learn" class="hamburger-item" role="menuitem">Learn</button>
   `;
 
   document.getElementById('nav-menu-tickertester').addEventListener('click', navigateToTickerTester);
   document.getElementById('nav-menu-compare').addEventListener('click', navigateToCompare);
   document.getElementById('nav-menu-portfolios').addEventListener('click', navigateToPortfolios);
   document.getElementById('nav-menu-watchlist').addEventListener('click', navigateToWatchlist);
+  document.getElementById('nav-menu-learn').addEventListener('click', navigateToLearn);
 }
 
 function initSiteNavMenu() {
@@ -1224,6 +1239,7 @@ function initDesktopNavBar() {
   document.getElementById('nav-bar-compare').addEventListener('click', navigateToCompare);
   document.getElementById('nav-bar-portfolios').addEventListener('click', navigateToPortfolios);
   document.getElementById('nav-bar-watchlist').addEventListener('click', navigateToWatchlist);
+  document.getElementById('nav-bar-learn').addEventListener('click', navigateToLearn);
 }
 
 async function init() {

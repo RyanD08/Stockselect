@@ -128,6 +128,10 @@ let pendingWatchlistReturnView = null; // state.view to restore once the add com
 // "just open the My Watchlist screen."
 let pendingPortfoliosRedirect = false;
 let pendingWatchlistViewRedirect = false;
+// pendingLearnRedirect itself is declared in js/learn.js (that feature owns
+// it, same reasoning as watchlistState/watchlistViewState living in this
+// file even though app.js's nav code reads them) -- handled below
+// alongside the two flags above.
 
 // Firebase Auth's error codes (e.g. "auth/wrong-password") are never shown
 // to the client directly -- always translated to plain language here.
@@ -195,7 +199,7 @@ async function resetPassword(email) {
 // Auth user last: if the Firestore pass fails partway, the account (and
 // the ability to retry) still exists, rather than leaving a deleted
 // account with undeletable leftover data.
-const ALL_USER_SUBCOLLECTIONS = ['savedPortfolios', 'watchlist', 'meta', 'savedSurveys', 'savedSurvey', 'surveys'];
+const ALL_USER_SUBCOLLECTIONS = ['savedPortfolios', 'watchlist', 'meta', 'savedSurveys', 'savedSurvey', 'surveys', 'learnProgress'];
 
 async function deleteAccount(password) {
   if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
@@ -310,6 +314,13 @@ if (firebaseReady) {
       // Same, for the hamburger nav's "My Watchlist".
       pendingWatchlistViewRedirect = false;
       openMyWatchlistView();
+      return;
+    }
+
+    if (user && pendingLearnRedirect) {
+      // Same, for the nav's "Learn" (js/learn.js).
+      pendingLearnRedirect = false;
+      openLearnHub(); // js/learn.js
       return;
     }
 
@@ -1204,6 +1215,7 @@ function renderAccount() {
     pendingWatchlistReturnView = null;
     pendingPortfoliosRedirect = false; // ...and any interrupted hamburger-nav redirect
     pendingWatchlistViewRedirect = false;
+    pendingLearnRedirect = false; // js/learn.js
     state.view = 'intro';
     render();
   });
