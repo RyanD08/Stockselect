@@ -152,7 +152,7 @@ function renderSurvey() {
         ${CATEGORIES.map((cat, i) => renderCategoryChip(cat, i)).join('')}
       </div>
       <div class="survey-sticky-header">
-        <p class="step-label">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
+        <p class="step-label" role="status">Step ${state.categoryIndex + 1} of ${CATEGORIES.length}</p>
         <h1><span class="category-icon">${category.icon}</span>${escapeHtml(category.label)}</h1>
       </div>
       <p class="scale-hint">For each item, rate how important it is to you: 1 = not important, 5 = very important.</p>
@@ -1258,6 +1258,35 @@ function initOnlineOfflineHandler() {
   window.addEventListener('online', hideOfflineBanner);
 }
 
+// One button, created once and toggled via a hidden attribute rather than
+// added/removed -- present on every view (Results and Ticker Tester are
+// the screens long enough for it to matter, but it's harmless everywhere
+// else). Lives outside #app like the nav/banners above, so it survives
+// every render()/renderInPlace() call untouched.
+function initBackToTopButton() {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.id = 'back-to-top-btn';
+  btn.className = 'back-to-top-btn';
+  btn.setAttribute('aria-label', 'Back to top');
+  btn.hidden = true;
+  btn.textContent = '↑';
+  document.body.appendChild(btn);
+
+  btn.addEventListener('click', () => {
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+  });
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      btn.hidden = window.scrollY < 400;
+    },
+    { passive: true }
+  );
+}
+
 // --- Hamburger site nav (static markup outside #app, present on every view) --
 //
 // 2026-08-25: replaced the old header nav (a single "Ticker Tester" text
@@ -1421,6 +1450,16 @@ function initSiteNavMenu() {
     if (dropdown.contains(evt.target) || btn.contains(evt.target)) return;
     closeHamburgerDropdown();
   });
+  // Escape closes it too -- a keyboard-only user had no way to dismiss the
+  // open dropdown short of tabbing all the way through it. Returns focus
+  // to the hamburger button itself, same as a real disclosure widget.
+  document.addEventListener('keydown', (evt) => {
+    if (evt.key !== 'Escape') return;
+    const dropdown = document.getElementById('hamburger-dropdown');
+    if (!dropdown || dropdown.hidden) return;
+    closeHamburgerDropdown();
+    btn.focus();
+  });
   renderSiteNavMenu();
 }
 
@@ -1443,6 +1482,7 @@ function initDesktopNavBar() {
 async function init() {
   initGlobalErrorHandler();
   initOnlineOfflineHandler();
+  initBackToTopButton();
   initLogoHomeLink();
   initSiteDisclaimerToggle();
   initPrivacyPolicyLink();

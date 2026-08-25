@@ -486,7 +486,11 @@ function renderLearnHub() {
       <h1>Values-Investing Lessons</h1>
       <p class="lede">Short lessons on the concepts behind TrueNorth’s scoring, each with a quick quiz to check your understanding. Optional -- nothing else on the site requires finishing these.</p>
 
-      ${learnState.error ? `<p class="error-text">${escapeHtml(learnState.error)}</p>` : ''}
+      ${
+        learnState.error
+          ? `<div class="error-text-row"><p class="error-text">${escapeHtml(learnState.error)}</p><button type="button" id="learn-retry-btn" class="btn-link-action">Try Again</button></div>`
+          : ''
+      }
 
       <div class="learn-progress-wrap">
         <div class="learn-progress-bar-row">
@@ -516,6 +520,16 @@ function renderLearnHub() {
     state.view = 'intro';
     render();
   });
+
+  const retryBtn = document.getElementById('learn-retry-btn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', async () => {
+      retryBtn.disabled = true;
+      retryBtn.textContent = 'Retrying…';
+      await loadLearnProgress();
+      if (state.view === 'learn') renderInPlace();
+    });
+  }
 }
 
 function renderLearnLessonListItem(lesson) {
