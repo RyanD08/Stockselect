@@ -262,7 +262,11 @@ function renderMyBadges() {
       <p class="eyebrow">Account</p>
       <h1>My Badges</h1>
       <p class="lede">Achievements earned across TrueNorth. Equip one to show it in the header.</p>
-      ${error ? `<p class="error-text">${escapeHtml(error)}</p>` : ''}
+      ${
+        error
+          ? `<div class="error-text-row"><p class="error-text">${escapeHtml(error)}</p><button type="button" id="badges-retry-btn" class="btn-link-action">Try Again</button></div>`
+          : ''
+      }
       ${
         loading
           ? `<p class="muted">${spinnerHtml('Loading…')}</p>`
@@ -293,6 +297,18 @@ function renderMyBadges() {
       renderInPlace();
     });
   });
+
+  const retryBtn = document.getElementById('badges-retry-btn');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', async () => {
+      retryBtn.disabled = true;
+      retryBtn.textContent = 'Retrying…';
+      // Retries both -- isEarned() depends on Learn progress too (see the
+      // comment above), and either one could be the one that actually failed.
+      await Promise.all([loadBadgeState(), loadLearnProgress()]); // js/learn.js
+      if (state.view === 'myBadges') renderInPlace();
+    });
+  }
 }
 
 function renderBadgeListItem(badge) {
