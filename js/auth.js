@@ -90,6 +90,7 @@ const watchlistViewState = {
   error: null,
   entries: [], // [{ ticker, addedAt }], newest-first
   expandedTickers: new Set(), // tickers whose compact scoring detail is currently expanded
+  addQuery: '', // the "add a company" search box's current text -- see renderWatchlistAddPicker
 };
 
 // Set when a signed-out visitor clicks "Save My Portfolio" on the results
@@ -117,6 +118,16 @@ let pendingCompareRedirect = false;
 // being a fixed destination.
 let pendingWatchlistAdd = null; // ticker, or null
 let pendingWatchlistReturnView = null; // state.view to restore once the add completes
+
+// Same pattern once more, for the hamburger nav menu's own My Portfolios
+// and My Watchlist items (see renderSiteNavMenu, app.js) -- a logged-out
+// click redirects to login and, once signed in, navigates straight to the
+// screen they were trying to reach. Kept as their own flags (mirroring
+// pendingCompareRedirect's own name/shape) rather than reusing
+// pendingWatchlistAdd, which is scoped to adding one specific ticker, not
+// "just open the My Watchlist screen."
+let pendingPortfoliosRedirect = false;
+let pendingWatchlistViewRedirect = false;
 
 // Firebase Auth's error codes (e.g. "auth/wrong-password") are never shown
 // to the client directly -- always translated to plain language here.
@@ -181,6 +192,7 @@ if (firebaseReady) {
     authState.user = user;
     authState.ready = true;
     renderAccountWidget();
+    renderSiteNavMenu(); // js/app.js -- refreshes the hamburger dropdown's email line
 
     if (user) {
       // Fire-and-forget: populates watchlistState.tickers so every ☆/★
@@ -251,6 +263,22 @@ if (firebaseReady) {
       }
       state.view = returnView;
       render();
+      return;
+    }
+
+    if (user && pendingPortfoliosRedirect) {
+      // The hamburger nav's "My Portfolios" was clicked while signed out --
+      // now signed in, so go straight there instead of the usual intro
+      // landing below.
+      pendingPortfoliosRedirect = false;
+      openMyPortfoliosView();
+      return;
+    }
+
+    if (user && pendingWatchlistViewRedirect) {
+      // Same, for the hamburger nav's "My Watchlist".
+      pendingWatchlistViewRedirect = false;
+      openMyWatchlistView();
       return;
     }
 
@@ -556,6 +584,7 @@ function renderMyWatchlist() {
       <p class="lede">
         ${watchlistViewState.loading ? "Companies you're tracking." : `${count} of ${MAX_WATCHLIST_SIZE} watchlisted companies.`}
       </p>
+      ${!watchlistViewState.loading && state.dataset ? renderWatchlistAddPicker() : ''}
       ${watchlistViewState.loading ? '<p class="muted">Loading…</p>' : renderWatchlistEntries()}
       <div class="nav-row">
         <button type="button" id="watchlist-back-btn" class="btn btn-secondary">Back</button>
@@ -568,7 +597,87 @@ function renderMyWatchlist() {
     render();
   });
 
+  wireWatchlistAddPicker();
   wireWatchlistEntryToggles();
+}
+
+// A second, direct entry point into watchlisting a company -- lets a
+// client add straight from this screen instead of needing to look the
+// company up in Ticker Tester first. Same filterCompanies()
+// (ticker-tester.js) dataset restriction as every other search box on the
+// site (no free-text submission of a company outside the dataset), and
+// the click handler below calls the exact same handleWatchlistToggleClick
+// every ☆/★ button already uses -- no separate add path, no separate
+// watchlist data structure. Already-watchlisted companies are filtered out
+// of the results entirely (rather than shown disabled) since this picker
+// only ever adds -- surfacing a company already on the list here would
+// invite a click that the shared toggle handler would read as "remove."
+function renderWatchlistAddPicker() {
+  const query = watchlistViewState.addQuery;
+  const results = filterCompanies(query).filter((c) => !watchlistState.tickers.has(c.ticker)); // js/ticker-tester.js
+  const showDropdown = query.trim().length > 0;
+
+  return `
+    <div class="ticker-search watchlist-add-picker">
+      <label for="watchlist-add-input">Add a company to your watchlist</label>
+      <input
+        type="text"
+        id="watchlist-add-input"
+        autocomplete="off"
+        placeholder="e.g. Apple or AAPL"
+        value="${escapeHtml(query)}"
+      />
+      ${
+        showDropdown
+          ? `
+        <ul class="ticker-search-results">
+          ${
+            results.length > 0
+              ? results
+                  .map(
+                    (c) => `
+              <li>
+                <button type="button" class="ticker-search-result watchlist-add-result" data-ticker="${escapeHtml(c.ticker)}">
+                  <span class="ticker-search-result-ticker">${escapeHtml(c.ticker)}</span>
+                  <span class="ticker-search-result-name">${escapeHtml(c.name)}</span>
+                  <span class="ticker-search-result-sector">${escapeHtml(c.sector)}</span>
+                </button>
+              </li>
+            `
+                  )
+                  .join('')
+              : '<li class="ticker-search-empty">No matching companies found (or already on your watchlist).</li>'
+          }
+        </ul>
+      `
+          : ''
+      }
+    </div>
+  `;
+}
+
+function wireWatchlistAddPicker() {
+  const input = document.getElementById('watchlist-add-input');
+  if (input) {
+    input.addEventListener('input', () => {
+      watchlistViewState.addQuery = input.value;
+      renderInPlace();
+      // Re-render moves focus/cursor to the end by default -- restore it
+      // so typing feels continuous, same as every other search box here.
+      const refocused = document.getElementById('watchlist-add-input');
+      if (refocused) {
+        refocused.focus();
+        refocused.setSelectionRange(refocused.value.length, refocused.value.length);
+      }
+    });
+  }
+
+  document.querySelectorAll('.watchlist-add-result').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      watchlistViewState.addQuery = '';
+      handleWatchlistToggleClick(btn.dataset.ticker);
+    });
+  });
 }
 
 function renderWatchlistEntries() {
@@ -678,6 +787,12 @@ function wireWatchlistEntryToggles() {
 
 // --- Header account widget (static markup outside #app, present on every view) --
 
+// 2026-08-25: reduced to just Log In/Log Out -- My Portfolios and My
+// Watchlist moved into the hamburger nav menu (see renderSiteNavMenu,
+// app.js), which now owns all feature navigation; this widget's only job
+// is the one control that must stay visible outside the menu at all
+// times. The signed-in client's email moved into the hamburger dropdown
+// itself (its own top line) rather than living here redundantly.
 function renderAccountWidget() {
   const el = document.getElementById('account-widget');
   if (!el) return;
@@ -687,14 +802,7 @@ function renderAccountWidget() {
   }
 
   if (authState.user) {
-    el.innerHTML = `
-      <span class="account-widget-email">${escapeHtml(authState.user.email)}</span>
-      <button type="button" id="account-my-portfolios-link" class="account-widget-link">My Portfolios</button>
-      <button type="button" id="account-my-watchlist-link" class="account-widget-link">My Watchlist</button>
-      <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
-    `;
-    document.getElementById('account-my-portfolios-link').addEventListener('click', openMyPortfoliosView);
-    document.getElementById('account-my-watchlist-link').addEventListener('click', openMyWatchlistView);
+    el.innerHTML = '<button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>';
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
       if (state.view === 'account' || state.view === 'portfolios' || state.view === 'watchlist') {
@@ -703,7 +811,7 @@ function renderAccountWidget() {
       }
     });
   } else {
-    el.innerHTML = '<button type="button" id="account-login-link" class="account-widget-link">Log In / Sign Up</button>';
+    el.innerHTML = '<button type="button" id="account-login-link" class="account-widget-link">Log In</button>';
     document.getElementById('account-login-link').addEventListener('click', () => {
       authViewState.mode = 'login';
       authViewState.error = null;
@@ -823,6 +931,8 @@ function renderAccount() {
     pendingCompareRedirect = false; // ...and any interrupted Compare-Two-Companies redirect
     pendingWatchlistAdd = null; // ...and any interrupted watchlist add
     pendingWatchlistReturnView = null;
+    pendingPortfoliosRedirect = false; // ...and any interrupted hamburger-nav redirect
+    pendingWatchlistViewRedirect = false;
     state.view = 'intro';
     render();
   });

@@ -61,25 +61,14 @@ body {
   gap: 1rem;
 }
 
-/* Account widget — logged-out ("Log In / Sign Up") and logged-in (email +
-   Log Out) states, on the same navy header as the logo. Empty (no markup)
-   until Firebase resolves the first auth check, and permanently empty if
-   Firebase never loaded — see auth.js/renderAccountWidget. */
+/* Account widget — just Log In / Log Out, the one control that stays
+   visible outside the hamburger menu at all times (see .hamburger-dropdown
+   below for everything else, including the signed-in email). Empty (no
+   markup) until Firebase resolves the first auth check, and permanently
+   empty if Firebase never loaded — see auth.js/renderAccountWidget. */
 .account-widget {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.account-widget-email {
-  color: #cdd3de;
-  font-size: 0.85rem;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .account-widget-link {
@@ -98,46 +87,106 @@ body {
   color: #fff;
 }
 
-/* Groups the site nav (currently just Ticker Tester) and the account
-   widget together on the right side of the header, so justify-content:
-   space-between on .site-header-inner only ever splits "logo" from
-   "everything else" regardless of how many items are in this group. */
+/* Groups the hamburger nav menu and the account widget together on the
+   right side of the header, so justify-content: space-between on
+   .site-header-inner only ever splits "logo" from "everything else"
+   regardless of how many items are in this group. */
 .site-header-actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
-/* Site nav — currently just Ticker Tester, always present regardless of
-   login state (unlike the account widget, which is empty until Firebase
-   resolves). */
-.site-nav {
+/* Hamburger nav menu — 2026-08-25, replaced the old flat "Ticker Tester"
+   text link plus My Portfolios/My Watchlist inside the account widget
+   with one menu covering all four features (see renderSiteNavMenu,
+   app.js). Anchors the dropdown via position: relative so it can hang
+   off the button's bottom-right regardless of scroll position. */
+.site-nav-menu {
+  position: relative;
+}
+
+.hamburger-btn {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
 }
 
-.site-nav-link {
+.hamburger-btn:hover,
+.hamburger-btn[aria-expanded='true'] {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 22px;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--gold-light);
+}
+
+/* Dropdown floats over page content (not part of #app's own stacking),
+   cream/white so it reads against any page it opens on top of, rather
+   than staying navy like the header bar it hangs from. Right-aligned to
+   the button so it never runs off the right edge of the viewport, and
+   comfortably tap-sized throughout for the "primarily viewed on phones"
+   requirement. */
+.hamburger-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 20;
+  min-width: 220px;
+  max-width: calc(100vw - 2rem);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 31, 61, 0.18);
+  padding: 0.4rem;
+}
+
+.hamburger-user-email {
+  padding: 0.55rem 0.75rem 0.4rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.3rem;
+}
+
+.hamburger-item {
+  display: block;
+  width: 100%;
+  text-align: left;
   border: none;
   background: none;
-  color: var(--gold-light);
+  color: var(--navy);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
   cursor: pointer;
-  padding: 0;
-  white-space: nowrap;
 }
 
-.site-nav-link:hover {
-  text-decoration: underline;
-  color: #fff;
-}
-
-@media (max-width: 560px) {
-  .account-widget-email {
-    display: none;
-  }
+.hamburger-item:hover {
+  background: var(--bg);
 }
 
 .logo-link {
@@ -365,6 +414,51 @@ select:focus-visible {
   color: var(--muted);
   font-size: 0.85rem;
   margin-left: 0.4rem;
+}
+
+/* Brand hero (2026-08-25) — sits directly above .intro-hero below, on the
+   homepage only. The logo card reuses .card's own visual language
+   (background/border/radius/shadow) verbatim rather than inventing a new
+   treatment, since the source PNG's own opaque white background (see the
+   comment above renderIntroBrandHero, app.js) needs *some* frame to avoid
+   reading as an unstyled rectangle -- a white card is what this site
+   already uses everywhere else for "a contained block of content."
+   Generous vertical padding on the outer wrapper is the point here — this
+   is meant to read as a real hero moment, not a small logo bump. */
+.intro-brand-hero {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 1.25rem 2rem;
+}
+
+.intro-brand-hero-card {
+  display: flex;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 31, 61, 0.06);
+  padding: 2rem 2.5rem;
+}
+
+.intro-brand-hero-logo {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+
+@media (max-width: 560px) {
+  .intro-brand-hero {
+    padding: 1.75rem 1rem 1.5rem;
+  }
+
+  .intro-brand-hero-card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .intro-brand-hero-logo {
+    max-width: 280px;
+  }
 }
 
 /* Landing hero: the site's one deliberate navy "major section" beyond the
@@ -1999,6 +2093,14 @@ h2 .category-icon {
 }
 
 /* Watchlist */
+
+/* Reuses .ticker-search's own layout/input styling wholesale (see Ticker
+   Tester above) -- this rule just adds the bottom margin that search box
+   didn't need in its original context, to separate it from the entry
+   list below. */
+.watchlist-add-picker {
+  margin-bottom: 1.5rem;
+}
 
 .watchlist-toggle-wrap {
   display: inline-flex;

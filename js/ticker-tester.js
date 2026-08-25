@@ -78,7 +78,7 @@ const tickerTesterState = {
   selectedTicker: null,
   // 'idle' | 'loading' | 'done' | 'none-found' | 'error' -- see
   // maybeAutoLoadRecentPortfolio() below. Reset to 'idle' each time the
-  // client navigates to Ticker Tester fresh (initTickerTesterNav), so a
+  // client navigates to Ticker Tester fresh (openTickerTester), so a
   // portfolio saved since their last visit gets picked up.
   autoLoadState: 'idle',
   // Whether the inline "Compare Two Companies requires an account" prompt
@@ -89,7 +89,7 @@ const tickerTesterState = {
 
 // State for Compare Two Companies (state.view = 'tickerCompare') -- reset
 // fresh every time enterTickerCompare() runs, same convention as
-// tickerTesterState's own reset in initTickerTesterNav below.
+// tickerTesterState's own reset in openTickerTester below.
 const tickerCompareState = {
   queryA: '',
   queryB: '',
@@ -111,17 +111,20 @@ let tickerRadarChartInstance = null;
 // separate two-dataset chart/canvas (see renderCompareRadarChartIfPresent).
 let tickerCompareRadarChartInstance = null;
 
-function initTickerTesterNav() {
-  const btn = document.getElementById('ticker-tester-nav-btn');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    tickerTesterState.query = '';
-    tickerTesterState.selectedTicker = null;
-    tickerTesterState.autoLoadState = 'idle';
-    tickerTesterState.showCompareLoginPrompt = false;
-    state.view = 'tickerTester';
-    render();
-  });
+// Resets Ticker Tester to a blank slate and navigates to it. Called by the
+// hamburger nav menu's "Ticker Tester" item (see renderSiteNavMenu,
+// app.js) -- no login gate, single-company Ticker Tester stays open to
+// everyone, unlike Compare/My Portfolios/My Watchlist. 2026-08-25:
+// replaced the old direct #ticker-tester-nav-btn wiring (that button no
+// longer exists, folded into the hamburger menu) with this plain callable
+// function.
+function openTickerTester() {
+  tickerTesterState.query = '';
+  tickerTesterState.selectedTicker = null;
+  tickerTesterState.autoLoadState = 'idle';
+  tickerTesterState.showCompareLoginPrompt = false;
+  state.view = 'tickerTester';
+  render();
 }
 
 // Shared entry point into Compare Two Companies -- called both when an
@@ -129,7 +132,7 @@ function initTickerTesterNav() {
 // auth.js's onAuthStateChanged once a client who saw the login-required
 // prompt finishes logging in (see pendingCompareRedirect there). Always
 // starts from a blank slate (no carried-over selections from a previous
-// compare session), same convention as initTickerTesterNav above.
+// compare session), same convention as openTickerTester above.
 function enterTickerCompare() {
   tickerCompareState.queryA = '';
   tickerCompareState.queryB = '';

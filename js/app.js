@@ -60,10 +60,40 @@ function render() {
   window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
+// 2026-08-25: a dedicated brand hero, above the existing intro card --
+// the site's one deliberate "top-middle logo moment," making a visitor
+// land on more than a small header bump before they hit the actual
+// question card below. Scoped to the intro/home view only (not a global
+// header addition present on every screen) since the brief specifically
+// asked for a homepage hero, not a change to the persistent site chrome.
+// Both logo PNGs in assets/ turn out to have an opaque white background
+// baked in despite one being named "transparent" (checked directly --
+// neither has a real alpha channel), so rather than let that show up as
+// an unstyled, accidental-looking white rectangle against the page's
+// cream background, the image sits inside a deliberate card frame using
+// this site's own established .card visual language (white bg, thin
+// border, rounded corners, soft shadow -- see intro-brand-hero-card in
+// styles.css) -- a natural extension of existing conventions, not a new
+// pattern invented for this hero specifically.
+function renderIntroBrandHero() {
+  return `
+    <div class="intro-brand-hero">
+      <div class="intro-brand-hero-card">
+        <img
+          src="assets/truenorth-logo-transparent.png"
+          alt="TrueNorth — Values-Guided Investing"
+          class="intro-brand-hero-logo"
+        />
+      </div>
+    </div>
+  `;
+}
+
 function renderIntro() {
   const hasProgress = state.touchedQuestionIds.size > 0;
 
   appEl.innerHTML = `
+    ${renderIntroBrandHero()}
     <section class="card intro-card intro-hero">
       <p class="eyebrow">Values-Guided Investing</p>
       <h1>Find Your True North</h1>
@@ -968,10 +998,139 @@ function initSiteDisclaimerToggle() {
   });
 }
 
+// --- Hamburger site nav (static markup outside #app, present on every view) --
+//
+// 2026-08-25: replaced the old header nav (a single "Ticker Tester" text
+// link, plus "My Portfolios"/"My Watchlist" living inside the account
+// widget -- see renderAccountWidget, auth.js) with one hamburger menu
+// listing all four features. Per explicit requirement, every item is
+// always visible regardless of login state -- only Ticker Tester itself
+// needs no login; My Portfolios, My Watchlist, and Compare Two Companies
+// each redirect a logged-out click to the login screen (see each item's
+// handler below) using the same "stash intent, send to login, finish
+// automatically once signed in" pattern already established for Save My
+// Portfolio, Compare's own in-Ticker-Tester CTA, and My Watchlist's ☆
+// button (see pendingSaveAnswers/pendingCompareRedirect/pendingWatchlistAdd
+// in auth.js) -- pendingPortfoliosRedirect/pendingWatchlistViewRedirect
+// (also auth.js) are the same pattern applied to these two new entry
+// points specifically, kept as their own separate flags rather than
+// folded into the existing ones since each names a distinct pending
+// action, consistent with how every prior pending-flag here is scoped to
+// one specific action rather than a shared generic one.
+//
+// The dropdown's open/closed state is plain DOM state (hidden attribute +
+// aria-expanded), not part of `state` -- it has nothing to do with survey
+// progress or which view is showing, and doesn't need to survive
+// renderInPlace()'s innerHTML replacement of #app (this region lives
+// outside #app entirely, same as the account widget and logo link).
+
+function toggleHamburgerDropdown() {
+  const dropdown = document.getElementById('hamburger-dropdown');
+  const btn = document.getElementById('hamburger-btn');
+  if (!dropdown || !btn) return;
+  const willOpen = dropdown.hidden;
+  dropdown.hidden = !willOpen;
+  btn.setAttribute('aria-expanded', String(willOpen));
+}
+
+function closeHamburgerDropdown() {
+  const dropdown = document.getElementById('hamburger-dropdown');
+  const btn = document.getElementById('hamburger-btn');
+  if (!dropdown || dropdown.hidden) return;
+  dropdown.hidden = true;
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+
+// Redirects a logged-out click on a gated menu item to the login screen,
+// stashing `pendingFlagSetter` (called with true) so onAuthStateChanged
+// (auth.js) can finish the navigation automatically once they sign in.
+function redirectGatedNavItemToLogin(setPending) {
+  setPending();
+  authViewState.mode = 'login';
+  authViewState.error = null;
+  authViewState.info = null;
+  state.view = 'account';
+  render();
+}
+
+// Rebuilt (not just re-wired) on init and every auth-state change -- see
+// its two call sites -- since the one auth-dependent piece of its content
+// (the signed-in client's email, shown as a non-interactive line at the
+// top) needs to stay in sync; the menu items themselves don't change
+// based on login state, only what happens when they're clicked.
+function renderSiteNavMenu() {
+  const dropdown = document.getElementById('hamburger-dropdown');
+  if (!dropdown) return;
+
+  dropdown.innerHTML = `
+    ${authState.user ? `<div class="hamburger-user-email">${escapeHtml(authState.user.email)}</div>` : ''}
+    <button type="button" id="nav-menu-tickertester" class="hamburger-item" role="menuitem">Ticker Tester</button>
+    <button type="button" id="nav-menu-compare" class="hamburger-item" role="menuitem">Compare Two Companies</button>
+    <button type="button" id="nav-menu-portfolios" class="hamburger-item" role="menuitem">My Portfolios</button>
+    <button type="button" id="nav-menu-watchlist" class="hamburger-item" role="menuitem">My Watchlist</button>
+  `;
+
+  document.getElementById('nav-menu-tickertester').addEventListener('click', () => {
+    closeHamburgerDropdown();
+    openTickerTester(); // js/ticker-tester.js -- no login gate, open to everyone
+  });
+
+  document.getElementById('nav-menu-compare').addEventListener('click', () => {
+    closeHamburgerDropdown();
+    if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+      enterTickerCompare(); // js/ticker-tester.js
+      return;
+    }
+    redirectGatedNavItemToLogin(() => {
+      pendingCompareRedirect = true; // js/auth.js -- same flag Compare's own in-Ticker-Tester CTA already uses
+    });
+  });
+
+  document.getElementById('nav-menu-portfolios').addEventListener('click', () => {
+    closeHamburgerDropdown();
+    if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+      openMyPortfoliosView(); // js/auth.js
+      return;
+    }
+    redirectGatedNavItemToLogin(() => {
+      pendingPortfoliosRedirect = true; // js/auth.js
+    });
+  });
+
+  document.getElementById('nav-menu-watchlist').addEventListener('click', () => {
+    closeHamburgerDropdown();
+    if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+      openMyWatchlistView(); // js/auth.js
+      return;
+    }
+    redirectGatedNavItemToLogin(() => {
+      pendingWatchlistViewRedirect = true; // js/auth.js
+    });
+  });
+}
+
+function initSiteNavMenu() {
+  const btn = document.getElementById('hamburger-btn');
+  if (!btn) return;
+  btn.addEventListener('click', (evt) => {
+    evt.stopPropagation();
+    toggleHamburgerDropdown();
+  });
+  // Outside-click closes the dropdown -- important on mobile, where
+  // there's no natural "click elsewhere" affordance otherwise.
+  document.addEventListener('click', (evt) => {
+    const dropdown = document.getElementById('hamburger-dropdown');
+    if (!dropdown || dropdown.hidden) return;
+    if (dropdown.contains(evt.target) || btn.contains(evt.target)) return;
+    closeHamburgerDropdown();
+  });
+  renderSiteNavMenu();
+}
+
 async function init() {
   initLogoHomeLink();
   initSiteDisclaimerToggle();
-  initTickerTesterNav(); // js/ticker-tester.js
+  initSiteNavMenu();
   render();
   try {
     state.dataset = await loadDataset();
