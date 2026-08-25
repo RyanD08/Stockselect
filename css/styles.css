@@ -52,13 +52,54 @@ body {
   padding: 0.85rem 1.5rem;
 }
 
+/* Grid (not flex) so the centered title (.site-header-title) sits in the
+   remaining space between the logo and the nav actions regardless of
+   either side's own width, rather than needing absolute positioning that
+   could overlap them on narrow screens. */
 .site-header-inner {
   max-width: 900px;
   margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
+}
+
+/* 2026-08-25: the header's own "large text in the middle of the strip" --
+   replaces the earlier standalone hero card below the header (removed)
+   with a lighter-weight brand moment built directly into the persistent
+   navy strip instead. Matches the wordmark's own navy/gold pairing from
+   the logo image, just inverted for a dark background (light "True",
+   gold "North") since this sits on --navy rather than the logo's own
+   cream backing. Purely decorative -- the logo link's own aria-label
+   already names "TrueNorth home" for assistive tech. */
+.site-header-title {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.7rem;
+  letter-spacing: 0.01em;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-header-title-accent {
+  color: var(--gold-light);
+}
+
+@media (max-width: 640px) {
+  .site-header-title {
+    font-size: 1.15rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-header-title {
+    font-size: 0.95rem;
+  }
 }
 
 /* Account widget — just Log In / Log Out, the one control that stays
@@ -414,51 +455,6 @@ select:focus-visible {
   color: var(--muted);
   font-size: 0.85rem;
   margin-left: 0.4rem;
-}
-
-/* Brand hero (2026-08-25) — sits directly above .intro-hero below, on the
-   homepage only. The logo card reuses .card's own visual language
-   (background/border/radius/shadow) verbatim rather than inventing a new
-   treatment, since the source PNG's own opaque white background (see the
-   comment above renderIntroBrandHero, app.js) needs *some* frame to avoid
-   reading as an unstyled rectangle -- a white card is what this site
-   already uses everywhere else for "a contained block of content."
-   Generous vertical padding on the outer wrapper is the point here — this
-   is meant to read as a real hero moment, not a small logo bump. */
-.intro-brand-hero {
-  display: flex;
-  justify-content: center;
-  padding: 2.5rem 1.25rem 2rem;
-}
-
-.intro-brand-hero-card {
-  display: flex;
-  justify-content: center;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgba(15, 31, 61, 0.06);
-  padding: 2rem 2.5rem;
-}
-
-.intro-brand-hero-logo {
-  width: 100%;
-  max-width: 420px;
-  height: auto;
-}
-
-@media (max-width: 560px) {
-  .intro-brand-hero {
-    padding: 1.75rem 1rem 1.5rem;
-  }
-
-  .intro-brand-hero-card {
-    padding: 1.5rem 1.25rem;
-  }
-
-  .intro-brand-hero-logo {
-    max-width: 280px;
-  }
 }
 
 /* Landing hero: the site's one deliberate navy "major section" beyond the

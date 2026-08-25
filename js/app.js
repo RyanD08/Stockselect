@@ -60,40 +60,10 @@ function render() {
   window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
-// 2026-08-25: a dedicated brand hero, above the existing intro card --
-// the site's one deliberate "top-middle logo moment," making a visitor
-// land on more than a small header bump before they hit the actual
-// question card below. Scoped to the intro/home view only (not a global
-// header addition present on every screen) since the brief specifically
-// asked for a homepage hero, not a change to the persistent site chrome.
-// Both logo PNGs in assets/ turn out to have an opaque white background
-// baked in despite one being named "transparent" (checked directly --
-// neither has a real alpha channel), so rather than let that show up as
-// an unstyled, accidental-looking white rectangle against the page's
-// cream background, the image sits inside a deliberate card frame using
-// this site's own established .card visual language (white bg, thin
-// border, rounded corners, soft shadow -- see intro-brand-hero-card in
-// styles.css) -- a natural extension of existing conventions, not a new
-// pattern invented for this hero specifically.
-function renderIntroBrandHero() {
-  return `
-    <div class="intro-brand-hero">
-      <div class="intro-brand-hero-card">
-        <img
-          src="assets/truenorth-logo-transparent.png"
-          alt="TrueNorth — Values-Guided Investing"
-          class="intro-brand-hero-logo"
-        />
-      </div>
-    </div>
-  `;
-}
-
 function renderIntro() {
   const hasProgress = state.touchedQuestionIds.size > 0;
 
   appEl.innerHTML = `
-    ${renderIntroBrandHero()}
     <section class="card intro-card intro-hero">
       <p class="eyebrow">Values-Guided Investing</p>
       <h1>Find Your True North</h1>
