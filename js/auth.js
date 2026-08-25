@@ -142,6 +142,7 @@ const AUTH_ERROR_MESSAGES = {
   'auth/too-many-requests': 'Too many attempts. Please wait a moment and try again.',
   'auth/network-request-failed': 'Network error — check your connection and try again.',
   'auth/user-disabled': 'This account has been disabled.',
+  'auth/requires-recent-login': 'For your security, please log out and back in, then try again.',
 };
 
 function friendlyAuthError(err) {
@@ -185,6 +186,36 @@ async function resetPassword(email) {
   // instead of leaving the user stranded there. See firebase-config.js for
   // the siteUrl constant and the Authorized domains requirement.
   await firebaseAuth.sendPasswordResetEmail(email, { url: siteUrl });
+}
+
+// Every subcollection this app has ever written under users/{uid} -- the
+// three CURRENT ones (see the file header) plus every LEGACY one, so
+// deleting an account doesn't leave orphaned data behind under any name
+// this feature has used over time. Deletes Firestore data first and the
+// Auth user last: if the Firestore pass fails partway, the account (and
+// the ability to retry) still exists, rather than leaving a deleted
+// account with undeletable leftover data.
+const ALL_USER_SUBCOLLECTIONS = ['savedPortfolios', 'watchlist', 'meta', 'savedSurveys', 'savedSurvey', 'surveys'];
+
+async function deleteAccount(password) {
+  if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
+  const user = authState.user;
+
+  // Firebase requires a recent sign-in before allowing account deletion;
+  // re-entering the password here satisfies that and doubles as a genuine
+  // "are you sure this is you" confirmation for an irreversible action.
+  const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+  await user.reauthenticateWithCredential(credential);
+
+  const userDocRef = firebaseDb.collection('users').doc(user.uid);
+  await Promise.all(
+    ALL_USER_SUBCOLLECTIONS.map(async (name) => {
+      const snapshot = await userDocRef.collection(name).get();
+      await Promise.all(snapshot.docs.map((doc) => doc.ref.delete()));
+    })
+  );
+
+  await user.delete();
 }
 
 if (firebaseReady) {
@@ -799,9 +830,14 @@ function wireWatchlistEntryToggles() {
 // 2026-08-25: reduced to just Log In/Log Out -- My Portfolios and My
 // Watchlist moved into the hamburger nav menu (see renderSiteNavMenu,
 // app.js), which now owns all feature navigation; this widget's only job
-// is the one control that must stay visible outside the menu at all
-// times. The signed-in client's email moved into the hamburger dropdown
-// itself (its own top line) rather than living here redundantly.
+// is the account-lifecycle controls that must stay visible at every screen
+// width. That's also why Delete Account lives here rather than in the
+// hamburger dropdown -- the hamburger itself is hidden outright at >=720px
+// (see .site-nav-menu's breakpoint in css/styles.css, and the desktop nav
+// bar that replaces it), so this widget is the only place guaranteed
+// reachable regardless of viewport. The signed-in client's email moved into
+// the hamburger dropdown itself (its own top line) rather than living here
+// redundantly.
 function renderAccountWidget() {
   const el = document.getElementById('account-widget');
   if (!el) return;
@@ -811,7 +847,11 @@ function renderAccountWidget() {
   }
 
   if (authState.user) {
-    el.innerHTML = '<button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>';
+    el.innerHTML = `
+      <button type="button" id="account-delete-btn" class="account-widget-link account-widget-link-danger">Delete Account</button>
+      <button type="button" id="account-logout-btn" class="account-widget-link">Log Out</button>
+    `;
+    document.getElementById('account-delete-btn').addEventListener('click', openDeleteAccountModal);
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
       if (state.view === 'account' || state.view === 'portfolios' || state.view === 'watchlist') {
@@ -904,6 +944,105 @@ function closeTermsModal() {
   const overlay = document.getElementById('terms-modal-overlay');
   if (overlay) overlay.remove();
   document.removeEventListener('keydown', handleTermsModalKeydown);
+}
+
+// --- Delete My Account modal ----------------------------------------------
+
+const deleteAccountViewState = {
+  loading: false,
+  error: null,
+};
+
+function handleDeleteAccountModalKeydown(evt) {
+  if (evt.key === 'Escape') closeDeleteAccountModal();
+}
+
+// Same reasoning as the Terms modal above: appended straight to
+// document.body, independent of whatever screen is currently rendered
+// through #app, so opening it never disturbs anything underneath.
+function openDeleteAccountModal() {
+  if (document.getElementById('delete-account-modal-overlay')) return;
+  deleteAccountViewState.loading = false;
+  deleteAccountViewState.error = null;
+  const overlay = document.createElement('div');
+  overlay.id = 'delete-account-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = renderDeleteAccountModalCard();
+  document.body.appendChild(overlay);
+  wireDeleteAccountModal(overlay);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) closeDeleteAccountModal();
+  });
+  document.addEventListener('keydown', handleDeleteAccountModalKeydown);
+}
+
+function closeDeleteAccountModal() {
+  const overlay = document.getElementById('delete-account-modal-overlay');
+  if (overlay) overlay.remove();
+  document.removeEventListener('keydown', handleDeleteAccountModalKeydown);
+}
+
+function renderDeleteAccountModalCard() {
+  return `
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="delete-account-modal-title">
+      <div class="modal-header">
+        <h2 id="delete-account-modal-title">Delete My Account</h2>
+        <button type="button" id="delete-account-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>This permanently deletes your account and everything saved to it — your saved portfolios and watchlist. This can't be undone.</p>
+        <form id="delete-account-form" class="auth-form">
+          <label for="delete-account-password">Confirm your password to continue</label>
+          <input id="delete-account-password" type="password" autocomplete="current-password" required />
+          ${deleteAccountViewState.error ? `<p class="error-text">${escapeHtml(deleteAccountViewState.error)}</p>` : ''}
+          <div class="modal-actions">
+            <button type="button" id="delete-account-cancel-btn" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-danger" ${deleteAccountViewState.loading ? 'disabled' : ''}>
+              ${deleteAccountViewState.loading ? spinnerHtml('Deleting…') : 'Yes, Delete My Account'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `;
+}
+
+// Re-renders just the modal card in place (not the whole overlay) so the
+// overlay's own click-outside-to-close listener and keydown handler, set up
+// once in openDeleteAccountModal, don't need to be re-wired on every error.
+function rerenderDeleteAccountModalCard() {
+  const overlay = document.getElementById('delete-account-modal-overlay');
+  if (!overlay) return;
+  overlay.innerHTML = renderDeleteAccountModalCard();
+  wireDeleteAccountModal(overlay);
+}
+
+function wireDeleteAccountModal(overlay) {
+  overlay.querySelector('#delete-account-modal-close-btn').addEventListener('click', closeDeleteAccountModal);
+  overlay.querySelector('#delete-account-cancel-btn').addEventListener('click', closeDeleteAccountModal);
+  overlay.querySelector('#delete-account-form').addEventListener('submit', async (evt) => {
+    evt.preventDefault();
+    const password = overlay.querySelector('#delete-account-password').value;
+    deleteAccountViewState.loading = true;
+    deleteAccountViewState.error = null;
+    rerenderDeleteAccountModalCard();
+    try {
+      await deleteAccount(password);
+      closeDeleteAccountModal();
+      // onAuthStateChanged (above) picks up the now-signed-out state on its
+      // own -- clears the header/hamburger, resets watchlistState, etc. --
+      // same as a normal Log Out. Just make sure they land somewhere sane
+      // rather than wherever they happened to be (My Portfolios, My
+      // Watchlist, ...) now that account is gone.
+      state.view = 'intro';
+      render();
+    } catch (err) {
+      console.error('deleteAccount failed:', err);
+      deleteAccountViewState.loading = false;
+      deleteAccountViewState.error = friendlyAuthError(err);
+      rerenderDeleteAccountModalCard();
+    }
+  });
 }
 
 // --- Account view: login / sign-up form ---------------------------------

@@ -102,14 +102,17 @@ body {
   }
 }
 
-/* Account widget — just Log In / Log Out, the one control that stays
-   visible outside the hamburger menu at all times (see .hamburger-dropdown
-   below for everything else, including the signed-in email). Empty (no
-   markup) until Firebase resolves the first auth check, and permanently
-   empty if Firebase never loaded — see auth.js/renderAccountWidget. */
+/* Account widget — Log In/Log Out (plus Delete Account once signed in),
+   the account-lifecycle controls that stay visible at every screen width,
+   unlike the hamburger menu itself (see .hamburger-dropdown below for
+   everything else, including the signed-in email), which is hidden
+   outright at >=720px. Empty (no markup) until Firebase resolves the first
+   auth check, and permanently empty if Firebase never loaded — see
+   auth.js/renderAccountWidget. */
 .account-widget {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .account-widget-link {
@@ -125,6 +128,14 @@ body {
 
 .account-widget-link:hover {
   text-decoration: underline;
+  color: #fff;
+}
+
+.account-widget-link-danger {
+  color: #e39a95;
+}
+
+.account-widget-link-danger:hover {
   color: #fff;
 }
 
@@ -399,6 +410,15 @@ select:focus-visible {
   background: #eee9dd;
   color: var(--navy);
   margin-right: 0.75rem;
+}
+
+.btn-danger {
+  background: var(--danger-text);
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  opacity: 0.88;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -1735,6 +1755,17 @@ h2 .category-icon {
   color: var(--text);
   font-size: 0.9rem;
   line-height: 1.55;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.modal-actions .btn-secondary {
+  margin-right: 0;
 }
 
 .auth-info-text {
