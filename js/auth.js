@@ -483,19 +483,26 @@ async function loadWatchlistTickers() {
 // wireWatchlistToggleButtons (called unconditionally at the end of
 // app.js's renderInPlace, so no render call site has to remember to wire
 // it itself).
-function renderWatchlistToggleButton(ticker) {
+function renderWatchlistToggleButton(ticker, options = {}) {
   const isWatching = watchlistState.tickers.has(ticker);
   const isPending = watchlistState.pendingTicker === ticker;
   const showError = watchlistState.error && watchlistState.errorTicker === ticker;
+  // removeOnly: used on the My Watchlist screen itself, where every entry
+  // is already watched and the only reachable action is removal -- shows
+  // an explicit "Remove" instead of the ambiguous "★ Watching" label, but
+  // still just this same shared button/handler (no separate remove path).
+  const removeOnly = options.removeOnly === true;
+  const label = isPending ? (removeOnly ? 'Removing…' : 'Updating…') : removeOnly ? 'Remove' : isWatching ? '★ Watching' : '☆ Add to Watchlist';
+  const activeClass = removeOnly ? 'danger watchlist-remove-btn' : isWatching ? 'watchlist-toggle-btn-active' : '';
   return `
     <span class="watchlist-toggle-wrap">
       <button
         type="button"
-        class="btn-link-action watchlist-toggle-btn ${isWatching ? 'watchlist-toggle-btn-active' : ''}"
+        class="btn-link-action watchlist-toggle-btn ${activeClass}"
         data-ticker="${escapeHtml(ticker)}"
         ${isPending ? 'disabled' : ''}
       >
-        ${isPending ? 'Updating…' : isWatching ? '★ Watching' : '☆ Add to Watchlist'}
+        ${label}
       </button>
       ${showError ? `<span class="error-text watchlist-toggle-error">${escapeHtml(watchlistState.error)}</span>` : ''}
     </span>
@@ -708,7 +715,7 @@ function renderWatchlistEntry(entry) {
           <span class="watchlist-entry-ticker">${escapeHtml(entry.ticker)}</span>
           <span class="muted">No longer in the current dataset.</span>
         </div>
-        ${renderWatchlistToggleButton(entry.ticker)}
+        ${renderWatchlistToggleButton(entry.ticker, { removeOnly: true })}
       </li>
     `;
   }
@@ -726,7 +733,7 @@ function renderWatchlistEntry(entry) {
         <span class="watchlist-entry-sector">${escapeHtml(company.sector)}</span>
         ${display ? `<span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span>` : ''}
       </button>
-      ${renderWatchlistToggleButton(entry.ticker)}
+      ${renderWatchlistToggleButton(entry.ticker, { removeOnly: true })}
       ${isExpanded ? renderWatchlistEntryDetail(company, scored) : ''}
     </li>
   `;
