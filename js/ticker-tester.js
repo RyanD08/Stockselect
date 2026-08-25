@@ -1256,7 +1256,37 @@ function compareRiskTiebreak(companyA, companyB, riskProfile) {
   return rankA > rankB ? companyA : companyB;
 }
 
-// The verdict shown below the side-by-side comparison. Primary factor is
+// Strict per-category dominance check: true if one company wins or ties
+// every one of the 7 displayed category bars (including Risk Philosophy,
+// which valuesFitScore below deliberately excludes -- see that function's
+// header comment) with a real lead in at least one. This takes priority
+// over everything else in renderCompareVerdict below: a client looking at
+// the side-by-side bars and seeing one company ahead-or-tied on all seven
+// should never be told it's a "genuine toss-up" just because that same
+// lead, measured a different way (the aggregate values-fit score gap, or a
+// category valuesFitScore doesn't count at all), happened to fall under
+// VALUES_TIE_THRESHOLD or outside what the risk tiebreaker checks. Added
+// 2026-08-25 after exactly this case was reported: Walmart led or tied
+// Target on all 7 bars (including a real Governance/Community/Risk
+// Philosophy edge) and the verdict still called it a toss-up, because
+// those specific categories either fell under the score-gap threshold or
+// (Risk Philosophy) weren't counted by valuesFitScore at all. Returns
+// 'A'/'B' for a dominant winner, or null if the lead is mixed (each
+// company wins at least one category) or the two are tied everywhere.
+function compareCategoryDominance(scoresA, scoresB) {
+  let aWinsAny = false;
+  let bWinsAny = false;
+  for (let i = 0; i < scoresA.length; i++) {
+    if (scoresA[i].score > scoresB[i].score) aWinsAny = true;
+    else if (scoresB[i].score > scoresA[i].score) bWinsAny = true;
+  }
+  if (aWinsAny && !bWinsAny) return 'A';
+  if (bWinsAny && !aWinsAny) return 'B';
+  return null;
+}
+
+// The verdict shown below the side-by-side comparison. Highest priority is
+// compareCategoryDominance above; short of that, the primary factor is
 // valuesFitScore() (scoring.js) -- the same values-only formula
 // meetsValuesFloor() already uses to decide Low Match, deliberately not
 // entry.score (which has financial quality and risk preferences already
@@ -1292,6 +1322,25 @@ function renderCompareVerdict(companyA, companyB, scoredA, scoredB) {
     `;
   }
 
+  const categoryScoresA = computeCategoryScores(companyA, scoredA.entry, scoredA.ctx);
+  const categoryScoresB = computeCategoryScores(companyB, scoredB.entry, scoredB.ctx);
+  const dominance = compareCategoryDominance(categoryScoresA, categoryScoresB);
+  if (dominance) {
+    const winner = dominance === 'A' ? companyA : companyB;
+    const winnerScores = dominance === 'A' ? categoryScoresA : categoryScoresB;
+    const loserScores = dominance === 'A' ? categoryScoresB : categoryScoresA;
+    const topCategories = topDifferentiatingCategories(winnerScores, loserScores, 2);
+    const reason =
+      topCategories.length > 0
+        ? `it matches or leads on every category, with the clearest edge on ${topCategories.join(' and ')}`
+        : 'it matches or leads on every category';
+    return `
+      <div class="ticker-compare-verdict">
+        <p><strong>${escapeHtml(winner.name)} (${escapeHtml(winner.ticker)})</strong> is the better fit for your values -- ${reason}.</p>
+      </div>
+    `;
+  }
+
   const ctx = scoredA.ctx;
   const scoreA = valuesFitScore(companyA, state.answers, ctx);
   const scoreB = valuesFitScore(companyB, state.answers, ctx);
@@ -1299,10 +1348,8 @@ function renderCompareVerdict(companyA, companyB, scoredA, scoredB) {
 
   if (Math.abs(diff) > VALUES_TIE_THRESHOLD) {
     const winner = diff > 0 ? companyA : companyB;
-    const winnerScored = diff > 0 ? scoredA : scoredB;
-    const loserScored = diff > 0 ? scoredB : scoredA;
-    const winnerCategoryScores = computeCategoryScores(winner, winnerScored.entry, winnerScored.ctx);
-    const loserCategoryScores = computeCategoryScores(diff > 0 ? companyB : companyA, loserScored.entry, loserScored.ctx);
+    const winnerCategoryScores = diff > 0 ? categoryScoresA : categoryScoresB;
+    const loserCategoryScores = diff > 0 ? categoryScoresB : categoryScoresA;
     const topCategories = topDifferentiatingCategories(winnerCategoryScores, loserCategoryScores, 2);
     const reason =
       topCategories.length > 0
