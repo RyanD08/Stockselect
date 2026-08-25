@@ -97,8 +97,8 @@ function renderIntro() {
       </div>
 
       <div class="intro-cta-row">
-        <button id="start-btn" class="btn btn-primary btn-large" ${state.dataset ? '' : 'disabled'}>
-          ${!state.dataset ? spinnerHtml('Loading data…') : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
+        <button id="start-btn" class="btn btn-primary btn-large" ${state.dataset || state.datasetError ? '' : 'disabled'}>
+          ${state.datasetError ? 'Try Again' : !state.dataset ? spinnerHtml('Loading data…') : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
         </button>
         ${hasProgress ? '<button id="restart-fresh-btn" class="btn-link-inline">Start over instead</button>' : ''}
       </div>
@@ -108,7 +108,14 @@ function renderIntro() {
   `;
   const startBtn = document.getElementById('start-btn');
   if (startBtn) {
-    startBtn.addEventListener('click', () => {
+    startBtn.addEventListener('click', async () => {
+      if (state.datasetError) {
+        startBtn.disabled = true;
+        startBtn.textContent = 'Loading data…';
+        await loadDatasetIntoState();
+        if (state.view === 'intro') render();
+        return;
+      }
       state.view = 'survey';
       if (hasProgress) {
         // Resume where they left off rather than restarting from category 0.
@@ -1226,6 +1233,31 @@ function initGlobalErrorHandler() {
   });
 }
 
+// Same document.body-append pattern, but styled as informational
+// (--warn, not --danger) rather than an error -- being offline isn't a
+// bug, and this clears itself the moment the browser reports 'online'
+// again rather than needing to be dismissed.
+function showOfflineBanner() {
+  if (document.getElementById('offline-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'offline-banner';
+  banner.className = 'offline-banner';
+  banner.setAttribute('role', 'status');
+  banner.innerHTML = `<p>You're offline. Some features won't work until you're back online.</p>`;
+  document.body.appendChild(banner);
+}
+
+function hideOfflineBanner() {
+  const banner = document.getElementById('offline-banner');
+  if (banner) banner.remove();
+}
+
+function initOnlineOfflineHandler() {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) showOfflineBanner();
+  window.addEventListener('offline', showOfflineBanner);
+  window.addEventListener('online', hideOfflineBanner);
+}
+
 // --- Hamburger site nav (static markup outside #app, present on every view) --
 //
 // 2026-08-25: replaced the old header nav (a single "Ticker Tester" text
@@ -1410,6 +1442,7 @@ function initDesktopNavBar() {
 
 async function init() {
   initGlobalErrorHandler();
+  initOnlineOfflineHandler();
   initLogoHomeLink();
   initSiteDisclaimerToggle();
   initPrivacyPolicyLink();
@@ -1427,12 +1460,22 @@ async function init() {
     render();
   }
 
+  await loadDatasetIntoState();
+  if (state.view === 'intro') render();
+}
+
+// Shared by the initial load (init, above) and the intro screen's "Try
+// Again" button below -- a failed fetch (flaky mobile connection, a blip
+// on GitHub Pages) previously left the visitor stuck on a permanently
+// disabled, permanently-spinning button with no way to recover short of
+// a manual page refresh.
+async function loadDatasetIntoState() {
+  state.datasetError = null;
   try {
     state.dataset = await loadDataset();
   } catch (err) {
     state.datasetError = err.message;
   }
-  if (state.view === 'intro') render();
 }
 
 init();
