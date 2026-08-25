@@ -230,6 +230,51 @@ body {
   background: var(--bg);
 }
 
+/* Desktop nav bar -- a second strip beneath the main header row, showing
+   all four feature links directly rather than behind the hamburger, once
+   there's room for them. Hidden by default (mobile-first); the breakpoint
+   below both reveals this and hides .site-nav-menu, so exactly one of the
+   two navigation styles is ever visible or reachable at a given width. */
+.site-nav-bar {
+  display: none;
+  background: var(--navy-light);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.site-nav-bar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 2.25rem;
+}
+
+.site-nav-bar-link {
+  border: none;
+  background: none;
+  color: #dfe3ec;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0.15rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.site-nav-bar-link:hover {
+  color: #fff;
+  border-bottom-color: var(--gold-light);
+}
+
+@media (min-width: 720px) {
+  .site-nav-bar {
+    display: block;
+  }
+  .site-nav-menu {
+    display: none;
+  }
+}
+
 .logo-link {
   display: inline-block;
   line-height: 0;
@@ -393,21 +438,21 @@ select:focus-visible {
 
 /* Landing */
 
+/* Flex-wrap (not a fixed-column grid) so 7 items -- a count that never
+   divides evenly into 2 or 3 columns -- resolve into a naturally centered
+   last row instead of a grid leaving an orphaned single item stranded in
+   column 1 with empty cells beside it. */
 .category-preview-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 0.9rem;
-  margin: 1.5rem 0;
-}
-
-@media (max-width: 560px) {
-  .category-preview-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  margin: 1.75rem 0;
 }
 
 .category-preview-item {
   display: flex;
+  flex: 0 1 128px;
   flex-direction: column;
   align-items: center;
   text-align: center;
@@ -458,18 +503,33 @@ select:focus-visible {
 }
 
 /* Landing hero: the site's one deliberate navy "major section" beyond the
-   header (see the palette note in :root) — light text on navy, gold CTA. */
+   header (see the palette note in :root) — light text on navy, gold CTA.
+   More generous, responsive padding and a larger/tighter heading than the
+   site's other .card sections get, specifically here, for a more
+   confident "landing page" feel without changing any other screen. */
 .intro-hero {
   background: var(--navy);
   border-color: var(--navy);
+  padding: 3rem 3.25rem 2.75rem;
+}
+
+@media (max-width: 560px) {
+  .intro-hero {
+    padding: 2rem 1.5rem 1.75rem;
+  }
 }
 
 .intro-hero h1 {
   color: #fff;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.1rem;
 }
 
 .intro-hero .lede {
   color: #cdd3de;
+  max-width: 58ch;
 }
 
 .intro-hero .eyebrow {
@@ -478,6 +538,28 @@ select:focus-visible {
 
 .intro-hero .mini-stepper-text {
   color: #cdd3de;
+}
+
+/* CTA button and the "start over" link sit in one row so the link reads
+   as a secondary, lower-emphasis option beside the primary action rather
+   than stacked beneath it -- .btn-link-inline itself stays block-level
+   everywhere else it's used (its own line), this only changes it here. */
+.intro-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.intro-cta-row .btn-link-inline {
+  display: inline;
+  margin: 0;
+}
+
+.intro-privacy-note {
+  color: #9aa3b5;
+  font-size: 0.82rem;
+  margin: 0.85rem 0 0;
 }
 
 .intro-hero .error-text {

@@ -93,11 +93,13 @@ function renderIntro() {
         <span class="mini-stepper-text">${CATEGORIES.length} short steps &middot; ~5 min</span>
       </div>
 
-      <p class="lede">Nothing you enter is saved or sent anywhere.</p>
-      <button id="start-btn" class="btn btn-primary" ${state.dataset ? '' : 'disabled'}>
-        ${!state.dataset ? 'Loading data...' : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
-      </button>
-      ${hasProgress ? '<button id="restart-fresh-btn" class="btn-link-inline">Start over instead</button>' : ''}
+      <div class="intro-cta-row">
+        <button id="start-btn" class="btn btn-primary btn-large" ${state.dataset ? '' : 'disabled'}>
+          ${!state.dataset ? 'Loading data...' : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
+        </button>
+        ${hasProgress ? '<button id="restart-fresh-btn" class="btn-link-inline">Start over instead</button>' : ''}
+      </div>
+      <p class="intro-privacy-note">Nothing you enter is saved or sent anywhere.</p>
       ${state.datasetError ? `<p class="error-text">Could not load company data: ${escapeHtml(state.datasetError)}</p>` : ''}
     </section>
   `;
@@ -1104,6 +1106,49 @@ function redirectGatedNavItemToLogin(setPending, feature) {
   render();
 }
 
+// Shared navigation actions -- both the hamburger dropdown (mobile, below
+// the .site-nav-bar breakpoint) and the desktop nav bar (see
+// initDesktopNavBar below) call these same four functions rather than
+// each keeping its own copy of the login-gating logic, so a click reaches
+// the same destination with the same behavior either way.
+function navigateToTickerTester() {
+  closeHamburgerDropdown();
+  openTickerTester(); // js/ticker-tester.js -- no login gate, open to everyone
+}
+
+function navigateToCompare() {
+  closeHamburgerDropdown();
+  if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+    enterTickerCompare(); // js/ticker-tester.js
+    return;
+  }
+  redirectGatedNavItemToLogin(() => {
+    pendingCompareRedirect = true; // js/auth.js -- same flag Compare's own in-Ticker-Tester CTA already uses
+  }, 'compare');
+}
+
+function navigateToPortfolios() {
+  closeHamburgerDropdown();
+  if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+    openMyPortfoliosView(); // js/auth.js
+    return;
+  }
+  redirectGatedNavItemToLogin(() => {
+    pendingPortfoliosRedirect = true; // js/auth.js
+  }, 'my_portfolios');
+}
+
+function navigateToWatchlist() {
+  closeHamburgerDropdown();
+  if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+    openMyWatchlistView(); // js/auth.js
+    return;
+  }
+  redirectGatedNavItemToLogin(() => {
+    pendingWatchlistViewRedirect = true; // js/auth.js
+  }, 'my_watchlist');
+}
+
 // Rebuilt (not just re-wired) on init and every auth-state change -- see
 // its two call sites -- since the one auth-dependent piece of its content
 // (the signed-in client's email, shown as a non-interactive line at the
@@ -1121,43 +1166,10 @@ function renderSiteNavMenu() {
     <button type="button" id="nav-menu-watchlist" class="hamburger-item" role="menuitem">My Watchlist</button>
   `;
 
-  document.getElementById('nav-menu-tickertester').addEventListener('click', () => {
-    closeHamburgerDropdown();
-    openTickerTester(); // js/ticker-tester.js -- no login gate, open to everyone
-  });
-
-  document.getElementById('nav-menu-compare').addEventListener('click', () => {
-    closeHamburgerDropdown();
-    if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
-      enterTickerCompare(); // js/ticker-tester.js
-      return;
-    }
-    redirectGatedNavItemToLogin(() => {
-      pendingCompareRedirect = true; // js/auth.js -- same flag Compare's own in-Ticker-Tester CTA already uses
-    }, 'compare');
-  });
-
-  document.getElementById('nav-menu-portfolios').addEventListener('click', () => {
-    closeHamburgerDropdown();
-    if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
-      openMyPortfoliosView(); // js/auth.js
-      return;
-    }
-    redirectGatedNavItemToLogin(() => {
-      pendingPortfoliosRedirect = true; // js/auth.js
-    }, 'my_portfolios');
-  });
-
-  document.getElementById('nav-menu-watchlist').addEventListener('click', () => {
-    closeHamburgerDropdown();
-    if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
-      openMyWatchlistView(); // js/auth.js
-      return;
-    }
-    redirectGatedNavItemToLogin(() => {
-      pendingWatchlistViewRedirect = true; // js/auth.js
-    }, 'my_watchlist');
-  });
+  document.getElementById('nav-menu-tickertester').addEventListener('click', navigateToTickerTester);
+  document.getElementById('nav-menu-compare').addEventListener('click', navigateToCompare);
+  document.getElementById('nav-menu-portfolios').addEventListener('click', navigateToPortfolios);
+  document.getElementById('nav-menu-watchlist').addEventListener('click', navigateToWatchlist);
 }
 
 function initSiteNavMenu() {
@@ -1178,10 +1190,25 @@ function initSiteNavMenu() {
   renderSiteNavMenu();
 }
 
+// The desktop nav bar (#site-nav-bar, index.html) -- static markup, wired
+// once, unlike the hamburger dropdown above. It has no auth-dependent
+// content to rebuild (the signed-in email lives in the dropdown only, not
+// here), and CSS hides this whole element below the same breakpoint that
+// hides .site-nav-menu, so exactly one of the two is ever reachable.
+function initDesktopNavBar() {
+  const bar = document.getElementById('site-nav-bar');
+  if (!bar) return;
+  document.getElementById('nav-bar-tickertester').addEventListener('click', navigateToTickerTester);
+  document.getElementById('nav-bar-compare').addEventListener('click', navigateToCompare);
+  document.getElementById('nav-bar-portfolios').addEventListener('click', navigateToPortfolios);
+  document.getElementById('nav-bar-watchlist').addEventListener('click', navigateToWatchlist);
+}
+
 async function init() {
   initLogoHomeLink();
   initSiteDisclaimerToggle();
   initSiteNavMenu();
+  initDesktopNavBar();
 
   // A ?shared=<id> link (see createSharedResult/renderShareResultsControl)
   // lands here before the usual intro screen -- doesn't need state.dataset
