@@ -59,6 +59,24 @@ body {
   line-height: 1.5;
 }
 
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 0.75rem;
+  z-index: 100;
+  background: var(--navy);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 6px 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 .site-header {
   background: var(--navy);
   padding: 0.85rem 1.5rem;
@@ -3037,4 +3055,28 @@ h1 .category-icon {
 
 .site-disclaimer-full p:last-child {
   margin-bottom: 0;
+}
+
+/* Print -- strips chrome (nav, buttons, footer disclaimer toggle) so a
+   printed/saved-as-PDF results page reads as a clean takeaway document
+   rather than a screenshot of the web app. */
+@media print {
+  .site-header,
+  .site-footer,
+  .skip-link,
+  .results-toolbar,
+  .modal-overlay,
+  button {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .card {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
 }
