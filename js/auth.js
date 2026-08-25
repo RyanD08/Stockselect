@@ -834,9 +834,10 @@ function renderAccountWidget() {
 // --- Terms of Service modal ----------------------------------------------
 
 // Drafted as a reasonable starting point for an educational, no-real-money
-// tool -- NOT reviewed by an attorney. The bracketed placeholders (governing
-// law, contact email) need to be filled in, and this should get real legal
-// review before being relied on for actual users.
+// tool. Deliberately omits Governing Law and Contact sections (and the
+// "not reviewed by an attorney" note) for now -- add them back once there's
+// real jurisdiction/contact info to put in them, and get this reviewed
+// before relying on it for actual users.
 const TERMS_OF_SERVICE_HTML = `
   <h3>1. Acceptance of These Terms</h3>
   <p>By creating an account or using TrueNorth ("the Service"), you agree to these Terms of Service. If you don't agree, please don't create an account or use the Service.</p>
@@ -868,14 +869,6 @@ const TERMS_OF_SERVICE_HTML = `
 
   <h3>10. Changes to These Terms</h3>
   <p>We may update these terms from time to time. Continuing to use the Service after a change means you accept the updated terms.</p>
-
-  <h3>11. Governing Law</h3>
-  <p>[Placeholder — fill in the state/country whose laws govern these terms.]</p>
-
-  <h3>12. Contact</h3>
-  <p>Questions about these terms? Contact us at [insert contact email].</p>
-
-  <p class="muted" style="margin-top: 1.5rem; font-size: 0.8rem;">Last updated August 25, 2026. This document was drafted as a starting point and has not been reviewed by an attorney — have it reviewed before relying on it for real users.</p>
 `;
 
 function handleTermsModalKeydown(evt) {
