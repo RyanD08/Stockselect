@@ -412,52 +412,68 @@ function tickerTierDisplay(tier) {
   return TIER_DISPLAY[tier] || TIER_DISPLAY.Partial;
 }
 
-// One 1-10 score per category, weighted-average of that category's own
-// per-question alignment values (already computed by scoreCompany/
-// buildScoredEntry above -- see entry.alignments) by the client's raw 1-5
-// importance rating on each question. A question with no verifiable data
-// for this company (questionHasData -- values questions 1-25 only, same
-// as scoreCompany's own unitImportance gating) is excluded from the
-// average entirely rather than counted as a false "neutral," so it can't
-// silently drag a category toward the middle. Risk questions (26/28/29)
-// have no such data-gate in the main engine either, so none is applied
-// here.
-//
-// 2026-08-24: rescaled from a "5.5 is neutral" midpoint onto "10 is the
-// starting point, only penalties pull it down" -- Ticker Tester's own
-// display choice, not a change to entry.score/tier/rationale or anything
-// scoring.js computes. Several categories (Ethical Screens most visibly)
-// are made entirely of exclusionary-type questions, whose alignment can
-// only ever be 0 (no violation) or negative (a real one) -- never
-// positive, since there's no "reward" for merely not selling tobacco. A
-// company with zero violations averaged to exactly 0 alignment under the
-// old midpoint formula, which rounded up to a flat, uninformative 6/10
-// every time, regardless of the actual answers -- that category could
-// never show green for any company. Under score = 10 + 9*avgAlignment,
-// clamped to [1,10], the same zero-violations company now reads a clean
-// 10/10, and only actual negative alignment pulls it down from there,
-// proportionally. Categories that mix in preference-type questions
-// (Environmental, etc.) already capped at 10 for their best case, so this
-// only changes what "no negatives" looks like -- it no longer needs a
-// literal reward signal to reach the top of the scale.
+// One 1-10 score per category, using the *exact same weighting rules and
+// formula shape* scoreCompany() (scoring.js) uses for the real portfolio
+// score -- this is deliberately not a separate Ticker-Tester-only scoring
+// method (three different ones were tried here over 2026-08-24 alone: a
+// 5.5-midpoint average, a 10-is-the-ceiling average, and a multiplicative
+// violation-penalty model -- all reverted/replaced by explicit request in
+// favor of just reusing the main engine's own math):
+//   - Questions 1-25 (SCORED_QUESTION_IDS): importance = the client's 1-5
+//     rating SQUARED, exactly like unitImportance() -- and, like
+//     scoreCompany(), a question this company has no verifiable data on
+//     (questionHasData) contributes zero importance rather than being
+//     treated as a false "neutral," so it can't be counted at all, in
+//     either direction.
+//   - Questions 26/28/29 (RISK_DIRECT_QUESTION_IDS): importance =
+//     rating - 1 (so a rating of 1 is a true no-op, never a data-gate),
+//     same as scoreCompany's own RISK_DIRECT_QUESTION_IDS loop.
+//   - Question 27 (values-over-returns): only its second role in
+//     scoreCompany (the direct "reward weaker financial quality"
+//     alignment, importance = rating - 1) applies here -- its first role
+//     (financialImportance/financialAlignment, weighting overall
+//     financial quality as its own criterion) isn't tied to any of the 7
+//     categories a client sees, so it's excluded from every category
+//     subtotal the same way it always has been in this file.
+//   - raw = denominator > 0 ? 50 + 50*(numerator/denominator) : 50,
+//     clamped to [0,100] -- identical to scoreCompany's own formula --
+//     then divided by 10 for this file's existing 1-10 display scale.
+// Deliberately excluded: scoreCompany's overrepPenalty. That's a whole-
+// company anti-clustering adjustment computed from negative alignments
+// across ALL 25 values questions at once, not attributable to any single
+// category, so there's no correct way to allocate a slice of it into a
+// per-category subtotal -- omitting it (as every version of this function
+// always has) is the only sound choice, not an oversight.
 function computeCategoryScores(company, entry, ctx) {
   const financialAlignment = financialQualityAlignment(company, deriveRiskProfile(state.answers), ctx.timeHorizon);
 
   return CATEGORIES.map((category) => {
     const questions = questionsForCategory(category.key).filter((q) => q.type !== 'horizon');
-    let weightedSum = 0;
-    let weightTotal = 0;
+    let numerator = 0;
+    let denominator = 0;
 
     questions.forEach((q) => {
-      if (q.id <= 25 && !questionHasData(q.id, company, ctx)) return;
-      const importance = state.answers[q.id] || 3;
-      const alignment = q.id === 27 ? 1 - 2 * financialAlignment : entry.alignments[q.id];
-      weightedSum += importance * alignment;
-      weightTotal += importance;
+      if (q.id === 27) {
+        const importance = Math.max(0, (state.answers[27] || 3) - 1);
+        const alignment = 1 - 2 * financialAlignment;
+        numerator += importance * alignment;
+        denominator += importance;
+        return;
+      }
+      if (RISK_DIRECT_QUESTION_IDS.includes(q.id)) {
+        const importance = Math.max(0, (state.answers[q.id] || 3) - 1);
+        numerator += importance * entry.alignments[q.id];
+        denominator += importance;
+        return;
+      }
+      if (!questionHasData(q.id, company, ctx)) return;
+      const importance = Math.pow(state.answers[q.id] || 3, 2);
+      numerator += importance * entry.alignments[q.id];
+      denominator += importance;
     });
 
-    const avgAlignment = weightTotal > 0 ? weightedSum / weightTotal : 0;
-    const score = Math.round(Math.min(10, Math.max(1, 10 + 9 * avgAlignment)));
+    const raw = denominator > 0 ? 50 + 50 * (numerator / denominator) : 50;
+    const score = Math.round(Math.min(10, Math.max(1, raw / 10)));
     return { key: category.key, label: category.label, score };
   });
 }
