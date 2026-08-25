@@ -1169,7 +1169,7 @@ h2 .category-icon {
 .results-table th,
 .results-table td {
   text-align: left;
-  padding: 0.65rem 0.75rem;
+  padding: 0.5rem 0.7rem;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
 }
@@ -1180,6 +1180,24 @@ h2 .category-icon {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+/* Zebra striping + hover -- scoped to .holdings-table only (not the
+   simulation breakdown table, which shares .results-table's base styling
+   but uses its own row backgrounds for excluded/total rows that a
+   td-level zebra background would otherwise paint over), and only above
+   the 700px breakpoint where the table is still a real table -- below it
+   each td becomes its own full-width block (see the mobile card layout
+   further down), where a td-level background would band the card instead
+   of tinting a table row. */
+@media (min-width: 701px) {
+  .holdings-table tbody tr:nth-child(even) td {
+    background: var(--bg);
+  }
+
+  .holdings-table tbody tr:hover td {
+    background: #efe9da;
+  }
 }
 
 .results-table tbody tr.row-strong td:first-child {
@@ -1403,6 +1421,21 @@ h2 .category-icon {
   transform: rotate(90deg);
 }
 
+/* Wraps the rationale paragraph + optional partial-match note + the
+   financial-metrics list once "Why this holding" is expanded -- keeping
+   all of a row's supporting detail under one toggle instead of the two
+   separate always-visible/toggle blocks this used to be split across. */
+.holding-details {
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.holding-rationale-text {
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
 .financial-details-list {
   list-style: none;
   margin: 0.5rem 0 0;
@@ -1604,16 +1637,25 @@ h2 .category-icon {
    carries most states; the 5-portfolio-limit case gets its own small block
    with a link into My Portfolios instead. */
 
-.results-top-actions {
-  margin: 0 0 1.25rem;
+.results-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0 1.75rem;
 }
 
-.ticker-tester-cta-row {
-  margin: 0 0 1.5rem;
+.results-toolbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.save-results-row {
-  margin: 0.75rem 0 1.25rem;
+/* Forces the "5 portfolios saved" limit notice and the finished share-link
+   row onto their own full-width line below any buttons already in the
+   toolbar, rather than squeezing in as an oddly-wide flex item beside them. */
+.results-toolbar-full {
+  flex-basis: 100%;
 }
 
 .save-results-error {

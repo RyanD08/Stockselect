@@ -10,7 +10,7 @@ const state = {
   editOrigin: null, // null | 'review' — set while editing a category reached via the Review screen or the results "Edit My Answers" control
   touchedQuestionIds: new Set(), // questions the client has explicitly tapped an answer for — drives the "answered" highlight
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
-  expandedFinancialDetails: new Set(), // tickers with the "why this stock, financially" panel open on Results
+  expandedFinancialDetails: new Set(), // tickers with the "why this holding" details panel (rationale + financials) open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
   saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Portfolio" control (see auth.js for the actual save)
   shareResultState: { status: 'idle', url: null, errorMessage: null }, // 'idle' | 'sharing' | 'shared' | 'error' — the Results screen's "Share My Results" control (see createSharedResult in auth.js)
@@ -439,7 +439,7 @@ function renderSaveResultsControl() {
 
   if (status === 'limit-reached') {
     return `
-      <div class="save-results-row save-results-limit">
+      <div class="results-toolbar-full save-results-limit">
         <p class="error-text">${escapeHtml(errorMessage)}</p>
         <button type="button" id="go-to-my-portfolios-btn" class="save-results-link">Go to My Portfolios</button>
       </div>
@@ -448,12 +448,12 @@ function renderSaveResultsControl() {
 
   const label = status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved!' : 'Save My Portfolio';
   return `
-    <p class="save-results-row">
-      <button type="button" id="save-results-btn" class="btn btn-secondary" ${status === 'saving' ? 'disabled' : ''}>
+    <span class="results-toolbar-item">
+      <button type="button" id="save-results-btn" class="btn btn-primary" ${status === 'saving' ? 'disabled' : ''}>
         ${escapeHtml(label)}
       </button>
       ${status === 'error' ? `<span class="error-text save-results-error">${escapeHtml(errorMessage)}</span>` : ''}
-    </p>
+    </span>
   `;
 }
 
@@ -482,7 +482,7 @@ function renderShareResultsControl() {
 
   if (status === 'shared') {
     return `
-      <div class="share-results-row share-results-done">
+      <div class="results-toolbar-full share-results-done">
         <input type="text" class="share-results-link-input" value="${escapeHtml(url)}" readonly />
         <button type="button" id="copy-share-link-btn" class="btn-link-action">Copy Link</button>
       </div>
@@ -490,12 +490,12 @@ function renderShareResultsControl() {
   }
 
   return `
-    <p class="share-results-row">
-      <button type="button" id="share-results-btn" class="btn btn-secondary" ${status === 'sharing' ? 'disabled' : ''}>
+    <span class="results-toolbar-item">
+      <button type="button" id="share-results-btn" class="btn btn-primary" ${status === 'sharing' ? 'disabled' : ''}>
         ${status === 'sharing' ? 'Creating link…' : 'Share My Results'}
       </button>
       ${status === 'error' ? `<span class="error-text share-results-error">${escapeHtml(errorMessage)}</span>` : ''}
-    </p>
+    </span>
   `;
 }
 
@@ -509,15 +509,15 @@ function renderResults() {
 
   appEl.innerHTML = `
     <section class="card results-card">
+      <p class="eyebrow">Your Recommended Portfolio</p>
       <h1>Your TrueNorth Portfolio</h1>
-      <p class="results-top-actions">
+
+      <div class="results-toolbar">
         <button type="button" class="btn btn-secondary edit-answers-btn" data-edit-answers>Edit My Answers</button>
-      </p>
-      <p class="ticker-tester-cta-row">
-        <button type="button" id="ticker-tester-cta-btn" class="btn btn-primary btn-large">Test a Company in Ticker Tester</button>
-      </p>
-      ${renderSaveResultsControl()}
-      ${renderShareResultsControl()}
+        <button type="button" id="ticker-tester-cta-btn" class="btn btn-secondary">Test a Company in Ticker Tester</button>
+        ${renderSaveResultsControl()}
+        ${renderShareResultsControl()}
+      </div>
 
       <div class="summary-grid">
         <div class="summary-box">
@@ -554,7 +554,7 @@ function renderResults() {
       </p>
 
       <div class="table-wrap">
-        <table class="results-table">
+        <table class="results-table holdings-table">
           <thead>
             <tr>
               <th>Ticker</th>
@@ -754,7 +754,7 @@ function renderHoldingRow(entry) {
   const tierClass = `tier-${display.cssKey}`;
   const rowClass = `row-${display.cssKey}`;
   const ticker = entry.company.ticker;
-  const isFinDetailsOpen = state.expandedFinancialDetails.has(ticker);
+  const isDetailsOpen = state.expandedFinancialDetails.has(ticker);
   return `
     <tr class="${rowClass}">
       <td data-label="Ticker">${escapeHtml(ticker)}${renderWatchlistToggleButton(ticker)}</td>
@@ -763,20 +763,28 @@ function renderHoldingRow(entry) {
       <td data-label="Match Tier"><span class="tier-badge ${tierClass}">${display.badgeText}</span></td>
       <td data-label="Financial Score">${renderFinancialScoreBadge(entry.company)}</td>
       <td data-label="Rationale">
-        <div>${escapeHtml(entry.rationale)}</div>
-        ${entry.note ? `<div class="partial-note">${escapeHtml(entry.note)}</div>` : ''}
         ${
           entry.cautionFlags && entry.cautionFlags.length > 0
             ? `<div class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</div>`
             : ''
         }
-        <button type="button" class="financial-toggle-btn" data-ticker="${escapeHtml(ticker)}">
-          <span class="financial-toggle-chevron ${isFinDetailsOpen ? 'open' : ''}">${chevronIcon()}</span>
-          Why this stock, financially
+        <button type="button" class="financial-toggle-btn" data-ticker="${escapeHtml(ticker)}" aria-expanded="${isDetailsOpen}">
+          <span class="financial-toggle-chevron ${isDetailsOpen ? 'open' : ''}">${chevronIcon()}</span>
+          Why this holding
         </button>
-        ${isFinDetailsOpen ? renderFinancialDetails(entry.company) : ''}
+        ${isDetailsOpen ? renderHoldingDetails(entry) : ''}
       </td>
     </tr>
+  `;
+}
+
+function renderHoldingDetails(entry) {
+  return `
+    <div class="holding-details">
+      <p class="holding-rationale-text">${escapeHtml(entry.rationale)}</p>
+      ${entry.note ? `<p class="partial-note">${escapeHtml(entry.note)}</p>` : ''}
+      ${renderFinancialDetails(entry.company)}
+    </div>
   `;
 }
 
