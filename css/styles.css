@@ -142,8 +142,17 @@ body {
 /* Groups the hamburger nav menu and the account widget together on the
    right side of the header, so justify-content: space-between on
    .site-header-inner only ever splits "logo" from "everything else"
-   regardless of how many items are in this group. */
+   regardless of how many items are in this group. Also anchors the
+   hamburger dropdown (position: relative) -- deliberately here rather than
+   on .site-nav-menu itself, so the dropdown's `right: 0` aligns to this
+   whole group's right edge (reliably near the header's own right edge via
+   justify-content: flex-end below) instead of to the hamburger button,
+   whose own position shifts leftward as its sibling account-widget links
+   (Log Out, Delete Account) grow wider -- on a narrow phone screen that
+   shift was enough to push a button-anchored dropdown off the left edge
+   of the viewport entirely. */
 .site-header-actions {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 1.25rem;
@@ -154,11 +163,8 @@ body {
 /* Hamburger nav menu — 2026-08-25, replaced the old flat "Ticker Tester"
    text link plus My Portfolios/My Watchlist inside the account widget
    with one menu covering all four features (see renderSiteNavMenu,
-   app.js). Anchors the dropdown via position: relative so it can hang
-   off the button's bottom-right regardless of scroll position. */
-.site-nav-menu {
-  position: relative;
-}
+   app.js). No positioning of its own -- see .site-header-actions above for
+   where the dropdown is actually anchored. */
 
 .hamburger-btn {
   display: flex;

@@ -705,6 +705,13 @@ function renderTickerRadarChartIfPresent(company) {
     },
     options: {
       responsive: true,
+      // Category labels near the chart's left/right edges (e.g. "Risk
+      // Philosophy", "Community/Identity") are right/left-aligned by
+      // Chart.js based on their angle around the circle, so their text
+      // extends outward from the circle rather than being centered on it --
+      // without this padding reserved around the plot area, that text gets
+      // clipped by the canvas's own edge on narrow (mobile) widths.
+      layout: { padding: { top: 8, bottom: 8, left: 24, right: 24 } },
       scales: {
         r: {
           min: 1,
@@ -1131,6 +1138,9 @@ function renderCompareRadarChartIfPresent(companyA, companyB) {
     },
     options: {
       responsive: true,
+      // See the equivalent single-company chart above for why this is
+      // needed -- same left/right label clipping on narrow widths.
+      layout: { padding: { top: 8, bottom: 8, left: 24, right: 24 } },
       scales: {
         r: {
           min: 1,
