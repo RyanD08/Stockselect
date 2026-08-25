@@ -43,6 +43,29 @@
   />
   <meta name="twitter:image" content="https://ryand08.github.io/Stockselect/assets/og-image.png" />
 
+  <!-- Structured data -- lets search results show TrueNorth as a real free
+       web app listing rather than a bare link. The url/image fields here
+       mirror the Open Graph tags above; when a custom domain is added,
+       update both together in the same edit. -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "TrueNorth",
+      "url": "https://ryand08.github.io/Stockselect/",
+      "image": "https://ryand08.github.io/Stockselect/assets/og-image.png",
+      "description": "TrueNorth is a values-guided investing tool that builds an illustrative, personalized portfolio screen from your environmental, social, governance, and financial priorities.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any (web browser)",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  </script>
+
   <link rel="stylesheet" href="css/styles.css?v=20260825x" />
 </head>
 <body>
