@@ -831,6 +831,88 @@ function renderAccountWidget() {
   }
 }
 
+// --- Terms of Service modal ----------------------------------------------
+
+// Drafted as a reasonable starting point for an educational, no-real-money
+// tool -- NOT reviewed by an attorney. The bracketed placeholders (governing
+// law, contact email) need to be filled in, and this should get real legal
+// review before being relied on for actual users.
+const TERMS_OF_SERVICE_HTML = `
+  <h3>1. Acceptance of These Terms</h3>
+  <p>By creating an account or using TrueNorth ("the Service"), you agree to these Terms of Service. If you don't agree, please don't create an account or use the Service.</p>
+
+  <h3>2. What TrueNorth Is</h3>
+  <p>TrueNorth is an educational, illustrative tool that builds a sample stock portfolio based on values and risk preferences you provide. It is not a brokerage, financial advisor, or investment platform, and it does not execute trades or manage real money.</p>
+
+  <h3>3. Not Financial Advice</h3>
+  <p>Nothing on TrueNorth is financial, investment, tax, or legal advice. The portfolios, scores, and historical simulations shown are illustrative only, based on a limited dataset, and should not be relied on to make actual investment decisions. Consult a registered financial advisor before making any investment decisions.</p>
+
+  <h3>4. Accounts</h3>
+  <p>Creating an account is optional — most of TrueNorth works without one. If you create an account, you agree to provide a valid email address, keep your password secure, and notify us if you believe your account has been compromised. You're responsible for all activity under your account.</p>
+
+  <h3>5. Your Data</h3>
+  <p>If you create an account, we store the email address you provide and the data you choose to save — your questionnaire answers, saved portfolios, and watchlist. We use this only to provide the account features themselves (saving, loading, and displaying your own data back to you). We don't sell your data.</p>
+  <p>If you use the "Share My Results" feature, a public link is created containing a summary of that specific result (risk profile, top priorities, and a list of holdings with match tier). Anyone with that link can view it. This is separate from, and does not require, an account.</p>
+
+  <h3>6. Acceptable Use</h3>
+  <p>You agree not to misuse the Service — including attempting to access another user's account or data, interfering with the Service's normal operation, or using automated means to scrape or overload it.</p>
+
+  <h3>7. Termination</h3>
+  <p>We may suspend or terminate accounts that violate these terms. You may stop using the Service, or ask us to delete your account, at any time.</p>
+
+  <h3>8. No Warranty</h3>
+  <p>The Service is provided "as is," without warranties of any kind. Financial and values data comes from public sources (SEC EDGAR, EPA ECHO, OSHA, FEC, FTC records, and Finnhub market data) and may be incomplete, outdated, or inaccurate. We don't guarantee the accuracy, completeness, or reliability of anything shown.</p>
+
+  <h3>9. Limitation of Liability</h3>
+  <p>To the fullest extent permitted by law, TrueNorth and its creator are not liable for any losses or damages arising from your use of the Service, including any investment decisions made using information from it.</p>
+
+  <h3>10. Changes to These Terms</h3>
+  <p>We may update these terms from time to time. Continuing to use the Service after a change means you accept the updated terms.</p>
+
+  <h3>11. Governing Law</h3>
+  <p>[Placeholder — fill in the state/country whose laws govern these terms.]</p>
+
+  <h3>12. Contact</h3>
+  <p>Questions about these terms? Contact us at [insert contact email].</p>
+
+  <p class="muted" style="margin-top: 1.5rem; font-size: 0.8rem;">Last updated August 25, 2026. This document was drafted as a starting point and has not been reviewed by an attorney — have it reviewed before relying on it for real users.</p>
+`;
+
+function handleTermsModalKeydown(evt) {
+  if (evt.key === 'Escape') closeTermsModal();
+}
+
+// Appended straight to document.body rather than rendered through #app, so
+// opening/closing it never touches the signup form's own DOM -- the email
+// and password the user already typed stay put either way.
+function openTermsModal() {
+  if (document.getElementById('terms-modal-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'terms-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="terms-modal-title">
+      <div class="modal-header">
+        <h2 id="terms-modal-title">Terms of Service</h2>
+        <button type="button" id="terms-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">${TERMS_OF_SERVICE_HTML}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('terms-modal-close-btn').addEventListener('click', closeTermsModal);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) closeTermsModal();
+  });
+  document.addEventListener('keydown', handleTermsModalKeydown);
+}
+
+function closeTermsModal() {
+  const overlay = document.getElementById('terms-modal-overlay');
+  if (overlay) overlay.remove();
+  document.removeEventListener('keydown', handleTermsModalKeydown);
+}
+
 // --- Account view: login / sign-up form ---------------------------------
 
 function renderAccount() {
@@ -861,6 +943,17 @@ function renderAccount() {
           required
         />
 
+        ${
+          isSignup
+            ? `
+              <label class="terms-checkbox-row">
+                <input type="checkbox" id="terms-checkbox" />
+                <span>I have read the <button type="button" id="terms-open-btn" class="terms-link-btn">Terms of Service</button></span>
+              </label>
+            `
+            : ''
+        }
+
         ${authViewState.error ? `<p class="error-text">${escapeHtml(authViewState.error)}</p>` : ''}
         ${authViewState.info ? `<p class="auth-info-text">${escapeHtml(authViewState.info)}</p>` : ''}
 
@@ -884,6 +977,11 @@ function renderAccount() {
     evt.preventDefault();
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
+    if (isSignup && !document.getElementById('terms-checkbox').checked) {
+      authViewState.error = "Please confirm you've read the Terms of Service before creating an account.";
+      renderInPlace();
+      return;
+    }
     authViewState.error = null;
     authViewState.info = null;
     authViewState.loading = true;
@@ -901,6 +999,9 @@ function renderAccount() {
       renderInPlace();
     }
   });
+
+  const termsOpenBtn = document.getElementById('terms-open-btn');
+  if (termsOpenBtn) termsOpenBtn.addEventListener('click', openTermsModal);
 
   const forgotBtn = document.getElementById('forgot-password-btn');
   if (forgotBtn) {
