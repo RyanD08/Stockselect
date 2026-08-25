@@ -594,7 +594,7 @@ function renderMyWatchlist() {
         ${watchlistViewState.loading ? "Companies you're tracking." : `${count} of ${MAX_WATCHLIST_SIZE} watchlisted companies.`}
       </p>
       ${!watchlistViewState.loading && state.dataset ? renderWatchlistAddPicker() : ''}
-      ${watchlistViewState.loading ? '<p class="muted">Loading…</p>' : renderWatchlistEntries()}
+      ${watchlistViewState.loading ? `<p class="muted">${spinnerHtml('Loading…')}</p>` : renderWatchlistEntries()}
       <div class="nav-row">
         <button type="button" id="watchlist-back-btn" class="btn btn-secondary">Back</button>
       </div>
@@ -694,7 +694,7 @@ function renderWatchlistEntries() {
   if (watchlistViewState.entries.length === 0) {
     return '<p class="muted">You haven\'t watchlisted any companies yet. Look up a company in Ticker Tester (or anywhere else you see a ☆ Add to Watchlist button) to track it here.</p>';
   }
-  if (!state.dataset) return '<p class="muted">Loading company data…</p>';
+  if (!state.dataset) return `<p class="muted">${spinnerHtml('Loading company data…')}</p>`;
   return `<ul class="watchlist-list">${watchlistViewState.entries.map(renderWatchlistEntry).join('')}</ul>`;
 }
 
@@ -865,7 +865,7 @@ function renderAccount() {
         ${authViewState.info ? `<p class="auth-info-text">${escapeHtml(authViewState.info)}</p>` : ''}
 
         <button type="submit" class="btn btn-primary auth-submit-btn" ${authViewState.loading ? 'disabled' : ''}>
-          ${authViewState.loading ? 'Please wait…' : isSignup ? 'Create Account' : 'Log In'}
+          ${authViewState.loading ? spinnerHtml('Please wait…') : isSignup ? 'Create Account' : 'Log In'}
         </button>
       </form>
 
@@ -978,7 +978,7 @@ function renderMyPortfolios() {
       <p class="lede">
         ${myPortfoliosViewState.loading ? 'Your saved portfolios.' : `${count} of ${MAX_SAVED_PORTFOLIOS} saved portfolios.`}
       </p>
-      ${myPortfoliosViewState.loading ? '<p class="muted">Loading…</p>' : renderPortfoliosList()}
+      ${myPortfoliosViewState.loading ? `<p class="muted">${spinnerHtml('Loading…')}</p>` : renderPortfoliosList()}
       <div class="nav-row">
         <button type="button" id="portfolios-back-btn" class="btn btn-secondary">Back</button>
       </div>
@@ -1219,7 +1219,7 @@ function renderSharedResult() {
     appEl.innerHTML = `
       <section class="card shared-result-card">
         <p class="eyebrow">Shared Portfolio</p>
-        <h1>Loading…</h1>
+        <h1>${spinnerHtml('Loading…')}</h1>
       </section>
     `;
     return;

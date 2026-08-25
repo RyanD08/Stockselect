@@ -229,7 +229,7 @@ function renderTickerTester() {
       <section class="card ticker-tester-card">
         <p class="eyebrow">Ticker Tester</p>
         <h1>Ticker Tester</h1>
-        <p class="muted">Loading company data…</p>
+        <p class="muted">${spinnerHtml('Loading company data…')}</p>
         <div class="nav-row">
           <button type="button" id="ticker-tester-back-btn" class="btn btn-secondary">Back</button>
         </div>
@@ -456,7 +456,7 @@ function renderTickerResult(company) {
       return `
         <div class="ticker-result">
           ${changeCompanyRow}
-          <p class="muted">Loading your most recent saved portfolio…</p>
+          <p class="muted">${spinnerHtml('Loading your most recent saved portfolio…')}</p>
           ${renderRawCompanyData(company)}
         </div>
       `;
@@ -768,7 +768,7 @@ function renderTickerCompare() {
       <section class="card ticker-compare-card">
         <p class="eyebrow">Ticker Tester</p>
         <h1>Compare Two Companies</h1>
-        <p class="muted">Loading company data…</p>
+        <p class="muted">${spinnerHtml('Loading company data…')}</p>
         <div class="nav-row">
           <button type="button" id="ticker-compare-back-btn" class="btn btn-secondary">Back to Ticker Tester</button>
         </div>
@@ -952,7 +952,7 @@ function renderCompareResults(companyA, companyB) {
     if (tickerTesterState.autoLoadState === 'loading') {
       return `
         <div class="ticker-compare-results">
-          <p class="muted">Loading your most recent saved portfolio…</p>
+          <p class="muted">${spinnerHtml('Loading your most recent saved portfolio…')}</p>
           <div class="ticker-compare-columns">
             <div class="ticker-compare-column">${renderRawCompanyData(companyA)}</div>
             <div class="ticker-compare-column">${renderRawCompanyData(companyB)}</div>

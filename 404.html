@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Page Not Found — TrueNorth</title>
+
+  <link rel="icon" href="favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0f1f3d" />
+
+  <link rel="stylesheet" href="css/styles.css?v=20260825k" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <div class="brand">
+        <a href="index.html" class="logo-link" aria-label="TrueNorth home">
+          <img
+            src="assets/truenorth-logo-full.png"
+            alt="TrueNorth — Values-Guided Investing"
+            class="logo-img"
+            width="209"
+            height="80"
+          />
+        </a>
+      </div>
+      <p class="site-header-title" aria-hidden="true">True<span class="site-header-title-accent">North</span></p>
+      <div class="site-header-actions">
+        <div id="account-widget" class="account-widget"></div>
+      </div>
+    </div>
+    <!-- Static links, not the SPA's gated navigateTo* handlers -- this page
+         has no app.js loaded, and none of these destinations are
+         deep-linkable by URL (only ?shared= is, see js/auth.js), so every
+         link here lands on the homepage rather than the specific view. -->
+    <nav class="site-nav-bar" aria-label="Main">
+      <div class="site-nav-bar-inner">
+        <a href="index.html" class="site-nav-bar-link">Ticker Tester</a>
+        <a href="index.html" class="site-nav-bar-link">Compare Two Companies</a>
+        <a href="index.html" class="site-nav-bar-link">My Portfolios</a>
+        <a href="index.html" class="site-nav-bar-link">My Watchlist</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="app">
+    <section class="card results-card" style="text-align: center">
+      <div class="compass-motif" style="font-size: 2.4rem; margin-bottom: 0.75rem; justify-content: center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 2.3v2.4M12 19.3v2.4M2.3 12h2.4M19.3 12h2.4"/><path d="M12 7.5l1.9 5.3-1.9 4-1.9-4Z" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <p class="eyebrow" style="text-align: center">404</p>
+      <h1 style="text-align: center">Page Not Found</h1>
+      <p class="lede" style="text-align: center; margin: 0 auto 1.5rem; max-width: 46ch">
+        This page doesn't exist, or the link may be broken. Let's get you pointed back in the right direction.
+      </p>
+      <a href="index.html" class="btn btn-primary">Back to TrueNorth</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-disclaimer">
+      <p class="site-disclaimer-summary">
+        <span class="footer-brand">TrueNorth</span> &middot; This is an educational tool, not financial advice.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

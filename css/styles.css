@@ -259,6 +259,7 @@ body {
   cursor: pointer;
   padding: 0.15rem 0;
   border-bottom: 2px solid transparent;
+  text-decoration: none;
 }
 
 .site-nav-bar-link:hover {
@@ -376,6 +377,7 @@ select:focus-visible {
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   transition: opacity 0.15s ease;
 }
 
@@ -416,6 +418,37 @@ select:focus-visible {
 .error-text {
   color: var(--danger-text);
   margin-top: 1rem;
+}
+
+/* Shared loading indicator (see spinnerHtml() in app.js) -- a small ring
+   that inherits the surrounding text color via currentColor, so it matches
+   whether it's sitting in navy body text, a muted note, or on a filled
+   button. */
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  vertical-align: -0.2em;
+  animation: spinner-rotate 0.7s linear infinite;
+}
+
+.spinner + span {
+  margin-left: 0.5rem;
+}
+
+@keyframes spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 1.8s;
+  }
 }
 
 /* Shared icon sizing — icons are inline SVG using currentColor, sized via

@@ -95,7 +95,7 @@ function renderIntro() {
 
       <div class="intro-cta-row">
         <button id="start-btn" class="btn btn-primary btn-large" ${state.dataset ? '' : 'disabled'}>
-          ${!state.dataset ? 'Loading data...' : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
+          ${!state.dataset ? spinnerHtml('Loading data…') : hasProgress ? 'Continue Your Questionnaire' : 'Start the Questionnaire'}
         </button>
         ${hasProgress ? '<button id="restart-fresh-btn" class="btn-link-inline">Start over instead</button>' : ''}
       </div>
@@ -425,6 +425,15 @@ function renderReviewCategory(category, categoryIndex) {
 
 function chevronIcon() {
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>';
+}
+
+// Shared loading indicator -- a small CSS-animated ring (see .spinner in
+// css/styles.css) used everywhere a "Loading…"-style label previously stood
+// alone, so every async wait in the app reads the same way. `label` is
+// optional trailing text; omit it for spinner-only spots (e.g. inside an
+// already-labeled disabled button).
+function spinnerHtml(label) {
+  return `<span class="spinner" role="status" aria-label="Loading"></span>${label ? `<span>${escapeHtml(label)}</span>` : ''}`;
 }
 
 // Login is optional (see firebase-config.js/auth.js) — this renders
