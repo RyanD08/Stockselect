@@ -499,9 +499,15 @@ function renderShareResultsControl() {
   const { status, url, errorMessage } = state.shareResultState;
 
   if (status === 'shared') {
+    // navigator.share is checked at render time (this all runs client-side)
+    // so the native OS share sheet only appears where it's actually
+    // supported -- mostly mobile browsers. Copy Link stays available
+    // everywhere else as the fallback it always was.
+    const canNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
     return `
       <div class="results-toolbar-full share-results-done">
         <input type="text" class="share-results-link-input" value="${escapeHtml(url)}" readonly />
+        ${canNativeShare ? '<button type="button" id="native-share-btn" class="btn-link-action">Share</button>' : ''}
         <button type="button" id="copy-share-link-btn" class="btn-link-action">Copy Link</button>
       </div>
     `;
@@ -678,6 +684,23 @@ function renderResults() {
         state.shareResultState = { status: 'error', url: null, errorMessage: describeFirestoreError(err, 'Could not create a share link') };
       }
       renderInPlace();
+    });
+  }
+
+  const nativeShareBtn = document.getElementById('native-share-btn');
+  if (nativeShareBtn) {
+    nativeShareBtn.addEventListener('click', async () => {
+      try {
+        await navigator.share({
+          title: 'TrueNorth — Values-Guided Investing',
+          text: 'Check out my values-guided investment portfolio from TrueNorth.',
+          url: state.shareResultState.url,
+        });
+      } catch (err) {
+        // AbortError is just the user closing the OS share sheet -- not a
+        // real failure. Anything else is a soft failure too: the link is
+        // still right there in the input field and Copy Link still works.
+      }
     });
   }
 
@@ -1170,6 +1193,39 @@ function initPrivacyPolicyLink() {
   link.addEventListener('click', openPrivacyModal);
 }
 
+// Same document.body-append pattern as the modals above -- survives any
+// render()/renderInPlace() call, since those wipe #app's innerHTML but
+// never touch document.body directly. Only fires for genuinely uncaught
+// errors: every Firestore/network call in this app already has its own
+// try/catch and inline error message (see describeFirestoreError calls
+// throughout), so this is specifically the safety net for the case those
+// don't cover -- an unexpected crash a stranger hits that was never seen
+// in testing.
+function showGlobalErrorBanner() {
+  if (document.getElementById('global-error-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'global-error-banner';
+  banner.className = 'global-error-banner';
+  banner.setAttribute('role', 'alert');
+  banner.innerHTML = `
+    <p>Something went wrong. Try refreshing the page, or use "Edit My Answers" to start over.</p>
+    <button type="button" id="global-error-banner-dismiss-btn" aria-label="Dismiss">&times;</button>
+  `;
+  document.body.appendChild(banner);
+  document.getElementById('global-error-banner-dismiss-btn').addEventListener('click', () => banner.remove());
+}
+
+function initGlobalErrorHandler() {
+  window.addEventListener('error', (evt) => {
+    console.error('Uncaught error:', evt.error || evt.message);
+    showGlobalErrorBanner();
+  });
+  window.addEventListener('unhandledrejection', (evt) => {
+    console.error('Unhandled promise rejection:', evt.reason);
+    showGlobalErrorBanner();
+  });
+}
+
 // --- Hamburger site nav (static markup outside #app, present on every view) --
 //
 // 2026-08-25: replaced the old header nav (a single "Ticker Tester" text
@@ -1353,6 +1409,7 @@ function initDesktopNavBar() {
 }
 
 async function init() {
+  initGlobalErrorHandler();
   initLogoHomeLink();
   initSiteDisclaimerToggle();
   initPrivacyPolicyLink();
