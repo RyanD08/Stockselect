@@ -32,6 +32,7 @@ const badgeState = {
   loaded: false,
   earnedIds: new Set(),
   equippedId: null,
+  error: null,
   // Set true the moment a badge is freshly earned this session (see
   // checkAndAwardBadges below); consumed by the next renderLearnHub call,
   // which plays the gift-box-opening animation once and clears it. Not
@@ -49,16 +50,25 @@ function badgeMetaDoc() {
   return firebaseDb.collection('users').doc(authState.user.uid).collection('meta').doc('badges');
 }
 
+// Only marks loaded true on SUCCESS, same reasoning as
+// loadLearnProgress's own fix (js/learn.js): a failed load (most likely a
+// Firestore security-rules mismatch -- see that function's comment) leaves
+// loaded false so the next visit to Learn or My Badges retries instead of
+// getting stuck showing "not earned"/no header badge for the rest of the
+// session. badgeState.error is shown on My Badges so a real failure is
+// visible instead of silently looking like lost data.
 async function loadBadgeState() {
   if (!firebaseReady || !authState.user) return;
+  badgeState.error = null;
   try {
     const [badgesSnap, metaSnap] = await Promise.all([badgesCollection().get(), badgeMetaDoc().get()]);
     badgeState.earnedIds = new Set(badgesSnap.docs.filter((doc) => doc.data().earned).map((doc) => doc.id));
     badgeState.equippedId = metaSnap.exists ? metaSnap.data().equippedBadgeId || null : null;
+    badgeState.loaded = true;
   } catch (err) {
     console.error('loadBadgeState failed:', err);
+    badgeState.error = describeFirestoreError(err, 'Could not load your badges'); // js/auth.js
   }
-  badgeState.loaded = true;
 }
 
 // Checks every badge's requirement against the current in-memory progress
@@ -88,6 +98,7 @@ async function checkAndAwardBadges(showPopup) {
           .set({ earned: true, earnedAt: firebase.firestore.FieldValue.serverTimestamp() });
       } catch (err) {
         console.error('Awarding badge failed:', err);
+        badgeState.error = describeFirestoreError(err, 'Could not save your earned badge'); // js/auth.js
       }
     }
 
@@ -97,23 +108,27 @@ async function checkAndAwardBadges(showPopup) {
 
 async function equipBadge(badgeId) {
   badgeState.equippedId = badgeId;
+  badgeState.error = null;
   renderAccountWidget(); // js/auth.js -- refreshes the header badge slot
   if (!firebaseReady || !authState.user) return;
   try {
     await badgeMetaDoc().set({ equippedBadgeId: badgeId }, { merge: true });
   } catch (err) {
     console.error('equipBadge failed:', err);
+    badgeState.error = describeFirestoreError(err, 'Could not save your equipped badge'); // js/auth.js
   }
 }
 
 async function unequipBadge() {
   badgeState.equippedId = null;
+  badgeState.error = null;
   renderAccountWidget(); // js/auth.js
   if (!firebaseReady || !authState.user) return;
   try {
     await badgeMetaDoc().set({ equippedBadgeId: null }, { merge: true });
   } catch (err) {
     console.error('unequipBadge failed:', err);
+    badgeState.error = describeFirestoreError(err, 'Could not save your unequipped badge'); // js/auth.js
   }
 }
 
@@ -234,13 +249,27 @@ async function openMyBadgesView() {
 }
 
 function renderMyBadges() {
-  const loading = !learnState.progressLoaded || !badgeState.loaded;
+  // badgeState.error (or learnState.error, since isEarned() above depends
+  // on Learn progress too) takes priority over the loading spinner --
+  // otherwise a failed load would show a spinner forever instead of the
+  // actual problem. See loadBadgeState/loadLearnProgress: a failed load
+  // leaves *Loaded/loaded false, which is exactly why this checks the
+  // error first rather than assuming false = still in flight.
+  const error = badgeState.error || learnState.error;
+  const loading = !error && (!learnState.progressLoaded || !badgeState.loaded);
   appEl.innerHTML = `
     <section class="card my-badges-card">
       <p class="eyebrow">Account</p>
       <h1>My Badges</h1>
       <p class="lede">Achievements earned across TrueNorth. Equip one to show it in the header.</p>
-      ${loading ? `<p class="muted">${spinnerHtml('Loading…')}</p>` : `<ul class="badge-list">${BADGES.map(renderBadgeListItem).join('')}</ul>`}
+      ${error ? `<p class="error-text">${escapeHtml(error)}</p>` : ''}
+      ${
+        loading
+          ? `<p class="muted">${spinnerHtml('Loading…')}</p>`
+          : error
+            ? ''
+            : `<ul class="badge-list">${BADGES.map(renderBadgeListItem).join('')}</ul>`
+      }
       <div class="nav-row">
         <button type="button" id="my-badges-back-btn" class="btn btn-secondary">Back</button>
       </div>

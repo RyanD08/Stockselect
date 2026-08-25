@@ -392,21 +392,32 @@ const LESSONS = [
 let pendingLearnRedirect = false;
 
 // { [lessonId]: { completed: bool, lastScore, bestScore, total } }
-const learnState = { progress: {}, progressLoaded: false };
+const learnState = { progress: {}, progressLoaded: false, error: null };
 
 const learnLessonViewState = {
   lessonId: null,
   phase: 'lesson', // 'lesson' | 'quiz' | 'result'
   score: null,
   total: null,
+  saveError: null, // set if recordLessonCompletion's Firestore write fails -- shown on the result screen
 };
 
 function learnProgressCollection() {
   return firebaseDb.collection('users').doc(authState.user.uid).collection('learnProgress');
 }
 
+// Only marks progressLoaded true on SUCCESS -- a failed load (e.g. a
+// permission-denied because the Firestore security rules granting access
+// to learnProgress were never actually deployed to the live project; see
+// firestore.rules' own header -- Claude Code can write that file but can't
+// publish it) leaves progressLoaded false so the next openLearnHub/
+// openMyBadgesView call retries instead of getting permanently stuck
+// showing empty progress for the rest of the session. learnState.error is
+// shown on the hub so a real failure is visible instead of silently
+// looking like lost data.
 async function loadLearnProgress() {
   if (!firebaseReady || !authState.user) return;
+  learnState.error = null;
   try {
     const snapshot = await learnProgressCollection().get();
     const progress = {};
@@ -414,18 +425,21 @@ async function loadLearnProgress() {
       progress[doc.id] = doc.data();
     });
     learnState.progress = progress;
+    learnState.progressLoaded = true;
   } catch (err) {
     console.error('loadLearnProgress failed:', err);
+    learnState.error = describeFirestoreError(err, 'Could not load your Learn progress'); // js/auth.js
   }
-  learnState.progressLoaded = true;
 }
 
 // Always marks completed:true and keeps the higher of any prior best score
 // -- a retry can only improve the recorded best score, never un-complete a
-// lesson or lower what's shown. Firestore write failures are logged but
-// non-fatal: the score screen (already rendered by the caller before this
-// resolves) isn't blocked on it, and the local learnState.progress update
-// keeps the hub's badge correct for the rest of this session either way.
+// lesson or lower what's shown. The local learnState.progress update keeps
+// the hub's badge correct for the rest of THIS session regardless of
+// whether the Firestore write below succeeds -- but a failure there means
+// none of this survives a refresh, so it's surfaced via
+// learnLessonViewState.saveError (shown on the result screen) rather than
+// only logged, same reasoning as loadLearnProgress above.
 async function recordLessonCompletion(lessonId, score, total) {
   const prior = learnState.progress[lessonId];
   const bestScore = prior && typeof prior.bestScore === 'number' ? Math.max(prior.bestScore, score) : score;
@@ -438,6 +452,7 @@ async function recordLessonCompletion(lessonId, score, total) {
       .set({ ...data, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
   } catch (err) {
     console.error('recordLessonCompletion failed:', err);
+    learnLessonViewState.saveError = describeFirestoreError(err, 'Could not save your progress'); // js/auth.js
   }
 }
 
@@ -470,6 +485,8 @@ function renderLearnHub() {
       <p class="eyebrow">Learn</p>
       <h1>Values-Investing Lessons</h1>
       <p class="lede">Short lessons on the concepts behind TrueNorth’s scoring, each with a quick quiz to check your understanding. Optional -- nothing else on the site requires finishing these.</p>
+
+      ${learnState.error ? `<p class="error-text">${escapeHtml(learnState.error)}</p>` : ''}
 
       <div class="learn-progress-wrap">
         <div class="learn-progress-bar-row">
@@ -528,6 +545,7 @@ function openLearnLesson(lessonId) {
   learnLessonViewState.phase = 'lesson';
   learnLessonViewState.score = null;
   learnLessonViewState.total = null;
+  learnLessonViewState.saveError = null;
   state.view = 'learnLesson';
   render();
 }
@@ -628,10 +646,12 @@ async function handleQuizSubmit(lesson) {
 
   learnLessonViewState.score = score;
   learnLessonViewState.total = total;
+  learnLessonViewState.saveError = null;
   learnLessonViewState.phase = 'result';
   render();
 
   await recordLessonCompletion(lesson.id, score, total);
+  renderInPlace(); // reflect a save error (if any) on the just-rendered result screen
   if (!badgeState.loaded) await loadBadgeState(); // js/badges.js -- defensive; openLearnHub already loads this on the normal path
   await checkAndAwardBadges(true); // js/badges.js -- the real trigger: pops up a badge earned this attempt
 }
@@ -654,6 +674,7 @@ function renderLearnLessonResult(lesson) {
         <p class="learn-quiz-score">${score}/${total}</p>
         <p class="muted">${escapeHtml(message)}</p>
       </div>
+      ${learnLessonViewState.saveError ? `<p class="error-text">${escapeHtml(learnLessonViewState.saveError)}</p>` : ''}
       <div class="nav-row">
         <button type="button" id="learn-result-hub-btn" class="btn btn-secondary">Back to Learn</button>
         <button type="button" id="learn-result-retry-btn" class="btn btn-primary">Retry Quiz</button>
