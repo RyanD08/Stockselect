@@ -522,6 +522,7 @@ async function handleWatchlistToggleClick(ticker) {
     // Compare Two Companies (see pendingSaveAnswers/pendingCompareRedirect
     // above), just remembering which screen to come back to since this
     // button can be clicked from several different ones.
+    logAnalyticsEvent('login_wall_hit', { feature: 'watchlist' }); // js/firebase-config.js
     pendingWatchlistAdd = ticker;
     pendingWatchlistReturnView = state.view;
     authViewState.mode = 'login';
@@ -544,6 +545,7 @@ async function handleWatchlistToggleClick(ticker) {
       watchlistViewState.entries = watchlistViewState.entries.filter((e) => e.ticker !== ticker);
     } else {
       await addToWatchlist(ticker);
+      logAnalyticsEvent('watchlist_add', { ticker }); // js/firebase-config.js
       watchlistState.tickers.add(ticker);
       if (state.view === 'watchlist') {
         // Keep the My Watchlist screen's own ordered list in sync without

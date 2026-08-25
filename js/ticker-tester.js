@@ -307,6 +307,7 @@ function wireTickerCompareCta() {
         enterTickerCompare();
         return;
       }
+      logAnalyticsEvent('login_wall_hit', { feature: 'compare' }); // js/firebase-config.js
       tickerTesterState.showCompareLoginPrompt = true;
       renderInPlace();
     });
@@ -409,6 +410,7 @@ function wireTickerSearch() {
     btn.addEventListener('click', () => {
       tickerTesterState.selectedTicker = btn.dataset.ticker;
       tickerTesterState.query = '';
+      logAnalyticsEvent('ticker_tester_used', { ticker: tickerTesterState.selectedTicker }); // js/firebase-config.js
       renderInPlace();
     });
   });
@@ -919,6 +921,10 @@ function wireCompareSearchSlot(slot) {
       } else {
         tickerCompareState.tickerB = ticker;
         tickerCompareState.queryB = '';
+      }
+      if (tickerCompareState.tickerA && tickerCompareState.tickerB) {
+        // Both slots just became filled -- this click completed the pair.
+        logAnalyticsEvent('compare_used', { ticker_a: tickerCompareState.tickerA, ticker_b: tickerCompareState.tickerB }); // js/firebase-config.js
       }
       tickerCompareState.duplicateAttempted = false;
       renderInPlace();

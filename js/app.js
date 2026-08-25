@@ -365,6 +365,7 @@ function renderReview() {
 
   document.getElementById('review-submit-btn').addEventListener('click', () => {
     state.hasPersonalizedAnswers = true; // real answers now exist -- see ticker-tester.js
+    logAnalyticsEvent('survey_completed'); // js/firebase-config.js
     state.view = 'results';
     render();
   });
@@ -568,6 +569,7 @@ function renderResults() {
         // Not logged in -- stash the answers as they are right now, send
         // them to log in, and let auth.js's onAuthStateChanged finish this
         // save automatically the moment they succeed. No second click.
+        logAnalyticsEvent('login_wall_hit', { feature: 'save_portfolio' }); // js/firebase-config.js
         pendingSaveAnswers = { ...state.answers };
         authViewState.mode = 'login';
         authViewState.error = null;
@@ -1014,7 +1016,8 @@ function closeHamburgerDropdown() {
 // Redirects a logged-out click on a gated menu item to the login screen,
 // stashing `pendingFlagSetter` (called with true) so onAuthStateChanged
 // (auth.js) can finish the navigation automatically once they sign in.
-function redirectGatedNavItemToLogin(setPending) {
+function redirectGatedNavItemToLogin(setPending, feature) {
+  logAnalyticsEvent('login_wall_hit', { feature }); // js/firebase-config.js
   setPending();
   authViewState.mode = 'login';
   authViewState.error = null;
@@ -1053,7 +1056,7 @@ function renderSiteNavMenu() {
     }
     redirectGatedNavItemToLogin(() => {
       pendingCompareRedirect = true; // js/auth.js -- same flag Compare's own in-Ticker-Tester CTA already uses
-    });
+    }, 'compare');
   });
 
   document.getElementById('nav-menu-portfolios').addEventListener('click', () => {
@@ -1064,7 +1067,7 @@ function renderSiteNavMenu() {
     }
     redirectGatedNavItemToLogin(() => {
       pendingPortfoliosRedirect = true; // js/auth.js
-    });
+    }, 'my_portfolios');
   });
 
   document.getElementById('nav-menu-watchlist').addEventListener('click', () => {
@@ -1075,7 +1078,7 @@ function renderSiteNavMenu() {
     }
     redirectGatedNavItemToLogin(() => {
       pendingWatchlistViewRedirect = true; // js/auth.js
-    });
+    }, 'my_watchlist');
   });
 }
 

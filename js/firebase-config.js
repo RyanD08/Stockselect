@@ -80,3 +80,18 @@ if (firebaseApp) {
     console.warn('Firebase Analytics unavailable (often blocked by ad/privacy blockers) — pageview tracking is disabled; nothing else on the site is affected.', err);
   }
 }
+
+// Shared custom-event logger, called from auth.js/ticker-tester.js/app.js
+// (all loaded after this file, so this global is already defined by the
+// time they run -- same cross-file pattern the rest of the site already
+// relies on). A no-op whenever firebaseAnalytics never initialized (ad/
+// privacy blocker, offline) -- every call site above stays unconditional,
+// this is the one place that knows whether logging is actually possible.
+function logAnalyticsEvent(name, params) {
+  if (!firebaseAnalytics) return;
+  try {
+    firebaseAnalytics.logEvent(name, params);
+  } catch (err) {
+    console.warn(`Analytics event "${name}" failed to log:`, err);
+  }
+}
