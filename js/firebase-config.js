@@ -40,6 +40,18 @@
 // the sign-in calls themselves), so this needs to be checked in the console.
 const siteUrl = 'https://ryand08.github.io/Stockselect/';
 
+// A shared-portfolio link normally points straight at this site with
+// ?shared=<id> -- fine to open, but its link-preview in iMessage/Slack/etc.
+// shows this site's one generic, static <meta> title (see index.html),
+// never anything about the specific portfolio, since those unfurlers read
+// raw HTML and don't run this site's JavaScript. Setting this to a
+// deployed cloudflare-worker/share-preview.js Worker's URL (see that
+// folder's README) makes the share button build links through it instead,
+// so the preview reads "Check Out My Portfolio in TrueNorth" with a
+// description built from that specific portfolio. Left null, "Share My
+// Results" still works exactly as before -- just with the generic preview.
+const SHARE_PREVIEW_BASE_URL = null; // e.g. 'https://truenorth-share.your-name.workers.dev'
+
 const firebaseConfig = {
   apiKey: 'AIzaSyDwwUO4RwXYDP-x6r5L5pea3vEbX7qrWZI',
   authDomain: 'truenorth-a93e7.firebaseapp.com',

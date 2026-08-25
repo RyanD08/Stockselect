@@ -644,7 +644,13 @@ function renderResults() {
           topPriorities: topPriorities.map((q) => q.short),
           holdings,
         }); // js/auth.js
-        const url = `${location.origin}${location.pathname}?shared=${shareId}`;
+        // Routes through the Cloudflare Worker (see cloudflare-worker/) for
+        // a per-portfolio link preview once it's deployed and configured --
+        // js/firebase-config.js -- otherwise falls back to the plain site
+        // link, which still works fine, just with the site's generic preview.
+        const url = SHARE_PREVIEW_BASE_URL
+          ? `${SHARE_PREVIEW_BASE_URL}/s/${shareId}`
+          : `${location.origin}${location.pathname}?shared=${shareId}`;
         state.shareResultState = { status: 'shared', url, errorMessage: null };
         logAnalyticsEvent('share_created', { holdings_count: holdings.length }); // js/firebase-config.js
       } catch (err) {
