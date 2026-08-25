@@ -660,6 +660,35 @@ function destroyTickerRadarChart() {
   }
 }
 
+// Chart.js radar point labels never wrap on their own -- a long single-line
+// label like "Risk Philosophy" or "Community/Identity" (no space to break
+// on) just gets clipped by the canvas edge on a narrow phone screen,
+// regardless of how much layout.padding is reserved around the plot. Chart.js
+// *does* support multi-line labels when a label is an array of strings
+// (one per line), so this greedily wraps each category's label at
+// maxLineLength, breaking on spaces first and, for the two labels with no
+// spaces at all, on "/" as a fallback.
+function wrapChartLabel(label, maxLineLength = 14) {
+  const words = label
+    .split(' ')
+    .flatMap((word) =>
+      word.length > maxLineLength ? word.split('/').map((part, i, arr) => (i < arr.length - 1 ? `${part}/` : part)) : [word]
+    );
+  const lines = [];
+  let current = '';
+  words.forEach((word) => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length > maxLineLength && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) lines.push(current);
+  return lines;
+}
+
 // Runs after renderTickerTester() has already written the canvas into the
 // DOM (Chart.js needs a real <canvas> element to bind to). No-ops
 // (destroying any prior chart) whenever personalization isn't available or
@@ -690,7 +719,7 @@ function renderTickerRadarChartIfPresent(company) {
   tickerRadarChartInstance = new Chart(canvas, {
     type: 'radar',
     data: {
-      labels: categoryScores.map((c) => c.label),
+      labels: categoryScores.map((c) => wrapChartLabel(c.label)),
       datasets: [
         {
           label: `${company.ticker} match`,
@@ -1114,7 +1143,7 @@ function renderCompareRadarChartIfPresent(companyA, companyB) {
   tickerCompareRadarChartInstance = new Chart(canvas, {
     type: 'radar',
     data: {
-      labels: categoryScoresA.map((c) => c.label),
+      labels: categoryScoresA.map((c) => wrapChartLabel(c.label)),
       datasets: [
         {
           label: `${companyA.ticker} match`,
