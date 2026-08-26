@@ -1289,6 +1289,77 @@ const PRIVACY_POLICY_HTML = `
   <p>We may update this policy as the Service changes. Continued use of TrueNorth after a change means you accept the updated policy.</p>
 `;
 
+const FAQ_HTML = `
+  <h3>What is TrueNorth?</h3>
+  <p>A free tool that builds an illustrative, personalized portfolio from your own environmental, social, governance, and financial priorities. Answer a short questionnaire and it screens a universe of S&amp;P 500 companies against what you told it you care about.</p>
+
+  <h3>Where does the data come from?</h3>
+  <p>Financial data (P/E, revenue growth, margins, ROE, market cap, beta, dividend policy, analyst consensus, recent returns) comes from SEC EDGAR filings and live Finnhub market data. Values/ESG data is sourced per-company from SEC EDGAR (10-K and DEF 14A filings), EPA ECHO, OSHA, FEC, and FTC records -- each field carries its own confidence rating and source citation rather than a single blended score.</p>
+
+  <h3>How current is it?</h3>
+  <p>Market data (price, market cap, and similar figures) is pulled from a live feed. The underlying company fundamentals and values/ESG data come from periodic SEC filings and public records, which are refreshed on an ongoing basis rather than continuously -- see "Read more" in the footer disclaimer for the full breakdown of what's live versus periodic.</p>
+
+  <h3>Why the S&amp;P 500?</h3>
+  <p>It's a large, well-documented universe with consistent public filings to draw from, which keeps the underlying data verifiable rather than guessed at.</p>
+
+  <h3>Is this financial advice?</h3>
+  <p>No. TrueNorth is an educational, illustrative tool, not licensed financial advice, and the results shouldn't be relied on for actual investment decisions. Please consult a registered financial advisor before making any investment decisions.</p>
+
+  <h3>Is TrueNorth free?</h3>
+  <p>Yes, entirely -- no paywall, no premium tier.</p>
+
+  <h3>Do I need an account?</h3>
+  <p>No. You can take the survey, view your results, use Ticker Tester, and compare companies without one. An account just lets you save portfolios, keep a watchlist, and track Learn progress between visits.</p>
+
+  <h3>Is my data sold or shared?</h3>
+  <p>No. TrueNorth doesn't sell your information and doesn't show ads. See the Privacy Policy below for the full detail on what's collected and why.</p>
+
+  <h3>How accurate is the values/ESG data?</h3>
+  <p>Coverage is real but not complete for every company or every question -- some fields have no comprehensive public data source at S&amp;P 500 scale and will always show as unverified rather than guessed. Each field's confidence rating is shown alongside it so you can judge how much weight to give it.</p>
+
+  <h3>What's the $15,000 historical simulation?</h3>
+  <p>A hypothetical, backward-looking illustration only -- it applies today's recommended portfolio to last year's actual price history. It doesn't reflect a real investment, future performance, fees, or taxes, and this exact portfolio didn't exist a year ago.</p>
+`;
+
+function handleFaqModalKeydown(evt) {
+  if (evt.key === 'Escape') closeFaqModal();
+}
+
+// Same document.body-append modal pattern as Privacy Policy just below.
+function openFaqModal() {
+  if (document.getElementById('faq-modal-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'faq-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="faq-modal-title">
+      <div class="modal-header">
+        <h2 id="faq-modal-title">Frequently Asked Questions</h2>
+        <button type="button" id="faq-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" tabindex="0">${FAQ_HTML}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  document.getElementById('faq-modal-close-btn').addEventListener('click', closeFaqModal);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) closeFaqModal();
+  });
+  document.addEventListener('keydown', handleFaqModalKeydown);
+}
+
+function closeFaqModal() {
+  const overlay = document.getElementById('faq-modal-overlay');
+  if (overlay) overlay.remove();
+  document.removeEventListener('keydown', handleFaqModalKeydown);
+}
+
+function initFaqLink() {
+  const link = document.getElementById('faq-link');
+  if (!link) return;
+  link.addEventListener('click', openFaqModal);
+}
+
 function handlePrivacyModalKeydown(evt) {
   if (evt.key === 'Escape') closePrivacyModal();
 }
@@ -1616,6 +1687,7 @@ async function init() {
   initLogoHomeLink();
   initSiteDisclaimerToggle();
   initPrivacyPolicyLink();
+  initFaqLink();
   initSiteNavMenu();
   initDesktopNavBar();
 
