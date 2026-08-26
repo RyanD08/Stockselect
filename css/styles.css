@@ -2154,6 +2154,20 @@ h1 .category-icon {
   margin-top: 1rem;
 }
 
+.csv-preview-text {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text);
+  overflow-x: auto;
+  white-space: pre;
+}
+
 .modal-actions .btn-secondary {
   margin-right: 0;
 }

@@ -1260,6 +1260,25 @@ function csvField(value) {
   return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
 }
 
+// Shared by the original download (below) and the CSV preview modal's own
+// "Download" button -- builds a fresh, short-lived object URL each time
+// rather than one long-lived URL threaded through the toast/modal, so
+// nothing here has to track when it's safe to revoke. Revoking a couple
+// seconds later, not in the same tick as click(), is deliberate -- doing it
+// immediately can race the browser's own read of the blob in some browsers
+// (notably Safari) and silently no-op the download.
+function triggerFileDownload(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 function exportPortfolioCsv(holdings, triggerBtn) {
   const header = ['Ticker', 'Company', 'Sector', 'Match Tier', 'Financial Score', 'Allocation %'];
   const rows = holdings.map((entry) => [
@@ -1271,23 +1290,9 @@ function exportPortfolioCsv(holdings, triggerBtn) {
     entry.allocationPct.toFixed(2),
   ]);
   const csv = [header, ...rows].map((row) => row.map(csvField).join(',')).join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
   const filename = 'truenorth-portfolio.csv';
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  // showDownloadToast (below) becomes the sole owner of `url` from here --
-  // it holds the object URL alive for as long as the toast offers to
-  // reopen the file, then revokes it once the toast is dismissed. Revoking
-  // it here instead, in the same tick as click(), used to race the
-  // browser's own read of the blob in some browsers (notably Safari) and
-  // could silently no-op the download.
-  showDownloadToast(filename, url);
+  triggerFileDownload(csv, filename, 'text/csv;charset=utf-8;');
+  showDownloadToast(filename, csv);
 
   // The click itself gives no browser-chrome feedback on every platform
   // (no visible download bar in some mobile/embedded browsers), so without
@@ -1314,18 +1319,16 @@ function exportPortfolioCsv(holdings, triggerBtn) {
 // there has no way to tell the file actually landed anywhere. This is a
 // second, file-specific confirmation: a dismissible toast bottom-left,
 // outside #app (survives renderInPlace(), same convention as the offline
-// banner/back-to-top button), naming the file and offering to reopen the
-// exact blob just downloaded with one click -- no second click through a
-// downloads folder needed. Generic by filename/url, not CSV-specific, so a
-// future second export feature can reuse it as-is.
+// banner/back-to-top button), naming the file and offering to open its
+// content right on the current screen (see openCsvPreviewModal) with one
+// click. Generic by filename/content, not CSV-specific, so a future second
+// export feature can reuse it as-is.
 
 let downloadToastTimer = null;
-let downloadToastUrl = null;
 
-function showDownloadToast(filename, url) {
-  hideDownloadToast(); // clears any still-showing prior toast's timer + revokes ITS url first
+function showDownloadToast(filename, content) {
+  hideDownloadToast(); // clears any still-showing prior toast's timer first
 
-  downloadToastUrl = url;
   const toast = document.createElement('div');
   toast.id = 'download-toast';
   toast.className = 'download-toast';
@@ -1344,21 +1347,8 @@ function showDownloadToast(filename, url) {
   requestAnimationFrame(() => toast.classList.add('visible'));
 
   toast.querySelector('.download-toast-open').addEventListener('click', () => {
-    // Re-runs the exact same download mechanism as the original download
-    // (see exportPortfolioCsv) instead of window.open(url) -- opening a
-    // blob: URL in a new tab/window turned out to be unreliable across
-    // browsers (some mobile browsers and popup blockers silently swallow
-    // it even from inside a real click, on top of the Chrome-specific
-    // "treated as a second download and the empty tab closes itself" bug
-    // already worked around by this blob's text/plain type). A plain
-    // anchor-download click has none of that risk -- it's the same
-    // mechanism the browser already just proved works for this exact file.
-    const reopenLink = document.createElement('a');
-    reopenLink.href = url;
-    reopenLink.download = filename;
-    document.body.appendChild(reopenLink);
-    reopenLink.click();
-    reopenLink.remove();
+    hideDownloadToast();
+    openCsvPreviewModal(filename, content);
   });
   toast.querySelector('.download-toast-close').addEventListener('click', hideDownloadToast);
 
@@ -1372,10 +1362,59 @@ function hideDownloadToast() {
   }
   const toast = document.getElementById('download-toast');
   if (toast) toast.remove();
-  if (downloadToastUrl) {
-    URL.revokeObjectURL(downloadToastUrl);
-    downloadToastUrl = null;
-  }
+}
+
+// --- CSV preview modal ---------------------------------------------------
+//
+// What "open the file" actually means, right on the current screen: the
+// same document.body-append modal pattern as Terms/Privacy/FAQ (see
+// openFaqModal above) showing the exact CSV text just downloaded, rather
+// than trying to navigate to it -- opening a blob: URL in a new tab turned
+// out to be unreliable across browsers/popup blockers (see
+// triggerFileDownload's own comment on the download side of that same
+// lesson). No blob/tab/popup involved here at all, just plain text already
+// held in memory.
+
+function handleCsvPreviewModalKeydown(evt) {
+  if (evt.key === 'Escape') closeCsvPreviewModal();
+  trapModalTabFocus(evt, '#csv-preview-modal-overlay .modal-card');
+}
+
+function openCsvPreviewModal(filename, content) {
+  if (document.getElementById('csv-preview-modal-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'csv-preview-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="csv-preview-modal-title">
+      <div class="modal-header">
+        <h2 id="csv-preview-modal-title">${escapeHtml(filename)}</h2>
+        <button type="button" id="csv-preview-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" tabindex="0">
+        <pre class="csv-preview-text">${escapeHtml(content)}</pre>
+        <div class="modal-actions">
+          <button type="button" id="csv-preview-download-btn" class="btn btn-secondary">Download</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  focusModal('#csv-preview-modal-overlay .modal-card');
+  document.getElementById('csv-preview-modal-close-btn').addEventListener('click', closeCsvPreviewModal);
+  document.getElementById('csv-preview-download-btn').addEventListener('click', () => {
+    triggerFileDownload(content, filename, 'text/csv;charset=utf-8;');
+  });
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) closeCsvPreviewModal();
+  });
+  document.addEventListener('keydown', handleCsvPreviewModalKeydown);
+}
+
+function closeCsvPreviewModal() {
+  const overlay = document.getElementById('csv-preview-modal-overlay');
+  if (overlay) overlay.remove();
+  document.removeEventListener('keydown', handleCsvPreviewModalKeydown);
 }
 
 function downloadFileIcon() {
