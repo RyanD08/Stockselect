@@ -1402,8 +1402,20 @@ function openCsvPreviewModal(filename, content) {
   document.body.appendChild(overlay);
   focusModal('#csv-preview-modal-overlay .modal-card');
   document.getElementById('csv-preview-modal-close-btn').addEventListener('click', closeCsvPreviewModal);
-  document.getElementById('csv-preview-download-btn').addEventListener('click', () => {
+  document.getElementById('csv-preview-download-btn').addEventListener('click', (evt) => {
     triggerFileDownload(content, filename, 'text/csv;charset=utf-8;');
+    // Same "confirm the click actually did something" fix as the original
+    // Download as CSV button (see exportPortfolioCsv) -- the download
+    // itself gives no in-page feedback on every platform, so a working
+    // click looked identical to a broken one without this.
+    const downloadBtn = evt.currentTarget;
+    const originalText = downloadBtn.textContent;
+    downloadBtn.textContent = 'Downloaded ✓';
+    downloadBtn.disabled = true;
+    setTimeout(() => {
+      downloadBtn.textContent = originalText;
+      downloadBtn.disabled = false;
+    }, 1800);
   });
   overlay.addEventListener('click', (evt) => {
     if (evt.target === overlay) closeCsvPreviewModal();
