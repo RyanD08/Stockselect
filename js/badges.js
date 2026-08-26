@@ -396,6 +396,9 @@ function renderMyBadges() {
   // error first rather than assuming false = still in flight.
   const error = badgeState.error || learnState.error;
   const loading = !error && (!learnState.progressLoaded || !badgeState.loaded);
+  const earnedCount = BADGES.filter((b) => badgeState.earnedIds.has(b.id)).length;
+  const allEarned = earnedCount === BADGES.length;
+  const badgeProgressPct = BADGES.length > 0 ? Math.round((earnedCount / BADGES.length) * 100) : 0;
   appEl.innerHTML = `
     <section class="card my-badges-card">
       <p class="eyebrow">Account</p>
@@ -411,7 +414,16 @@ function renderMyBadges() {
           ? `<p class="muted">${spinnerHtml('Loading…')}</p>`
           : error
             ? ''
-            : `<ul class="badge-list">${BADGES.map(renderBadgeListItem).join('')}</ul>`
+            : `
+              <div class="learn-progress-wrap">
+                <div class="learn-progress-bar-row">
+                  <div class="learn-progress-track"><div class="learn-progress-fill" style="width:${badgeProgressPct}%"></div></div>
+                  <div class="learn-progress-giftbox">${giftBoxIcon(allEarned ? 'open' : 'closed')}</div>
+                </div>
+                <p class="learn-progress-label">${earnedCount} of ${BADGES.length} badges earned</p>
+              </div>
+              <ul class="badge-list">${BADGES.map(renderBadgeListItem).join('')}</ul>
+            `
       }
       <div class="nav-row">
         <button type="button" id="my-badges-back-btn" class="btn btn-secondary">Back</button>
