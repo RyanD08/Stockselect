@@ -1454,6 +1454,13 @@ h1 .category-icon {
   background: var(--danger-bg);
 }
 
+.holding-remove-confirm-row td {
+  background: var(--danger-bg);
+  border: 1px solid #eecfcd;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
 .portfolio-repopulate-row {
   display: flex;
   align-items: center;
@@ -1587,6 +1594,11 @@ h1 .category-icon {
 
   .results-table td[data-label='Remove']::before {
     content: none;
+  }
+
+  .holding-remove-confirm-row td {
+    display: block;
+    padding: 0.85rem 1rem;
   }
 }
 

@@ -14,6 +14,7 @@ const state = {
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
   manualPortfolioTickers: null, // null | string[] — null means "use buildPortfolio()'s own top-15 selection"; once the user removes a holding this becomes the authoritative ordered ticker list (can be under 15 until Repopulate is clicked)
   excludedHoldingTickers: new Set(), // tickers manually removed from the current portfolio — never re-suggested by Repopulate
+  confirmingRemoveTicker: null, // ticker currently showing its "remove this holding?" inline prompt on Results, or null
   saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Portfolio" control (see auth.js for the actual save)
   shareResultState: { status: 'idle', url: null, errorMessage: null }, // 'idle' | 'sharing' | 'shared' | 'error' — the Results screen's "Share My Results" control (see createSharedResult in auth.js)
   hasPersonalizedAnswers: false, // true once this session has real answers to score against: finished the survey (set below) or loaded a saved portfolio (see auth.js loadPortfolioIntoResults) — read by ticker-tester.js
@@ -392,6 +393,7 @@ function renderReview() {
     // portfolio, not this one.
     state.manualPortfolioTickers = null;
     state.excludedHoldingTickers.clear();
+    state.confirmingRemoveTicker = null;
     logAnalyticsEvent('survey_completed'); // js/firebase-config.js
     state.view = 'results';
     render();
@@ -692,6 +694,13 @@ function renderResults() {
 
   document.querySelectorAll('.holding-remove-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
+      state.confirmingRemoveTicker = btn.dataset.ticker;
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.holding-remove-confirm-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
       // First removal snapshots the current (fully auto-selected) holdings
       // as the manual list -- everything after that just edits it in place.
       if (!state.manualPortfolioTickers) {
@@ -700,6 +709,14 @@ function renderResults() {
       const ticker = btn.dataset.ticker;
       state.manualPortfolioTickers = state.manualPortfolioTickers.filter((t) => t !== ticker);
       state.excludedHoldingTickers.add(ticker);
+      state.confirmingRemoveTicker = null;
+      renderInPlace();
+    });
+  });
+
+  document.querySelectorAll('.holding-remove-cancel-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.confirmingRemoveTicker = null;
       renderInPlace();
     });
   });
@@ -871,6 +888,7 @@ function resetSurveyState() {
   state.simulationBreakdownExpanded = false;
   state.manualPortfolioTickers = null;
   state.excludedHoldingTickers.clear();
+  state.confirmingRemoveTicker = null;
   state.saveResultState = { status: 'idle', errorMessage: null };
   state.shareResultState = { status: 'idle', url: null, errorMessage: null };
   state.hasPersonalizedAnswers = false;
@@ -893,6 +911,25 @@ function renderHoldingRow(entry) {
   const rowClass = `row-${display.cssKey}`;
   const ticker = entry.company.ticker;
   const isDetailsOpen = state.expandedFinancialDetails.has(ticker);
+
+  // In-page confirmation instead of window.confirm() -- same reasoning as
+  // the Delete Portfolio flow (auth.js): a native confirm() dialog can be
+  // silently suppressed on mobile, which looks indistinguishable from the
+  // button doing nothing. Real Yes/Cancel buttons, always visible.
+  if (state.confirmingRemoveTicker === ticker) {
+    return `
+      <tr class="holding-remove-confirm-row">
+        <td colspan="7">
+          <p class="portfolio-delete-confirm-text">Remove ${escapeHtml(entry.company.name)} (${escapeHtml(ticker)}) from your portfolio?</p>
+          <div class="portfolio-delete-confirm-actions">
+            <button type="button" class="btn-link-action danger holding-remove-confirm-btn" data-ticker="${escapeHtml(ticker)}">Yes, Remove</button>
+            <button type="button" class="btn-link-action holding-remove-cancel-btn">Cancel</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
   return `
     <tr class="${rowClass}">
       <td data-label="Ticker">${escapeHtml(ticker)}${renderWatchlistToggleButton(ticker)}</td>
