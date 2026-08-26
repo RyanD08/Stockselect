@@ -1061,7 +1061,14 @@ function fillFromCandidates(candidates, selected, sectorCounts) {
   }
 }
 
-function buildPortfolio(dataset, answers, clientContext) {
+// The full ranked candidate list a portfolio draws from: values-floor
+// primary candidates first (tier/score sorted), then below-threshold
+// backfill candidates in the same order buildPortfolio() below fills from.
+// Exposed separately from buildPortfolio() so the Results screen's manual
+// remove/repopulate controls (js/app.js) can find the next-best qualified
+// replacement using this exact same ranking, rather than a second,
+// possibly-diverging notion of "next best."
+function buildScoredCandidatePool(dataset, answers, clientContext) {
   const ctx = {
     homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
     tiesSector: (clientContext && clientContext.tiesSector) || null,
@@ -1091,10 +1098,15 @@ function buildPortfolio(dataset, answers, clientContext) {
       })
   );
 
+  return { riskProfile, pool: [...primaryCandidates, ...backfillCandidates] };
+}
+
+function buildPortfolio(dataset, answers, clientContext) {
+  const { riskProfile, pool } = buildScoredCandidatePool(dataset, answers, clientContext);
+
   const sectorCounts = {};
   const selected = [];
-  fillFromCandidates(primaryCandidates, selected, sectorCounts);
-  fillFromCandidates(backfillCandidates, selected, sectorCounts);
+  fillFromCandidates(pool, selected, sectorCounts);
 
   const allocationPct = selected.length > 0 ? 100 / selected.length : 0;
   selected.forEach((entry) => {

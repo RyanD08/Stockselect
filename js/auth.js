@@ -1443,6 +1443,10 @@ function loadPortfolioIntoResults(portfolio) {
   );
   state.saveResultState = { status: 'idle', errorMessage: null };
   state.hasPersonalizedAnswers = true; // real answers now exist -- see ticker-tester.js
+  // A different saved portfolio's answers -- any manual remove/repopulate
+  // edits belonged to whatever was previously on screen, not this one.
+  state.manualPortfolioTickers = null;
+  state.excludedHoldingTickers.clear();
   state.view = 'results';
   render();
 }
