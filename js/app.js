@@ -639,6 +639,8 @@ function renderResults() {
         <button type="button" id="ticker-tester-cta-btn" class="btn btn-secondary">Test a Company in Ticker Tester</button>
         ${renderSaveResultsControl()}
         ${renderShareResultsControl()}
+        ${holdings.length > 0 ? '<button type="button" id="export-csv-btn" class="btn btn-secondary">Download as CSV</button>' : ''}
+        ${state.manualPortfolioTickers ? '<button type="button" id="reset-portfolio-btn" class="btn btn-secondary">Reset to Recommended</button>' : ''}
       </div>
 
       <div class="summary-grid">
@@ -656,6 +658,8 @@ function renderResults() {
           <p class="muted">${riskProfileBlurb(riskProfile)}</p>
         </div>
       </div>
+
+      ${renderValuesProfileSection()}
 
       <h2>Recommended Holdings</h2>
       <p class="muted">
@@ -720,6 +724,24 @@ function renderResults() {
       </div>
     </section>
   `;
+
+  renderSectorDonutChartIfPresent(holdings);
+  renderValuesProfileChartIfPresent();
+
+  const exportCsvBtn = document.getElementById('export-csv-btn');
+  if (exportCsvBtn) {
+    exportCsvBtn.addEventListener('click', () => exportPortfolioCsv(holdings));
+  }
+
+  const resetPortfolioBtn = document.getElementById('reset-portfolio-btn');
+  if (resetPortfolioBtn) {
+    resetPortfolioBtn.addEventListener('click', () => {
+      state.manualPortfolioTickers = null;
+      state.excludedHoldingTickers.clear();
+      state.confirmingRemoveTicker = null;
+      renderInPlace();
+    });
+  }
 
   document.querySelectorAll('.financial-toggle-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1046,21 +1068,218 @@ function renderSectorChart(holdings) {
   return `
     <div class="sector-chart">
       <h3>Sector Diversification</h3>
-      <div class="sector-chart-rows">
-        ${sectors
-          .map(
-            (sector) => `
-          <div class="sector-chart-row">
-            <span class="sector-chart-label">${escapeHtml(sector)}</span>
-            <span class="sector-chart-track"><span class="sector-chart-fill" style="width:${(counts[sector] / maxCount) * 100}%"></span></span>
-            <span class="sector-chart-count">${counts[sector]}</span>
-          </div>
-        `
-          )
-          .join('')}
+      <div class="sector-chart-layout">
+        <div class="sector-donut-wrap">
+          <canvas id="sector-donut-chart" role="img" aria-label="Donut chart of sector allocation"></canvas>
+        </div>
+        <div class="sector-chart-rows">
+          ${sectors
+            .map(
+              (sector) => `
+            <div class="sector-chart-row">
+              <span class="sector-chart-label">${escapeHtml(sector)}</span>
+              <span class="sector-chart-track"><span class="sector-chart-fill" style="width:${(counts[sector] / maxCount) * 100}%"></span></span>
+              <span class="sector-chart-count">${counts[sector]}</span>
+            </div>
+          `
+            )
+            .join('')}
+        </div>
       </div>
     </div>
   `;
+}
+
+// Distinct-hue palette for the sector donut below -- more entries than the
+// S&P 500's 11 GICS sectors ever needs, cycling only degrades gracefully if
+// a future dataset adds sectors beyond this list.
+const SECTOR_CHART_COLORS = [
+  '#0f1f3d', // --navy
+  '#c9962f', // --gold
+  '#5b7a63', // muted green
+  '#a6543a', // brick
+  '#5a6b8c', // slate blue
+  '#8a6d9e', // muted plum
+  '#c98a3a', // amber
+  '#4a8a8a', // teal
+  '#9e5b6d', // dusty rose
+  '#6b7c3a', // olive
+  '#7a5a3a', // umber
+];
+
+// Chart.js requires destroying a previous chart bound to a <canvas> before
+// creating a new one there (same reasoning as tickerRadarChartInstance in
+// js/ticker-tester.js) -- a client editing holdings on Results (remove/
+// repopulate) re-renders this same canvas id repeatedly.
+let sectorDonutChartInstance = null;
+
+function destroySectorDonutChart() {
+  if (sectorDonutChartInstance) {
+    sectorDonutChartInstance.destroy();
+    sectorDonutChartInstance = null;
+  }
+}
+
+// Runs after renderResults() has already written the canvas into the DOM.
+// Degrades to just the existing bar-list rows (no crash, no blank gap) if
+// Chart.js never loaded -- same graceful-degradation convention as Ticker
+// Tester's radar chart (see renderTickerRadarChartIfPresent).
+function renderSectorDonutChartIfPresent(holdings) {
+  const canvas = document.getElementById('sector-donut-chart');
+  if (!canvas) {
+    destroySectorDonutChart();
+    return;
+  }
+  if (typeof Chart === 'undefined') {
+    // Hides the whole fixed-width wrapper, not just the canvas -- otherwise
+    // the layout still reserves the donut's 180px column and the bar-list
+    // rows are left stranded to the right of a blank gap.
+    const wrap = canvas.closest('.sector-donut-wrap');
+    if (wrap) wrap.hidden = true;
+    else canvas.hidden = true;
+    return;
+  }
+
+  const counts = {};
+  holdings.forEach((h) => {
+    counts[h.company.sector] = (counts[h.company.sector] || 0) + 1;
+  });
+  const sectors = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+
+  destroySectorDonutChart();
+  sectorDonutChartInstance = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: sectors,
+      datasets: [
+        {
+          data: sectors.map((s) => counts[s]),
+          backgroundColor: sectors.map((_, i) => SECTOR_CHART_COLORS[i % SECTOR_CHART_COLORS.length]),
+          borderColor: '#f5f1e8', // --cream, so slices separate cleanly against the card background
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#1c2530', boxWidth: 12, padding: 10, font: { size: 11 } } },
+      },
+    },
+  });
+}
+
+// --- Your Values Profile radar chart (Results) -----------------------------
+//
+// A new AGGREGATION of already-collected survey answers, not a new scoring
+// method: each category's value is just the plain average of the client's
+// own 1-5 importance ratings for that category's questions (horizon
+// excluded -- it's a single-select, not a 1-5 rating). Distinct from Ticker
+// Tester's radar chart (computeCategoryScores, js/ticker-tester.js), which
+// plots a *company's* alignment against those same answers -- this one
+// plots the answers themselves, so it needs no company/dataset at all and
+// is available the moment the client reaches Results.
+
+let valuesProfileChartInstance = null;
+
+function destroyValuesProfileChart() {
+  if (valuesProfileChartInstance) {
+    valuesProfileChartInstance.destroy();
+    valuesProfileChartInstance = null;
+  }
+}
+
+function renderValuesProfileSection() {
+  return `
+    <div class="values-profile-section">
+      <h2>Your Values Profile</h2>
+      <p class="muted">How much you prioritized each category, based on your survey answers.</p>
+      <div class="values-profile-chart-wrap">
+        <canvas id="values-profile-chart" role="img" aria-label="Radar chart of your priority rating by category"></canvas>
+      </div>
+    </div>
+  `;
+}
+
+function renderValuesProfileChartIfPresent() {
+  const canvas = document.getElementById('values-profile-chart');
+  if (!canvas) {
+    destroyValuesProfileChart();
+    return;
+  }
+  if (typeof Chart === 'undefined') {
+    canvas.hidden = true;
+    return;
+  }
+
+  const categoryAverages = CATEGORIES.map((category) => {
+    const questions = questionsForCategory(category.key).filter((q) => q.type !== 'horizon');
+    const total = questions.reduce((sum, q) => sum + (state.answers[q.id] || 3), 0);
+    return { label: category.label, avg: questions.length > 0 ? total / questions.length : 3 };
+  });
+
+  destroyValuesProfileChart();
+  valuesProfileChartInstance = new Chart(canvas, {
+    type: 'radar',
+    data: {
+      labels: categoryAverages.map((c) => wrapChartLabel(c.label)), // js/ticker-tester.js
+      datasets: [
+        {
+          label: 'Your priority',
+          data: categoryAverages.map((c) => c.avg),
+          backgroundColor: 'rgba(15, 31, 61, 0.15)', // --navy, translucent fill
+          borderColor: '#0f1f3d', // --navy
+          borderWidth: 2,
+          pointBackgroundColor: '#0f1f3d',
+          pointBorderColor: '#0f1f3d',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      layout: { padding: { top: 8, bottom: 8, left: 24, right: 24 } },
+      scales: {
+        r: {
+          min: 1,
+          max: 5,
+          ticks: { stepSize: 1, showLabelBackdrop: false, color: '#6b675c' },
+          pointLabels: { color: '#1c2530', font: { size: 12 } },
+          grid: { color: '#e1ddd3' },
+          angleLines: { color: '#e1ddd3' },
+        },
+      },
+      plugins: { legend: { display: false } },
+    },
+  });
+}
+
+// --- CSV export (Results) ---------------------------------------------------
+
+function csvField(value) {
+  const str = String(value);
+  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+}
+
+function exportPortfolioCsv(holdings) {
+  const header = ['Ticker', 'Company', 'Sector', 'Match Tier', 'Financial Score', 'Allocation %'];
+  const rows = holdings.map((entry) => [
+    entry.company.ticker,
+    entry.company.name,
+    entry.company.sector,
+    (TIER_DISPLAY[entry.tier] || TIER_DISPLAY.Partial).badgeText,
+    entry.company.financial_metrics.overall_financial_score_label,
+    entry.allocationPct.toFixed(2),
+  ]);
+  const csv = [header, ...rows].map((row) => row.map(csvField).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'truenorth-portfolio.csv';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function formatUsd(amount) {
@@ -1762,6 +1981,27 @@ function initDesktopNavBar() {
   document.getElementById('nav-bar-my-badges').addEventListener('click', navigateToMyBadges);
 }
 
+// Lets a keyboard user rate a question without leaving the keyboard: with a
+// scale button focused (Tab already lands here in the normal flow), digits
+// 1-5 jump straight to that value's button and click it, reusing the exact
+// same click handler already wired in renderSurvey() (state update, DOM
+// update, "touched" styling) rather than duplicating that logic here.
+// Gated on state.view so a 1-5 press elsewhere on the site (e.g. typing in
+// the home-country input) is never intercepted.
+function initSurveyKeyboardShortcuts() {
+  document.addEventListener('keydown', (evt) => {
+    if (state.view !== 'survey') return;
+    if (!/^[1-5]$/.test(evt.key)) return;
+    const active = document.activeElement;
+    if (!active || !active.classList.contains('scale-btn')) return;
+    const target = document.querySelector(`.scale-btn[data-question="${active.dataset.question}"][data-value="${evt.key}"]`);
+    if (!target) return;
+    evt.preventDefault();
+    target.click();
+    target.focus();
+  });
+}
+
 async function init() {
   initGlobalErrorHandler();
   initOnlineOfflineHandler();
@@ -1772,6 +2012,7 @@ async function init() {
   initFaqLink();
   initSiteNavMenu();
   initDesktopNavBar();
+  initSurveyKeyboardShortcuts();
 
   // A ?shared=<id> link (see createSharedResult/renderShareResultsControl)
   // lands here before the usual intro screen -- doesn't need state.dataset
