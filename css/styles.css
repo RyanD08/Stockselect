@@ -146,6 +146,91 @@ body {
   background: var(--navy-light);
 }
 
+.download-toast {
+  position: fixed;
+  left: 1rem;
+  bottom: 1.25rem;
+  z-index: 92;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 320px;
+  background: var(--navy);
+  border-radius: 8px;
+  padding: 0.55rem 0.5rem 0.55rem 0.9rem;
+  box-shadow: 0 6px 20px rgba(15, 31, 61, 0.35);
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+
+.download-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@media (max-width: 480px) {
+  .download-toast {
+    left: 0.75rem;
+    right: 0.75rem;
+    max-width: none;
+  }
+}
+
+.download-toast-open {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  text-align: left;
+}
+
+.download-toast-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--gold-light);
+}
+
+.download-toast-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.download-toast-filename {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.download-toast-close {
+  flex: none;
+  border: none;
+  background: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+}
+
+.download-toast-close:hover {
+  color: #fff;
+}
+
 .offline-banner {
   position: fixed;
   left: 1rem;
