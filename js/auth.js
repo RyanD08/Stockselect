@@ -238,7 +238,15 @@ if (firebaseReady) {
       // sign-in/page-load -- an accepted, deliberate cost for correctness
       // everywhere rather than plumbing a "have I checked yet" flag through
       // every render call site that can show a toggle button.
-      loadWatchlistTickers();
+      loadWatchlistTickers().then(async () => {
+        // Backfill for Watchlist Started/Watchlist Full (js/badges.js) --
+        // same silent-backfill reasoning as openLearnHub's own call, for a
+        // client whose watchlist already qualified before these badges
+        // existed, or who never opens My Badges to trigger it themselves.
+        if (!badgeState.loaded) await loadBadgeState();
+        await checkAndAwardBadges(false);
+        renderAccountWidget();
+      });
       // Same fire-and-forget reasoning, for the header's equipped-badge
       // slot (js/badges.js) -- loaded here so it's correct immediately on
       // sign-in/page-load, not only after a visit to Learn or My Badges.
@@ -269,6 +277,7 @@ if (firebaseReady) {
         await saveNewPortfolio(answersToSave);
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
+        await afterPortfolioSaved();
       } catch (err) {
         console.error('saveNewPortfolio failed (post-login auto-save):', err);
         state.saveResultState =
@@ -449,6 +458,24 @@ async function saveNewPortfolio(answers) {
   });
 }
 
+// Called after every successful saveNewPortfolio(), from both call sites
+// (the Results screen's own Save button, js/app.js, and the post-login
+// auto-save continuation just below). Refreshes myPortfoliosViewState so
+// Portfolio Builder/Portfolio Collector's isEarned() (js/badges.js) sees
+// the count this save just changed, rather than whatever stale list (or
+// empty array) happened to be sitting there from before -- then runs the
+// real award check, popup included.
+async function afterPortfolioSaved() {
+  try {
+    myPortfoliosViewState.portfolios = await listSavedPortfolios();
+  } catch (err) {
+    console.error('listSavedPortfolios failed (post-save badge check):', err);
+    return;
+  }
+  if (!badgeState.loaded) await loadBadgeState(); // js/badges.js
+  await checkAndAwardBadges(true); // js/badges.js
+}
+
 async function listSavedPortfolios() {
   if (!firebaseReady || !authState.user) return [];
   await migrateLegacySurveysIfNeeded();
@@ -610,6 +637,10 @@ async function handleWatchlistToggleClick(ticker) {
       await addToWatchlist(ticker);
       logAnalyticsEvent('watchlist_add', { ticker }); // js/firebase-config.js
       watchlistState.tickers.add(ticker);
+      // Watchlist Started / Watchlist Full (js/badges.js) -- the real
+      // trigger, right after the add that pushes the client over the line.
+      if (!badgeState.loaded) await loadBadgeState(); // js/badges.js
+      await checkAndAwardBadges(true); // js/badges.js
       if (state.view === 'watchlist') {
         // Keep the My Watchlist screen's own ordered list in sync without
         // a full refetch -- addedAt.toDate() is only ever read for display
@@ -1262,6 +1293,12 @@ async function openMyPortfoliosView() {
   render();
   try {
     myPortfoliosViewState.portfolios = await listSavedPortfolios();
+    // Backfill for Portfolio Builder/Portfolio Collector (js/badges.js) --
+    // same silent-backfill reasoning as openLearnHub's own call, for a
+    // client whose saved-portfolio count already qualified before these
+    // badges existed.
+    if (!badgeState.loaded) await loadBadgeState(); // js/badges.js
+    await checkAndAwardBadges(false); // js/badges.js
   } catch (err) {
     console.error('listSavedPortfolios failed:', err);
     myPortfoliosViewState.error = describeFirestoreError(err, 'Could not load your saved portfolios');

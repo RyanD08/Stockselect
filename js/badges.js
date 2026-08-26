@@ -22,6 +22,52 @@ const BADGES = [
     lockedHint: 'Complete all 8 Learn lessons to earn this badge.',
     isEarned: () => LESSONS.every((l) => learnState.progress[l.id] && learnState.progress[l.id].completed),
   },
+  {
+    id: 'curious-investor',
+    name: 'Curious Investor',
+    description: 'Completed your first Learn lesson.',
+    lockedHint: 'Complete any one Learn lesson to earn this badge.',
+    isEarned: () => LESSONS.some((l) => learnState.progress[l.id] && learnState.progress[l.id].completed),
+  },
+  {
+    id: 'quiz-ace',
+    name: 'Quiz Ace',
+    description: 'Scored 100% on a Learn lesson quiz.',
+    lockedHint: 'Score a perfect quiz on any Learn lesson to earn this badge.',
+    isEarned: () =>
+      LESSONS.some((l) => {
+        const progress = learnState.progress[l.id];
+        return progress && typeof progress.bestScore === 'number' && progress.bestScore === l.quiz.length;
+      }),
+  },
+  {
+    id: 'portfolio-builder',
+    name: 'Portfolio Builder',
+    description: 'Saved your first portfolio.',
+    lockedHint: 'Save a portfolio from your results to earn this badge.',
+    isEarned: () => myPortfoliosViewState.portfolios.length >= 1, // js/auth.js
+  },
+  {
+    id: 'portfolio-collector',
+    name: 'Portfolio Collector',
+    description: `Saved the maximum of ${MAX_SAVED_PORTFOLIOS} portfolios.`, // js/auth.js
+    lockedHint: `Save ${MAX_SAVED_PORTFOLIOS} portfolios to earn this badge.`,
+    isEarned: () => myPortfoliosViewState.portfolios.length >= MAX_SAVED_PORTFOLIOS, // js/auth.js
+  },
+  {
+    id: 'watchlist-started',
+    name: 'Watchlist Started',
+    description: 'Added your first company to your watchlist.',
+    lockedHint: 'Add a company to your watchlist to earn this badge.',
+    isEarned: () => watchlistState.tickers.size >= 1, // js/auth.js
+  },
+  {
+    id: 'watchlist-full',
+    name: 'Watchlist Full',
+    description: `Filled your watchlist to the maximum of ${MAX_WATCHLIST_SIZE} companies.`, // js/auth.js
+    lockedHint: `Add ${MAX_WATCHLIST_SIZE} companies to your watchlist to earn this badge.`,
+    isEarned: () => watchlistState.tickers.size >= MAX_WATCHLIST_SIZE, // js/auth.js
+  },
 ];
 
 // A signed-out visitor who clicks "My Badges" -- same pattern as
@@ -240,11 +286,23 @@ function closeBadgeEarnedModal() {
 async function openMyBadgesView() {
   state.view = 'myBadges';
   render();
-  // Self-sufficient regardless of whether Learn was ever opened this
-  // session -- isEarned() (BADGES above) reads learnState.progress, so a
+  // Self-sufficient regardless of which screens were visited earlier this
+  // session -- isEarned() (BADGES above) reads learnState.progress,
+  // myPortfoliosViewState.portfolios, and watchlistState.tickers, so a
   // client landing here directly still gets a correct locked/earned split
   // and the same silent-backfill treatment as openLearnHub.
   if (!learnState.progressLoaded) await loadLearnProgress();
+  if (myPortfoliosViewState.loading) {
+    // js/auth.js -- `loading` doubles as "never successfully fetched yet"
+    // (starts true, only ever set false once a fetch attempt resolves).
+    try {
+      myPortfoliosViewState.portfolios = await listSavedPortfolios(); // js/auth.js
+    } catch (err) {
+      console.error('listSavedPortfolios failed (My Badges backfill):', err);
+    }
+    myPortfoliosViewState.loading = false;
+  }
+  if (!watchlistState.loaded) await loadWatchlistTickers(); // js/auth.js
   if (!badgeState.loaded) await loadBadgeState();
   await checkAndAwardBadges(false);
   renderInPlace();
