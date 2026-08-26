@@ -792,6 +792,7 @@ function renderResults() {
         await saveNewPortfolio(state.answers);
         state.saveResultState = { status: 'saved', errorMessage: null };
         scheduleSaveResultRevert();
+        await afterPortfolioSaved(); // js/auth.js -- Portfolio Builder/Portfolio Collector (js/badges.js)
       } catch (err) {
         // Logged, not just swallowed. The on-screen message also includes
         // the raw Firestore error code (see describeFirestoreError in
