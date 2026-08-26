@@ -1447,6 +1447,7 @@ function loadPortfolioIntoResults(portfolio) {
   // edits belonged to whatever was previously on screen, not this one.
   state.manualPortfolioTickers = null;
   state.excludedHoldingTickers.clear();
+  state.confirmingRemoveTicker = null;
   state.view = 'results';
   render();
 }
