@@ -190,6 +190,7 @@ function renderEquippedBadgeHtml() {
 
 function handleBadgeEarnedModalKeydown(evt) {
   if (evt.key === 'Escape') closeBadgeEarnedModal();
+  trapModalTabFocus(evt, '#badge-earned-modal-overlay .modal-card'); // js/app.js
 }
 
 // Same document.body-append pattern as the Terms/Delete-Account modals
@@ -215,6 +216,7 @@ function openBadgeEarnedModal(badge) {
     </div>
   `;
   document.body.appendChild(overlay);
+  focusModal('#badge-earned-modal-overlay .modal-card'); // js/app.js
 
   document.getElementById('badge-earned-dismiss-btn').addEventListener('click', closeBadgeEarnedModal);
   document.getElementById('badge-earned-equip-btn').addEventListener('click', async () => {

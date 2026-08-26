@@ -946,6 +946,7 @@ const TERMS_OF_SERVICE_HTML = `
 
 function handleTermsModalKeydown(evt) {
   if (evt.key === 'Escape') closeTermsModal();
+  trapModalTabFocus(evt, '#terms-modal-overlay .modal-card'); // js/app.js
 }
 
 // Appended straight to document.body rather than rendered through #app, so
@@ -966,6 +967,7 @@ function openTermsModal() {
     </div>
   `;
   document.body.appendChild(overlay);
+  focusModal('#terms-modal-overlay .modal-card'); // js/app.js
   document.getElementById('terms-modal-close-btn').addEventListener('click', closeTermsModal);
   overlay.addEventListener('click', (evt) => {
     if (evt.target === overlay) closeTermsModal();
@@ -988,6 +990,7 @@ const deleteAccountViewState = {
 
 function handleDeleteAccountModalKeydown(evt) {
   if (evt.key === 'Escape') closeDeleteAccountModal();
+  trapModalTabFocus(evt, '#delete-account-modal-overlay .modal-card'); // js/app.js
 }
 
 // Same reasoning as the Terms modal above: appended straight to
@@ -1002,6 +1005,7 @@ function openDeleteAccountModal() {
   overlay.className = 'modal-overlay';
   overlay.innerHTML = renderDeleteAccountModalCard();
   document.body.appendChild(overlay);
+  focusModal('#delete-account-modal-overlay .modal-card'); // js/app.js
   wireDeleteAccountModal(overlay);
   overlay.addEventListener('click', (evt) => {
     if (evt.target === overlay) closeDeleteAccountModal();

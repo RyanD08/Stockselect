@@ -1204,6 +1204,45 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+const MODAL_FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Shared by every modal's keydown handler across the site (Terms/Delete
+// Account -- auth.js; Badge Earned -- badges.js; Privacy/FAQ -- below):
+// keeps Tab/Shift+Tab cycling within the modal card instead of escaping
+// into the page underneath the overlay. Queries the DOM fresh on every
+// keypress rather than caching the focusable list, since the Delete
+// Account modal re-renders its own card content mid-interaction (password
+// step -> confirming step).
+function trapModalTabFocus(evt, modalCardSelector) {
+  if (evt.key !== 'Tab') return;
+  const modal = document.querySelector(modalCardSelector);
+  if (!modal) return;
+  const focusable = modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR);
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (evt.shiftKey && document.activeElement === first) {
+    evt.preventDefault();
+    last.focus();
+  } else if (!evt.shiftKey && document.activeElement === last) {
+    evt.preventDefault();
+    first.focus();
+  }
+}
+
+// Moves keyboard focus into a just-opened modal -- without this, the trap
+// above has nothing to anchor to, since focus is still on whatever
+// trigger button opened the modal. Prefers the close button (present on
+// every modal except Badge Earned), falling back to the first focusable
+// element.
+function focusModal(modalCardSelector) {
+  const modal = document.querySelector(modalCardSelector);
+  if (!modal) return;
+  const target = modal.querySelector('.modal-close-btn') || modal.querySelector(MODAL_FOCUSABLE_SELECTOR);
+  if (target) target.focus();
+}
+
 // The header logo and the "Home" text link beside it are both static
 // markup (outside the #app render cycle), so their listeners are wired
 // once here rather than re-attached on every render(). Navigating home
@@ -1323,6 +1362,7 @@ const FAQ_HTML = `
 
 function handleFaqModalKeydown(evt) {
   if (evt.key === 'Escape') closeFaqModal();
+  trapModalTabFocus(evt, '#faq-modal-overlay .modal-card');
 }
 
 // Same document.body-append modal pattern as Privacy Policy just below.
@@ -1341,6 +1381,7 @@ function openFaqModal() {
     </div>
   `;
   document.body.appendChild(overlay);
+  focusModal('#faq-modal-overlay .modal-card');
   document.getElementById('faq-modal-close-btn').addEventListener('click', closeFaqModal);
   overlay.addEventListener('click', (evt) => {
     if (evt.target === overlay) closeFaqModal();
@@ -1362,6 +1403,7 @@ function initFaqLink() {
 
 function handlePrivacyModalKeydown(evt) {
   if (evt.key === 'Escape') closePrivacyModal();
+  trapModalTabFocus(evt, '#privacy-modal-overlay .modal-card');
 }
 
 // Same document.body-append pattern as the Terms of Service/Delete-Account
@@ -1382,6 +1424,7 @@ function openPrivacyModal() {
     </div>
   `;
   document.body.appendChild(overlay);
+  focusModal('#privacy-modal-overlay .modal-card');
   document.getElementById('privacy-modal-close-btn').addEventListener('click', closePrivacyModal);
   overlay.addEventListener('click', (evt) => {
     if (evt.target === overlay) closePrivacyModal();
