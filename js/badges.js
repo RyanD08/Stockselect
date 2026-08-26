@@ -81,6 +81,27 @@ const BADGES = [
     tier: 'gold',
     isEarned: () => watchlistState.tickers.size >= MAX_WATCHLIST_SIZE, // js/auth.js
   },
+  // The hidden 8th badge -- what actually happens when the My Badges
+  // progress bar reaches the end (see renderMyBadges: its own earnedCount/
+  // badgeProgressPct math is deliberately based on the 7 *visible* badges
+  // only, so "finishing the bar" and "earning this" are the same moment).
+  // `secret: true` (see renderMyBadges' list filter) keeps it out of the
+  // badge list entirely -- no locked entry, no lockedHint spoiler -- until
+  // isEarned() actually goes true, at which point it appears like any other
+  // earned badge. Placed last in this array on purpose: isEarned() reads
+  // the live badgeState.earnedIds mid-loop (see checkAndAwardBadges), so
+  // earning the 7th regular badge and this one both resolve in the exact
+  // same pass -- openBadgeEarnedModal's own queue (see below) is what makes
+  // that not silently drop this popup behind the other one.
+  {
+    id: 'true-north-spectrum',
+    name: 'Full Spectrum',
+    description: 'Earned every other badge on TrueNorth.',
+    lockedHint: 'Earn all 7 other badges to unlock this one.',
+    tier: 'rainbow',
+    secret: true,
+    isEarned: () => BADGES.filter((b) => !b.secret).every((b) => badgeState.earnedIds.has(b.id)),
+  },
 ];
 
 // A signed-out visitor who clicks "My Badges" -- same pattern as
@@ -244,6 +265,13 @@ const BADGE_GLYPHS = {
       <path d="M30.8 22.5l.85 1.75 1.95.28-1.4 1.37.33 1.93-1.73-.9-1.73.9.33-1.93-1.4-1.37 1.95-.28Z" opacity="0.9" />
     </g>
   `,
+  // Full Spectrum -- a four-point sparkle, the one glyph on the site drawn
+  // in white rather than navy: it needs to read against this badge's own
+  // rainbow-gradient medallion (see BADGE_TIER_RING/badgeMedallionIcon)
+  // instead of the flat pale tier color every other glyph sits on.
+  'true-north-spectrum': `
+    <path d="M24 14.5l1.8 6 6 1.8-6 1.8-1.8 6-1.8-6-6-1.8 6-1.8Z" fill="#fff" stroke="var(--navy)" stroke-width="0.6" stroke-linejoin="round" />
+  `,
 };
 
 // gold matches the original design exactly (ribbon tails + faint middle
@@ -260,16 +288,45 @@ const BADGE_TIER_RING = {
   silver: (color) => ({ cy: 24, ribbon: '', midRing: true }),
   bronze: (color) => ({ cy: 24, ribbon: '', midRing: false }),
 };
+// The hidden capstone-of-capstones gets gold's own shape (ribbon tails +
+// mid ring) -- same "maxed out completely" silhouette, just filled with a
+// gradient instead of a flat color, so it reads as gold's obvious successor
+// rather than an unrelated one-off shape.
+BADGE_TIER_RING.rainbow = BADGE_TIER_RING.gold;
 
 const BADGE_TIER_COLOR = { bronze: '#b5713a', silver: '#b9c0c9', gold: 'var(--gold)' };
 
+// Counter, not a fixed id -- badgeMedallionIcon can render the same badge
+// more than once on screen at a time (e.g. the equipped header badge and
+// this same badge's own list item, both visible on My Badges at once), and
+// SVG gradients are looked up by id, so two instances sharing one id would
+// leave the second an invisible blank fill instead of its own rainbow.
+let rainbowGradientCounter = 0;
+
 function badgeMedallionIcon(badge) {
   const tier = badge.tier || 'gold';
-  const color = BADGE_TIER_COLOR[tier];
+  const isRainbow = tier === 'rainbow';
+  const gradientId = isRainbow ? `badge-rainbow-grad-${rainbowGradientCounter++}` : null;
+  const color = isRainbow ? `url(#${gradientId})` : BADGE_TIER_COLOR[tier];
   const { cy, ribbon, midRing } = BADGE_TIER_RING[tier](color);
   const glyph = BADGE_GLYPHS[badge.id] || BADGE_GLYPHS['values-literacy-certified'];
   return `
     <svg viewBox="0 0 48 48" class="badge-medallion-icon" aria-hidden="true">
+      ${
+        isRainbow
+          ? `<defs>
+              <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e0574a" />
+                <stop offset="17%" stop-color="#e8934a" />
+                <stop offset="33%" stop-color="#e0c34a" />
+                <stop offset="50%" stop-color="#6ea866" />
+                <stop offset="67%" stop-color="#4a86b0" />
+                <stop offset="83%" stop-color="#5c5ba6" />
+                <stop offset="100%" stop-color="#9c5aa0" />
+              </linearGradient>
+            </defs>`
+          : ''
+      }
       ${ribbon}
       <circle cx="24" cy="${cy}" r="17" fill="var(--bg)" />
       <circle cx="24" cy="${cy}" r="15.5" fill="${color}" stroke="var(--navy)" stroke-width="1.4" />
@@ -318,11 +375,21 @@ function handleBadgeEarnedModalKeydown(evt) {
   trapModalTabFocus(evt, '#badge-earned-modal-overlay .modal-card'); // js/app.js
 }
 
+// Queued rather than dropped when a popup is already showing -- normally
+// only one badge is ever newly earned per action, but Full Spectrum (see
+// BADGES above) is specifically designed to complete in the very same
+// checkAndAwardBadges pass as whichever regular badge finishes the set, so
+// this exact collision is expected, not a one-off edge case.
+let badgeEarnedModalQueue = [];
+
 // Same document.body-append pattern as the Terms/Delete-Account modals
 // (auth.js) -- independent of whatever screen is rendered through #app, so
 // it can appear on top of the quiz-result screen without disturbing it.
 function openBadgeEarnedModal(badge) {
-  if (document.getElementById('badge-earned-modal-overlay')) return;
+  if (document.getElementById('badge-earned-modal-overlay')) {
+    badgeEarnedModalQueue.push(badge);
+    return;
+  }
   const overlay = document.createElement('div');
   overlay.id = 'badge-earned-modal-overlay';
   overlay.className = 'modal-overlay';
@@ -358,6 +425,9 @@ function closeBadgeEarnedModal() {
   const overlay = document.getElementById('badge-earned-modal-overlay');
   if (overlay) overlay.remove();
   document.removeEventListener('keydown', handleBadgeEarnedModalKeydown);
+  if (badgeEarnedModalQueue.length > 0) {
+    openBadgeEarnedModal(badgeEarnedModalQueue.shift());
+  }
 }
 
 // --- My Badges view ------------------------------------------------------
@@ -396,9 +466,15 @@ function renderMyBadges() {
   // error first rather than assuming false = still in flight.
   const error = badgeState.error || learnState.error;
   const loading = !error && (!learnState.progressLoaded || !badgeState.loaded);
-  const earnedCount = BADGES.filter((b) => badgeState.earnedIds.has(b.id)).length;
-  const allEarned = earnedCount === BADGES.length;
-  const badgeProgressPct = BADGES.length > 0 ? Math.round((earnedCount / BADGES.length) * 100) : 0;
+  // Progress bar tracks the 7 *visible* badges only -- secret ones (see
+  // BADGES above) are deliberately excluded from this math, so "the bar
+  // reaches 100%" and "the 7 regular badges are all earned" are the exact
+  // same moment, regardless of whether a hidden capstone exists on top of
+  // that or not.
+  const visibleBadges = BADGES.filter((b) => !b.secret);
+  const earnedCount = visibleBadges.filter((b) => badgeState.earnedIds.has(b.id)).length;
+  const allEarned = earnedCount === visibleBadges.length;
+  const badgeProgressPct = visibleBadges.length > 0 ? Math.round((earnedCount / visibleBadges.length) * 100) : 0;
   appEl.innerHTML = `
     <section class="card my-badges-card">
       <p class="eyebrow">Account</p>
@@ -420,9 +496,11 @@ function renderMyBadges() {
                   <div class="learn-progress-track"><div class="learn-progress-fill" style="width:${badgeProgressPct}%"></div></div>
                   <div class="learn-progress-giftbox">${giftBoxIcon(allEarned ? 'open' : 'closed')}</div>
                 </div>
-                <p class="learn-progress-label">${earnedCount} of ${BADGES.length} badges earned</p>
+                <p class="learn-progress-label">${earnedCount} of ${visibleBadges.length} badges earned</p>
               </div>
-              <ul class="badge-list">${BADGES.map(renderBadgeListItem).join('')}</ul>
+              <ul class="badge-list">${BADGES.filter((b) => !b.secret || badgeState.earnedIds.has(b.id))
+                .map(renderBadgeListItem)
+                .join('')}</ul>
             `
       }
       <div class="nav-row">
