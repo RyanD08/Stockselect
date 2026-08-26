@@ -1267,7 +1267,28 @@ function csvField(value) {
 // seconds later, not in the same tick as click(), is deliberate -- doing it
 // immediately can race the browser's own read of the blob in some browsers
 // (notably Safari) and silently no-op the download.
-function triggerFileDownload(content, filename, mimeType) {
+// iOS Safari's support for <a download> against a blob: URL is unreliable
+// (varies by iOS version) -- it commonly does NOT save into the Files app
+// the way a desktop browser saves into Downloads, sometimes landing in
+// Safari's own separate in-browser downloads list instead, sometimes doing
+// nothing visible at all. navigator.share() with a real File is the
+// correct API for this on iOS: it opens the native Share Sheet, and "Save
+// to Files" there is what actually puts the file into Files.app. Feature-
+// detected via canShare (not just the presence of navigator.share, which
+// exists on some desktop browsers for URLs/text but still returns false
+// for files) so desktop keeps using the plain anchor-download path below.
+async function triggerFileDownload(content, filename, mimeType) {
+  const file = new File([content], filename, { type: mimeType });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return; // client cancelled the Share Sheet -- not a failure
+      console.error('navigator.share failed, falling back to anchor download:', err);
+    }
+  }
+
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
