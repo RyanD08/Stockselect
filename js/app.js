@@ -1271,13 +1271,7 @@ function exportPortfolioCsv(holdings, triggerBtn) {
     entry.allocationPct.toFixed(2),
   ]);
   const csv = [header, ...rows].map((row) => row.map(csvField).join(',')).join('\r\n');
-  // text/plain, not text/csv -- the <a download> attribute below forces a
-  // save with the right .csv extension regardless of the blob's own
-  // reported type, but a text/csv blob opened via window.open (the
-  // toast's "reopen" button, see showDownloadToast) gets silently treated
-  // as a second download by Chrome instead of actually displaying it --
-  // text/plain is what renders inline in a new tab.
-  const blob = new Blob([csv], { type: 'text/plain;charset=utf-8;' });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const filename = 'truenorth-portfolio.csv';
   const link = document.createElement('a');
@@ -1350,10 +1344,21 @@ function showDownloadToast(filename, url) {
   requestAnimationFrame(() => toast.classList.add('visible'));
 
   toast.querySelector('.download-toast-open').addEventListener('click', () => {
-    // Still inside this click's own user gesture, so opening a blob: URL
-    // this way is allowed even though the download that created it
-    // happened several seconds earlier.
-    window.open(url, '_blank', 'noopener');
+    // Re-runs the exact same download mechanism as the original download
+    // (see exportPortfolioCsv) instead of window.open(url) -- opening a
+    // blob: URL in a new tab/window turned out to be unreliable across
+    // browsers (some mobile browsers and popup blockers silently swallow
+    // it even from inside a real click, on top of the Chrome-specific
+    // "treated as a second download and the empty tab closes itself" bug
+    // already worked around by this blob's text/plain type). A plain
+    // anchor-download click has none of that risk -- it's the same
+    // mechanism the browser already just proved works for this exact file.
+    const reopenLink = document.createElement('a');
+    reopenLink.href = url;
+    reopenLink.download = filename;
+    document.body.appendChild(reopenLink);
+    reopenLink.click();
+    reopenLink.remove();
   });
   toast.querySelector('.download-toast-close').addEventListener('click', hideDownloadToast);
 
