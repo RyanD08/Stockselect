@@ -33,10 +33,43 @@ QUESTIONS.forEach((q) => {
 
 const appEl = document.getElementById('app');
 
+const VIEW_TITLES = {
+  intro: 'TrueNorth — Values-Guided Investing',
+  survey: 'Survey — TrueNorth',
+  review: 'Review Your Answers — TrueNorth',
+  results: 'Your Portfolio — TrueNorth',
+  portfolios: 'My Portfolios — TrueNorth',
+  watchlist: 'My Watchlist — TrueNorth',
+  tickerTester: 'Ticker Tester — TrueNorth',
+  tickerCompare: 'Compare Two Companies — TrueNorth',
+  sharedResult: 'Shared Portfolio — TrueNorth',
+  learn: 'Learn — TrueNorth',
+  myBadges: 'My Badges — TrueNorth',
+};
+
+// Keeps the browser tab title (and so also history/bookmarks) meaningful
+// per screen instead of the same generic title everywhere it was showing
+// before -- also the other half of the SPA-navigation announcement, next
+// to the focus move in render() below: screen readers surface a changed
+// document.title the same way they'd surface a real page's <title>.
+function updateDocumentTitle() {
+  if (state.view === 'account') {
+    document.title = `${authViewState.mode === 'signup' ? 'Create Account' : 'Log In'} — TrueNorth`; // js/auth.js
+    return;
+  }
+  if (state.view === 'learnLesson') {
+    const lesson = LESSONS.find((l) => l.id === learnLessonViewState.lessonId); // js/learn.js
+    document.title = `${lesson ? lesson.title : 'Learn'} — TrueNorth`;
+    return;
+  }
+  document.title = VIEW_TITLES[state.view] || 'TrueNorth — Values-Guided Investing';
+}
+
 // Re-renders the current view without moving the scroll position — for
 // in-place UI toggles (accordion expand/collapse, financial-details
 // dropdown) where jumping the viewport back to top would be jarring.
 function renderInPlace() {
+  updateDocumentTitle();
   if (state.view === 'intro') renderIntro();
   else if (state.view === 'survey') renderSurvey();
   else if (state.view === 'review') renderReview();
@@ -64,6 +97,11 @@ function renderInPlace() {
 // top so each new screen or survey step is read from the beginning.
 function render() {
   renderInPlace();
+  // Moves keyboard focus into the new screen so a screen reader announces
+  // it -- #app already carries tabindex="-1" for the skip link, so this is
+  // free. preventScroll avoids fighting the smooth scrollTo below with an
+  // instant jump-then-animate.
+  appEl.focus({ preventScroll: true });
   const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
