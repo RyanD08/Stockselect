@@ -1271,20 +1271,29 @@ function exportPortfolioCsv(holdings, triggerBtn) {
     entry.allocationPct.toFixed(2),
   ]);
   const csv = [header, ...rows].map((row) => row.map(csvField).join(',')).join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  // text/plain, not text/csv -- the <a download> attribute below forces a
+  // save with the right .csv extension regardless of the blob's own
+  // reported type, but a text/csv blob opened via window.open (the
+  // toast's "reopen" button, see showDownloadToast) gets silently treated
+  // as a second download by Chrome instead of actually displaying it --
+  // text/plain is what renders inline in a new tab.
+  const blob = new Blob([csv], { type: 'text/plain;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
+  const filename = 'truenorth-portfolio.csv';
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'truenorth-portfolio.csv';
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   link.remove();
-  // Revoking on the same tick as click() races the browser's own read of
-  // the blob URL in some browsers (notably Safari) -- the download can
-  // silently no-op if the URL is gone before it starts reading. Deferring
-  // the revoke a tick, same fix as this exact bug elsewhere on the web,
-  // lets the download actually begin first.
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  // showDownloadToast (below) becomes the sole owner of `url` from here --
+  // it holds the object URL alive for as long as the toast offers to
+  // reopen the file, then revokes it once the toast is dismissed. Revoking
+  // it here instead, in the same tick as click(), used to race the
+  // browser's own read of the blob in some browsers (notably Safari) and
+  // could silently no-op the download.
+  showDownloadToast(filename, url);
 
   // The click itself gives no browser-chrome feedback on every platform
   // (no visible download bar in some mobile/embedded browsers), so without
@@ -1301,6 +1310,71 @@ function exportPortfolioCsv(holdings, triggerBtn) {
       triggerBtn.disabled = false;
     }, 1800);
   }
+}
+
+// --- Download toast ----------------------------------------------------
+//
+// A real download (unlike Save/Share, which just write to Firestore) gets
+// no in-page confirmation from the button alone on every platform -- some
+// mobile/embedded browsers show no download-shelf UI at all, so a client
+// there has no way to tell the file actually landed anywhere. This is a
+// second, file-specific confirmation: a dismissible toast bottom-left,
+// outside #app (survives renderInPlace(), same convention as the offline
+// banner/back-to-top button), naming the file and offering to reopen the
+// exact blob just downloaded with one click -- no second click through a
+// downloads folder needed. Generic by filename/url, not CSV-specific, so a
+// future second export feature can reuse it as-is.
+
+let downloadToastTimer = null;
+let downloadToastUrl = null;
+
+function showDownloadToast(filename, url) {
+  hideDownloadToast(); // clears any still-showing prior toast's timer + revokes ITS url first
+
+  downloadToastUrl = url;
+  const toast = document.createElement('div');
+  toast.id = 'download-toast';
+  toast.className = 'download-toast';
+  toast.setAttribute('role', 'status');
+  toast.innerHTML = `
+    <button type="button" class="download-toast-open" aria-label="Open ${escapeHtml(filename)}">
+      <span class="download-toast-icon">${downloadFileIcon()}</span>
+      <span class="download-toast-filename">${escapeHtml(filename)}</span>
+    </button>
+    <button type="button" class="download-toast-close" aria-label="Dismiss">&times;</button>
+  `;
+  document.body.appendChild(toast);
+  // Adding .visible a frame later (rather than in the markup above) is
+  // what makes the slide-up/fade-in actually transition instead of
+  // snapping straight to its end state.
+  requestAnimationFrame(() => toast.classList.add('visible'));
+
+  toast.querySelector('.download-toast-open').addEventListener('click', () => {
+    // Still inside this click's own user gesture, so opening a blob: URL
+    // this way is allowed even though the download that created it
+    // happened several seconds earlier.
+    window.open(url, '_blank', 'noopener');
+  });
+  toast.querySelector('.download-toast-close').addEventListener('click', hideDownloadToast);
+
+  downloadToastTimer = setTimeout(hideDownloadToast, 6000);
+}
+
+function hideDownloadToast() {
+  if (downloadToastTimer) {
+    clearTimeout(downloadToastTimer);
+    downloadToastTimer = null;
+  }
+  const toast = document.getElementById('download-toast');
+  if (toast) toast.remove();
+  if (downloadToastUrl) {
+    URL.revokeObjectURL(downloadToastUrl);
+    downloadToastUrl = null;
+  }
+}
+
+function downloadFileIcon() {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg>';
 }
 
 function formatUsd(amount) {
