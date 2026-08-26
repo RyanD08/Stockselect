@@ -3186,7 +3186,7 @@ h1 .category-icon {
   margin: 0.6rem 0 0;
 }
 
-.site-footer-links .site-disclaimer-toggle {
+.site-footer-links .site-disclaimer-toggle:first-child {
   margin-left: 0;
 }
 
