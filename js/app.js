@@ -12,6 +12,8 @@ const state = {
   reviewExpanded: new Set(), // category keys currently expanded on the Review screen
   expandedFinancialDetails: new Set(), // tickers with the "why this holding" details panel (rationale + financials) open on Results
   simulationBreakdownExpanded: false, // whether the $15k historical-simulation company breakdown table is open on Results
+  manualPortfolioTickers: null, // null | string[] — null means "use buildPortfolio()'s own top-15 selection"; once the user removes a holding this becomes the authoritative ordered ticker list (can be under 15 until Repopulate is clicked)
+  excludedHoldingTickers: new Set(), // tickers manually removed from the current portfolio — never re-suggested by Repopulate
   saveResultState: { status: 'idle', errorMessage: null }, // 'idle' | 'saving' | 'saved' | 'error' — the Results screen's "Save My Portfolio" control (see auth.js for the actual save)
   shareResultState: { status: 'idle', url: null, errorMessage: null }, // 'idle' | 'sharing' | 'shared' | 'error' — the Results screen's "Share My Results" control (see createSharedResult in auth.js)
   hasPersonalizedAnswers: false, // true once this session has real answers to score against: finished the survey (set below) or loaded a saved portfolio (see auth.js loadPortfolioIntoResults) — read by ticker-tester.js
@@ -385,6 +387,11 @@ function renderReview() {
 
   document.getElementById('review-submit-btn').addEventListener('click', () => {
     state.hasPersonalizedAnswers = true; // real answers now exist -- see ticker-tester.js
+    // A fresh computation from these (possibly just-edited) answers --
+    // any prior manual remove/repopulate edits belonged to the last
+    // portfolio, not this one.
+    state.manualPortfolioTickers = null;
+    state.excludedHoldingTickers.clear();
     logAnalyticsEvent('survey_completed'); // js/firebase-config.js
     state.view = 'results';
     render();
@@ -530,12 +537,56 @@ function renderShareResultsControl() {
   `;
 }
 
+// Draws the next-best qualified replacement(s) from `pool` (the same
+// ranked list buildPortfolio() itself fills from) until
+// state.manualPortfolioTickers reaches MAX_PORTFOLIO_SIZE or the pool has
+// nothing left to offer -- respecting the same per-sector cap
+// fillFromCandidates enforces, computed fresh from whatever's currently in
+// the portfolio (not the original selection, since removals can free up a
+// sector that was previously at cap).
+function repopulatePortfolio(pool) {
+  if (!state.manualPortfolioTickers) return;
+  const poolByTicker = new Map(pool.map((e) => [e.company.ticker, e]));
+  const currentTickers = new Set(state.manualPortfolioTickers);
+  const sectorCounts = {};
+  state.manualPortfolioTickers.forEach((t) => {
+    const entry = poolByTicker.get(t);
+    if (!entry) return;
+    sectorCounts[entry.company.sector] = (sectorCounts[entry.company.sector] || 0) + 1;
+  });
+  for (const entry of pool) {
+    if (state.manualPortfolioTickers.length >= MAX_PORTFOLIO_SIZE) break;
+    const ticker = entry.company.ticker;
+    if (currentTickers.has(ticker) || state.excludedHoldingTickers.has(ticker)) continue;
+    const countInSector = sectorCounts[entry.company.sector] || 0;
+    if (countInSector >= MAX_PER_SECTOR) continue;
+    sectorCounts[entry.company.sector] = countInSector + 1;
+    state.manualPortfolioTickers.push(ticker);
+    currentTickers.add(ticker);
+  }
+}
+
 function renderResults() {
-  const { riskProfile, holdings } = buildPortfolio(state.dataset, state.answers, {
+  const { riskProfile, pool } = buildScoredCandidatePool(state.dataset, state.answers, {
     homeCountry: state.homeCountry,
     tiesSector: state.tiesSector,
     timeHorizon: state.timeHorizon,
   });
+
+  let holdings;
+  if (state.manualPortfolioTickers) {
+    const poolByTicker = new Map(pool.map((e) => [e.company.ticker, e]));
+    holdings = state.manualPortfolioTickers.map((t) => poolByTicker.get(t)).filter(Boolean);
+  } else {
+    const sectorCounts = {};
+    holdings = [];
+    fillFromCandidates(pool, holdings, sectorCounts);
+  }
+  const allocationPct = holdings.length > 0 ? 100 / holdings.length : 0;
+  holdings.forEach((entry) => {
+    entry.allocationPct = allocationPct;
+  });
+
   const topPriorities = QUESTIONS.filter((q) => q.id <= 25 && state.answers[q.id] === 5);
 
   appEl.innerHTML = `
@@ -573,6 +624,17 @@ function renderResults() {
         Matches. Domestic-company match is based on headquarters in <strong>${escapeHtml(state.homeCountry)}</strong>.
       </p>
 
+      ${
+        holdings.length < MAX_PORTFOLIO_SIZE
+          ? `
+        <div class="portfolio-repopulate-row">
+          <p class="muted">Your portfolio has ${holdings.length} of ${MAX_PORTFOLIO_SIZE} holdings.</p>
+          <button type="button" id="repopulate-btn" class="btn btn-secondary">Repopulate to ${MAX_PORTFOLIO_SIZE}</button>
+        </div>
+      `
+          : ''
+      }
+
       ${renderSectorChart(holdings)}
 
       ${renderHistoricalSimulationSection(holdings)}
@@ -594,6 +656,7 @@ function renderResults() {
               <th>Match Tier</th>
               <th>Financial Score</th>
               <th>Rationale</th>
+              <th><span class="sr-only">Remove</span></th>
             </tr>
           </thead>
           <tbody>
@@ -626,6 +689,31 @@ function renderResults() {
       renderInPlace();
     });
   });
+
+  document.querySelectorAll('.holding-remove-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      // First removal snapshots the current (fully auto-selected) holdings
+      // as the manual list -- everything after that just edits it in place.
+      if (!state.manualPortfolioTickers) {
+        state.manualPortfolioTickers = holdings.map((entry) => entry.company.ticker);
+      }
+      const ticker = btn.dataset.ticker;
+      state.manualPortfolioTickers = state.manualPortfolioTickers.filter((t) => t !== ticker);
+      state.excludedHoldingTickers.add(ticker);
+      renderInPlace();
+    });
+  });
+
+  const repopulateBtn = document.getElementById('repopulate-btn');
+  if (repopulateBtn) {
+    repopulateBtn.addEventListener('click', () => {
+      if (!state.manualPortfolioTickers) {
+        state.manualPortfolioTickers = holdings.map((entry) => entry.company.ticker);
+      }
+      repopulatePortfolio(pool);
+      renderInPlace();
+    });
+  }
 
   const saveResultsBtn = document.getElementById('save-results-btn');
   if (saveResultsBtn) {
@@ -781,6 +869,8 @@ function resetSurveyState() {
   state.timeHorizon = 'long';
   state.expandedFinancialDetails.clear();
   state.simulationBreakdownExpanded = false;
+  state.manualPortfolioTickers = null;
+  state.excludedHoldingTickers.clear();
   state.saveResultState = { status: 'idle', errorMessage: null };
   state.shareResultState = { status: 'idle', url: null, errorMessage: null };
   state.hasPersonalizedAnswers = false;
@@ -821,6 +911,9 @@ function renderHoldingRow(entry) {
           Why this holding
         </button>
         ${isDetailsOpen ? renderHoldingDetails(entry) : ''}
+      </td>
+      <td data-label="Remove">
+        <button type="button" class="holding-remove-btn" data-ticker="${escapeHtml(ticker)}" aria-label="Remove ${escapeHtml(entry.company.name)} from portfolio">&times;</button>
       </td>
     </tr>
   `;
