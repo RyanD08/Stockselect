@@ -730,7 +730,7 @@ function renderResults() {
 
   const exportCsvBtn = document.getElementById('export-csv-btn');
   if (exportCsvBtn) {
-    exportCsvBtn.addEventListener('click', () => exportPortfolioCsv(holdings));
+    exportCsvBtn.addEventListener('click', () => exportPortfolioCsv(holdings, exportCsvBtn));
   }
 
   const resetPortfolioBtn = document.getElementById('reset-portfolio-btn');
@@ -1260,7 +1260,7 @@ function csvField(value) {
   return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
 }
 
-function exportPortfolioCsv(holdings) {
+function exportPortfolioCsv(holdings, triggerBtn) {
   const header = ['Ticker', 'Company', 'Sector', 'Match Tier', 'Financial Score', 'Allocation %'];
   const rows = holdings.map((entry) => [
     entry.company.ticker,
@@ -1279,7 +1279,28 @@ function exportPortfolioCsv(holdings) {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  // Revoking on the same tick as click() races the browser's own read of
+  // the blob URL in some browsers (notably Safari) -- the download can
+  // silently no-op if the URL is gone before it starts reading. Deferring
+  // the revoke a tick, same fix as this exact bug elsewhere on the web,
+  // lets the download actually begin first.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  // The click itself gives no browser-chrome feedback on every platform
+  // (no visible download bar in some mobile/embedded browsers), so without
+  // this the button looks like it did nothing even on a successful
+  // download -- same "confirm the action happened" reasoning as the Save/
+  // Share buttons' own saving->saved state flip (renderSaveResultsControl/
+  // renderShareResultsControl below).
+  if (triggerBtn) {
+    const originalText = triggerBtn.textContent;
+    triggerBtn.textContent = 'Downloaded ✓';
+    triggerBtn.disabled = true;
+    setTimeout(() => {
+      triggerBtn.textContent = originalText;
+      triggerBtn.disabled = false;
+    }, 1800);
+  }
 }
 
 function formatUsd(amount) {
