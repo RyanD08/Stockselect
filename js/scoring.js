@@ -222,7 +222,11 @@ function unitRawRating(unit, answers) {
 // (ids 1-25); ids 26+ (risk/financial terms) never call this.
 function questionHasData(qid, company, ctx) {
   switch (qid) {
-    case 1: return !hasNoData(fieldOf(company, 'carbon_fossil_fuel_involvement'));
+    case 1: {
+      const screen = fossilFuelScreen(company);
+      if (screen && typeof screen.involved === 'boolean') return true;
+      return !hasNoData(fieldOf(company, 'carbon_fossil_fuel_involvement'));
+    }
     case 2: return !hasNoData(fieldOf(company, 'renewable_clean_tech_involvement'));
     case 3: { const f = fieldOf(company, 'environmental_pollution_violations'); return !hasNoData(f) && typeof f.value === 'object'; }
     case 4: return !hasNoData(fieldOf(company, 'sustainable_agriculture_resource_use'));
@@ -328,6 +332,15 @@ function fieldOf(company, key) {
   return f && typeof f === 'object' ? f : null;
 }
 
+// fossilfreefunds.org (As You Sow)'s own named-list fossil-fuel screen,
+// bundled per-company under additional_data_sources -- see
+// carbonFossilFuelAlignment/renewableCleanTechAlignment below for why this
+// is preferred over the plain 10-K keyword scan.
+function fossilFuelScreen(company) {
+  const sources = company.additional_data_sources;
+  return sources && sources.fossil_fuel_screen ? sources.fossil_fuel_screen : null;
+}
+
 function hasNoData(f) {
   return !f || f.confidence === 'None' || f.value === 'No verifiable data found' || f.value === undefined || f.value === null;
 }
@@ -358,11 +371,42 @@ function parseUsdString(s) {
   return Number.isFinite(n) ? n : null;
 }
 
-// Q1/Q2: business-description keyword-scan involvement level.
+// Q1/Q2: business-description keyword-scan involvement level -- with a real
+// problem uncovered by a client's own results: the two scans run
+// independently over the same 10-K "Item 1 Business" text, so a huge share
+// of energy/utility companies get flagged "High" on BOTH carbon involvement
+// AND clean-tech involvement at once (confirmed in this dataset for
+// Chevron, First Solar, NextEra Energy, Constellation Energy, and Vistra
+// alike), which canceled a client's avoid-fossil and prefer-clean-tech
+// answers against each other for exactly the companies where they should
+// matter most -- while the same keyword scan sometimes finds nothing at all
+// (ExxonMobil's 10-K couldn't be fetched, so it scored a fully unpenalized
+// neutral despite being a fossil-fuel major).
+//
+// Q1 now prefers fossilfreefunds.org's own named-list fossil-fuel screen
+// (bundled per-company under additional_data_sources.fossil_fuel_screen,
+// see fossilFuelScreen above) when present: it's far more precise (53 real
+// matches across the S&P 500 vs. the keyword scan's 228 "High" flags,
+// confirmed against this dataset directly) and covers 497 of 502 companies,
+// including ExxonMobil, where the keyword scan has nothing. The keyword
+// scan is only a fallback for the handful of companies missing it.
+//
+// Q2 still has to lean on the keyword scan -- the named-list screen is
+// fossil-only, it never confirms a company IS clean energy -- but now
+// withholds credit whenever that same company is confirmed fossil-involved
+// by the more reliable screen, so a real fossil-fuel company's boilerplate
+// climate-risk language can no longer buy back the penalty it just earned.
 function carbonFossilFuelAlignment(company) {
+  const screen = fossilFuelScreen(company);
+  if (screen && typeof screen.involved === 'boolean') {
+    if (!screen.involved) return 0;
+    return LEVEL_EXCLUSIONARY.High * confidenceWeight(screen.confidence);
+  }
   return enumFieldAlignment(company, 'carbon_fossil_fuel_involvement', LEVEL_EXCLUSIONARY);
 }
 function renewableCleanTechAlignment(company) {
+  const screen = fossilFuelScreen(company);
+  if (screen && screen.involved === true) return 0;
   return enumFieldAlignment(company, 'renewable_clean_tech_involvement', LEVEL_PREFERENCE);
 }
 
