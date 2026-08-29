@@ -22,8 +22,16 @@
  * survey and scoring logic never touch the data source directly.
  */
 
-const FINANCIAL_SOURCE_URL = 'data/financial_dataset_sp500.json';
-const ESG_SOURCE_URL = 'data/esg_dataset_sp500.json';
+// Cache-busts the two dataset fetches the same way index.html/404.html
+// cache-bust every local <script>/<link> tag (see the comment above those
+// tags) -- bump this whenever either JSON file's *content* changes, in
+// lockstep with the next ?v= bump, so a browser/GitHub Pages cache can't
+// keep serving a stale dataset after a content-only change like this one
+// (unlike the script tags, fetch() URLs aren't touched by the HTML's own
+// ?v= query string, so this needed its own).
+const DATASET_CACHE_BUST = '20260829d';
+const FINANCIAL_SOURCE_URL = `data/financial_dataset_sp500.json?v=${DATASET_CACHE_BUST}`;
+const ESG_SOURCE_URL = `data/esg_dataset_sp500.json?v=${DATASET_CACHE_BUST}`;
 
 async function fetchJson(url) {
   const response = await fetch(url);
