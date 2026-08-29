@@ -276,6 +276,50 @@ const MAX_PORTFOLIO_SIZE = 15;
 // sector diversification as a goal.
 const MAX_PER_SECTOR = 5;
 
+// Reserved theme slots (2026-08-29): a blended score across 25+ weighted
+// criteria structurally can't let one or two questions dominate a ranking
+// without breaking every other client's results -- simulation confirmed
+// that even maxing the clean-tech question, disabling every risk
+// preference, and prioritizing values over returns only moved First Solar
+// (the closest thing to a pure-play clean-energy stock in this dataset) to
+// ~#66 of 502. Rather than reshape the scoring math for every client, a
+// client who rates this specific "thematic preference" question 4-5/5 gets
+// 1-2 of their 15 slots reserved for a curated, hand-verified clean-energy
+// pick -- a narrow, explicit guarantee instead of a blended-average hope.
+//
+// This intentionally does NOT use renewable_clean_tech_involvement (the
+// dataset's only per-company clean-tech field, a 10-K keyword scan) to
+// pick candidates automatically: every "High" flag on that field carries
+// the same Medium confidence, so it can't distinguish a real clean-energy
+// company from one that merely mentions "renewable energy" in passing --
+// confirmed by testing it directly: the strongest available filter on that
+// field still surfaced Aflac, Nasdaq, and multiple oil/gas majors (whose
+// business the fossil-fuel screen simply doesn't happen to flag) as top
+// "clean energy" matches. CURATED_CLEAN_ENERGY_TICKERS is a manually
+// maintained, hand-verified exception to the rest of this file's fully
+// data-driven design instead -- every ticker here was checked directly
+// against additional_data_sources.fossil_fuel_screen (must be
+// involved: false) AND is a genuine, primarily clean-energy business, not
+// just a company with some renewable exposure. Commonly-perceived "clean
+// energy" names were deliberately left off after checking: NextEra,
+// Constellation, Vistra, AES, and GE Vernova are all confirmed
+// fossil-involved in this dataset (diversified utilities/equipment makers
+// with real natural gas or oil/gas exposure, not pure-plays -- see each
+// one's own fossil_fuel_screen.matched_categories). Enphase, SolarEdge,
+// Plug Power, and Sunrun aren't S&P 500 constituents in this dataset at
+// all, so they can't appear regardless. Revisit this list whenever S&P 500
+// membership changes -- it will not update itself, and a short list here
+// is a known, current limitation of the underlying data, not a bug.
+const CURATED_CLEAN_ENERGY_TICKERS = ['FSLR'];
+const THEMED_RESERVATION_QUESTION_ID = 2; // "Prioritizing renewable/clean tech"
+function themedReservedSlotCount(answers) {
+  const rating = answers[THEMED_RESERVATION_QUESTION_ID] || 3;
+  let desired = 0;
+  if (rating >= 5) desired = 2;
+  else if (rating >= 4) desired = 1;
+  return Math.min(desired, CURATED_CLEAN_ENERGY_TICKERS.length);
+}
+
 // Added 2026-08-22: a "who keeps showing up" simulation (3,000 random
 // client profiles) found that companies with ZERO negative alignment
 // across every values question they have real data for -- i.e. companies
@@ -1145,12 +1189,46 @@ function buildScoredCandidatePool(dataset, answers, clientContext) {
   return { riskProfile, pool: [...primaryCandidates, ...backfillCandidates] };
 }
 
-function buildPortfolio(dataset, answers, clientContext) {
-  const { riskProfile, pool } = buildScoredCandidatePool(dataset, answers, clientContext);
-
+// Shared by buildPortfolio() below AND the Results screen's own initial
+// fill (js/app.js renderResults(), before any manual remove/repopulate
+// edit exists) -- both need the exact same "reserved slots, then normal
+// fill" behavior, so it lives here once rather than as two
+// possibly-diverging copies. Once a client manually edits their holdings,
+// state.manualPortfolioTickers takes over in app.js and this function is
+// no longer consulted for that session -- the reservation is a starting
+// recommendation, not something a client is locked into.
+function fillPortfolioHoldings(pool, answers) {
   const sectorCounts = {};
   const selected = [];
-  fillFromCandidates(pool, selected, sectorCounts);
+
+  // See THEMED_RESERVATION_QUESTION_ID/CURATED_CLEAN_ENERGY_TICKERS above:
+  // reserve 1-2 slots for the client's curated clean-energy pick(s) before
+  // the normal fill, restricted to candidates that already cleared the
+  // real values floor (never force in a company that fails a genuine
+  // values screen just for its theme match), then fill the rest of the
+  // portfolio from the remaining pool exactly as before.
+  const reservedCount = themedReservedSlotCount(answers);
+  if (reservedCount > 0) {
+    const curatedTickers = new Set(CURATED_CLEAN_ENERGY_TICKERS);
+    const themedCandidates = pool.filter(
+      (entry) => curatedTickers.has(entry.company.ticker) && entry.tier !== 'Below Values Threshold'
+    );
+    fillFromCandidates(themedCandidates.slice(0, reservedCount), selected, sectorCounts);
+  }
+  const reservedTickers = new Set(selected.map((entry) => entry.company.ticker));
+  fillFromCandidates(pool.filter((entry) => !reservedTickers.has(entry.company.ticker)), selected, sectorCounts);
+
+  // Re-sort the combined (reserved + normally-filled) list back into the
+  // pool's own score order, so a reserved pick that didn't score at the
+  // very top doesn't visually jump to the top of the holdings list -- it
+  // appears exactly where its own score/tier would normally place it.
+  sortScoredEntries(selected);
+  return selected;
+}
+
+function buildPortfolio(dataset, answers, clientContext) {
+  const { riskProfile, pool } = buildScoredCandidatePool(dataset, answers, clientContext);
+  const selected = fillPortfolioHoldings(pool, answers);
 
   const allocationPct = selected.length > 0 ? 100 / selected.length : 0;
   selected.forEach((entry) => {

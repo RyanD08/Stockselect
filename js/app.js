@@ -618,9 +618,7 @@ function renderResults() {
     const poolByTicker = new Map(pool.map((e) => [e.company.ticker, e]));
     holdings = state.manualPortfolioTickers.map((t) => poolByTicker.get(t)).filter(Boolean);
   } else {
-    const sectorCounts = {};
-    holdings = [];
-    fillFromCandidates(pool, holdings, sectorCounts);
+    holdings = fillPortfolioHoldings(pool, state.answers);
   }
   const allocationPct = holdings.length > 0 ? 100 / holdings.length : 0;
   holdings.forEach((entry) => {
