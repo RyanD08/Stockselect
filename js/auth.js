@@ -139,7 +139,7 @@ let pendingWatchlistViewRedirect = false;
 const AUTH_ERROR_MESSAGES = {
   'auth/email-already-in-use': 'An account already exists with this email. Try logging in instead.',
   'auth/invalid-email': "That doesn't look like a valid email address.",
-  'auth/weak-password': 'Choose a password with at least 6 characters.',
+  'auth/weak-password': 'Choose a password with at least 8 characters.',
   'auth/wrong-password': 'Incorrect password. Try again, or use "Forgot password?" below.',
   'auth/user-not-found': 'No account found with that email.',
   'auth/invalid-credential': 'Incorrect email or password.',
@@ -1155,7 +1155,7 @@ function renderAccount() {
                   id="auth-password-confirm"
                   type="password"
                   autocomplete="new-password"
-                  minlength="6"
+                  minlength="8"
                   required
                 />
                 <button type="button" class="password-toggle-btn" data-password-toggle-for="auth-password-confirm">Show</button>
@@ -1192,6 +1192,20 @@ function renderAccount() {
     evt.preventDefault();
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
+    // Only gates account creation, never login -- the form's own
+    // novalidate attribute means the minlength="6" on these inputs was
+    // never actually enforced by the browser, and Firebase's own default
+    // minimum is the same 6 characters. Checked here, before the
+    // signUp() call, rather than relying on Firebase's own
+    // auth/weak-password rejection, so the message names the real
+    // requirement instead of a generic auth error. A shorter existing
+    // password from before this changed must still be able to log in, so
+    // this never runs outside isSignup.
+    if (isSignup && password.length < 8) {
+      authViewState.error = 'Please choose a password with at least 8 characters.';
+      renderInPlace();
+      return;
+    }
     if (isSignup && password !== document.getElementById('auth-password-confirm').value) {
       authViewState.error = 'Passwords do not match. Please retype them.';
       renderInPlace();
