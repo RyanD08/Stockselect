@@ -34,11 +34,12 @@
 // under Authentication > Settings > Authorized domains in the Firebase
 // console, or sendPasswordResetEmail will throw auth/unauthorized-continue-uri.
 // Firebase only adds `localhost` and the project's own *.firebaseapp.com
-// there by default -- a custom domain like ryand08.github.io is not added
-// automatically just because email/password sign-in already works from it
-// (that list is specifically consulted for continue/redirect URLs, not for
-// the sign-in calls themselves), so this needs to be checked in the console.
-const siteUrl = 'https://ryand08.github.io/Stockselect/';
+// there by default -- a custom domain like truenorthportfolios.com is not
+// added automatically just because email/password sign-in already works
+// from it (that list is specifically consulted for continue/redirect URLs,
+// not for the sign-in calls themselves), so this needs to be checked in the
+// console.
+const siteUrl = 'https://truenorthportfolios.com/';
 
 // A shared-portfolio link normally points straight at this site with
 // ?shared=<id> -- fine to open, but its link-preview in iMessage/Slack/etc.
