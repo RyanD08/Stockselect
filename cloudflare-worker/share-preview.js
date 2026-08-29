@@ -23,19 +23,20 @@
  *   3. Immediately redirects a real visitor (both a <meta refresh> and a
  *      JS location.replace, so it works whether or not the client runs
  *      JS) into the real interactive app at
- *      https://ryand08.github.io/Stockselect/?shared={shareId} -- a
- *      person clicking the link never actually sees this page, only
- *      unfurler bots (which don't follow the redirect) do.
+ *      https://truenorthportfolios.com/?shared={shareId} -- a person
+ *      clicking the link never actually sees this page, only unfurler bots
+ *      (which don't follow the redirect) do.
  *
  * Any other path is passed straight through to the real site unchanged,
  * so this Worker can also front the whole domain later (e.g. if
- * truenorthportfolio.com gets pointed at Cloudflare) without breaking
- * normal traffic -- it only ever does something different for /s/*.
+ * truenorthportfolios.com itself gets pointed at Cloudflare) without
+ * breaking normal traffic -- it only ever does something different for
+ * /s/*.
  *
  * DEPLOY: see cloudflare-worker/README.md in this same folder.
  */
 
-const SITE_URL = 'https://ryand08.github.io/Stockselect/';
+const SITE_URL = 'https://truenorthportfolios.com/';
 const FIREBASE_PROJECT_ID = 'truenorth-a93e7';
 const FIREBASE_API_KEY = 'AIzaSyDwwUO4RwXYDP-x6r5L5pea3vEbX7qrWZI'; // public client key, already shipped in js/firebase-config.js -- not a secret
 const OG_IMAGE_URL = SITE_URL + 'assets/og-image.png';
