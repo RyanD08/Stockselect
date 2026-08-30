@@ -23,9 +23,9 @@
   <meta name="apple-mobile-web-app-title" content="TrueNorth" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Canonical URL -- update alongside the Open Graph/JSON-LD urls above
-       once a custom domain replaces this github.io address. -->
-  <link rel="canonical" href="https://ryand08.github.io/Stockselect/" />
+  <!-- Canonical URL -- keep in lockstep with the Open Graph/JSON-LD urls
+       below if the domain ever changes again. -->
+  <link rel="canonical" href="https://truenorthportfolios.com/" />
 
   <!-- Open Graph / Twitter card -- so a TrueNorth link shared in Slack,
        iMessage, or social shows the real brand instead of a blank box.
@@ -39,8 +39,8 @@
     property="og:description"
     content="Build an illustrative, personalized portfolio screen from your environmental, social, governance, and financial priorities."
   />
-  <meta property="og:url" content="https://ryand08.github.io/Stockselect/" />
-  <meta property="og:image" content="https://ryand08.github.io/Stockselect/assets/og-image.png" />
+  <meta property="og:url" content="https://truenorthportfolios.com/" />
+  <meta property="og:image" content="https://truenorthportfolios.com/assets/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -49,19 +49,19 @@
     name="twitter:description"
     content="Build an illustrative, personalized portfolio screen from your environmental, social, governance, and financial priorities."
   />
-  <meta name="twitter:image" content="https://ryand08.github.io/Stockselect/assets/og-image.png" />
+  <meta name="twitter:image" content="https://truenorthportfolios.com/assets/og-image.png" />
 
   <!-- Structured data -- lets search results show TrueNorth as a real free
        web app listing rather than a bare link. The url/image fields here
-       mirror the Open Graph tags above; when a custom domain is added,
-       update both together in the same edit. -->
+       mirror the Open Graph tags above; keep them in lockstep if the domain
+       ever changes again. -->
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "TrueNorth",
-      "url": "https://ryand08.github.io/Stockselect/",
-      "image": "https://ryand08.github.io/Stockselect/assets/og-image.png",
+      "url": "https://truenorthportfolios.com/",
+      "image": "https://truenorthportfolios.com/assets/og-image.png",
       "description": "TrueNorth is a values-guided investing tool that builds an illustrative, personalized portfolio screen from your environmental, social, governance, and financial priorities.",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Any (web browser)",
@@ -74,7 +74,7 @@
     }
   </script>
 
-  <link rel="stylesheet" href="css/styles.css?v=20260829f" />
+  <link rel="stylesheet" href="css/styles.css?v=20260829g" />
 </head>
 <body>
   <a href="#app" class="skip-link">Skip to main content</a>
@@ -192,10 +192,10 @@
        bump the value whenever any js/*.js file changes, or a deploy can
        serve a stale script indefinitely to a visitor who already has it
        cached (no build step here to hash the filename automatically). -->
-  <script src="js/firebase-config.js?v=20260829f"></script>
-  <script src="js/auth.js?v=20260829f"></script>
-  <script src="js/learn.js?v=20260829f"></script>
-  <script src="js/badges.js?v=20260829f"></script>
+  <script src="js/firebase-config.js?v=20260829g"></script>
+  <script src="js/auth.js?v=20260829g"></script>
+  <script src="js/learn.js?v=20260829g"></script>
+  <script src="js/badges.js?v=20260829g"></script>
 
   <!-- Chart.js (radar chart on the Ticker Tester screen). `defer` is
        required, not cosmetic: a plain synchronous <script src> here would
@@ -207,12 +207,12 @@
        category list, no crash and no blank gap, if this never loads --
        see js/ticker-tester.js. -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
-  <script src="js/ticker-tester.js?v=20260829f"></script>
+  <script src="js/ticker-tester.js?v=20260829g"></script>
 
-  <script src="js/data.js?v=20260829f"></script>
-  <script src="js/questions.js?v=20260829f"></script>
-  <script src="js/scoring.js?v=20260829f"></script>
-  <script src="js/simulation.js?v=20260829f"></script>
-  <script src="js/app.js?v=20260829f"></script>
+  <script src="js/data.js?v=20260829g"></script>
+  <script src="js/questions.js?v=20260829g"></script>
+  <script src="js/scoring.js?v=20260829g"></script>
+  <script src="js/simulation.js?v=20260829g"></script>
+  <script src="js/app.js?v=20260829g"></script>
 </body>
 </html>
