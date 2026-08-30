@@ -170,6 +170,10 @@ function describeFirestoreError(err, action) {
 async function signUp(email, password) {
   if (!firebaseReady) throw new Error('Account features are unavailable right now.');
   const credential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+  // Firebase Auth doesn't tell Analytics on its own whether a sign-in was a
+  // fresh signup or a returning login -- without this, account creation was
+  // invisible in Analytics entirely.
+  logAnalyticsEvent('account_created'); // js/firebase-config.js
   // Best-effort: the account itself is already created at this point, and
   // nothing in the app requires a verified email to work (unlike a real
   // financial platform, this is a values-alignment/education tool with no
