@@ -1924,6 +1924,49 @@ function hideOfflineBanner() {
   if (banner) banner.remove();
 }
 
+// Same document.body-append pattern as the banners above -- shown/hidden by
+// js/auth.js's onAuthStateChanged for as long as a signed-in client's email
+// stays unverified. Informational rather than blocking: nothing in this app
+// requires a verified email to work, this is just a nudge so a client can
+// actually recover their account (password reset, or just proving the
+// address was typed correctly) if they ever need to.
+function showVerifyEmailBanner(email) {
+  let banner = document.getElementById('verify-email-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'verify-email-banner';
+    banner.className = 'verify-email-banner';
+    banner.setAttribute('role', 'status');
+    document.body.appendChild(banner);
+  }
+  banner.innerHTML = `
+    <p>Verify your email so you can recover your account if you ever forget your password. We sent a link to <strong>${escapeHtml(email)}</strong>.</p>
+    <div class="verify-email-banner-actions">
+      <button type="button" id="verify-email-resend-btn">Resend Email</button>
+      <button type="button" id="verify-email-dismiss-btn" aria-label="Dismiss">&times;</button>
+    </div>
+  `;
+  document.getElementById('verify-email-dismiss-btn').addEventListener('click', () => banner.remove());
+  document.getElementById('verify-email-resend-btn').addEventListener('click', async (evt) => {
+    const btn = evt.currentTarget;
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    try {
+      await resendVerificationEmail(); // js/auth.js
+      btn.textContent = 'Sent ✓';
+    } catch (err) {
+      btn.textContent = 'Resend Email';
+      btn.disabled = false;
+      console.warn('resendVerificationEmail failed:', err);
+    }
+  });
+}
+
+function hideVerifyEmailBanner() {
+  const banner = document.getElementById('verify-email-banner');
+  if (banner) banner.remove();
+}
+
 function initOnlineOfflineHandler() {
   if (typeof navigator !== 'undefined' && navigator.onLine === false) showOfflineBanner();
   window.addEventListener('offline', showOfflineBanner);
