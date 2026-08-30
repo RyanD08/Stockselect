@@ -1714,13 +1714,14 @@ function initSiteDisclaimerToggle() {
 // (matches what the code actually collects, as of 2026-08-25 -- Firebase
 // Auth for email/password, the Firestore subcollections under users/{uid}
 // listed in firestore.rules, and the Analytics events logged via
-// logAnalyticsEvent, js/firebase-config.js). Same reasoning as
-// TERMS_OF_SERVICE_HTML (auth.js): deliberately omits a Contact section and
-// any jurisdiction-specific language for now -- add them back once there's
-// real contact info to put in, and get this reviewed before relying on it
-// for actual users. Reachable from the site footer on every screen (unlike
-// the Terms of Service, which is only surfaced during signup), since privacy
-// information isn't tied to any one action the way agreeing to terms is.
+// logAnalyticsEvent, js/firebase-config.js). Contact section added
+// 2026-08-30 once a real address existed; still deliberately omits
+// jurisdiction-specific language (Governing Law) -- add that once there's
+// real jurisdiction info to put in, and get the whole thing reviewed before
+// relying on it as a finished legal document. Reachable from the site
+// footer on every screen (unlike the Terms of Service, which is only
+// surfaced during signup), since privacy information isn't tied to any one
+// action the way agreeing to terms is.
 const PRIVACY_POLICY_HTML = `
   <h3>1. Overview</h3>
   <p>This page explains what information TrueNorth collects, why, and what you can do about it. TrueNorth doesn't sell your information, and doesn't show ads.</p>
@@ -1752,7 +1753,10 @@ const PRIVACY_POLICY_HTML = `
   <h3>8. Children's Privacy</h3>
   <p>TrueNorth is not directed at children under 13, and we don't knowingly collect information from them.</p>
 
-  <h3>9. Changes to This Policy</h3>
+  <h3>9. Contact</h3>
+  <p>Questions, concerns, or requests about your data (including deletion requests beyond what "Delete Account" covers) can be sent to <a href="mailto:ryan.delp08@gmail.com">ryan.delp08@gmail.com</a>.</p>
+
+  <h3>10. Changes to This Policy</h3>
   <p>We may update this policy as the Service changes. Continued use of TrueNorth after a change means you accept the updated policy.</p>
 `;
 

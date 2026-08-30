@@ -981,10 +981,11 @@ function renderAccountWidget() {
 // --- Terms of Service modal ----------------------------------------------
 
 // Drafted as a reasonable starting point for an educational, no-real-money
-// tool. Deliberately omits Governing Law and Contact sections (and the
-// "not reviewed by an attorney" note) for now -- add them back once there's
-// real jurisdiction/contact info to put in them, and get this reviewed
-// before relying on it for actual users.
+// tool. Contact section added 2026-08-30 once a real address existed;
+// still deliberately omits Governing Law (and the "not reviewed by an
+// attorney" note) for now -- add that once there's real jurisdiction info
+// to put in, and get the whole thing reviewed before relying on it as a
+// finished legal document.
 const TERMS_OF_SERVICE_HTML = `
   <h3>1. Acceptance of These Terms</h3>
   <p>By creating an account or using TrueNorth ("the Service"), you agree to these Terms of Service. If you don't agree, please don't create an account or use the Service.</p>
@@ -1014,7 +1015,10 @@ const TERMS_OF_SERVICE_HTML = `
   <h3>9. Limitation of Liability</h3>
   <p>To the fullest extent permitted by law, TrueNorth and its creator are not liable for any losses or damages arising from your use of the Service, including any investment decisions made using information from it.</p>
 
-  <h3>10. Changes to These Terms</h3>
+  <h3>10. Contact</h3>
+  <p>Questions about these terms, or the Service generally, can be sent to <a href="mailto:ryan.delp08@gmail.com">ryan.delp08@gmail.com</a>.</p>
+
+  <h3>11. Changes to These Terms</h3>
   <p>We may update these terms from time to time. Continuing to use the Service after a change means you accept the updated terms.</p>
 `;
 
