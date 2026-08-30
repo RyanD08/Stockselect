@@ -167,6 +167,10 @@ function renderIntro() {
         state.furthestCategoryIndex = 0;
         state.editOrigin = null;
       }
+      // Paired with survey_completed (below) so completion rate is
+      // computable from Analytics alone -- previously only the completed
+      // half of the funnel was logged, with no denominator.
+      logAnalyticsEvent('survey_started', { resumed: hasProgress }); // js/firebase-config.js
       render();
     });
   }
@@ -176,6 +180,7 @@ function renderIntro() {
     restartFreshBtn.addEventListener('click', () => {
       resetSurveyState();
       state.view = 'survey';
+      logAnalyticsEvent('survey_started', { resumed: false }); // js/firebase-config.js
       render();
     });
   }
