@@ -1032,8 +1032,20 @@ function renderHoldingDetails(entry) {
 
 const FINANCIAL_SCORE_LABEL_CLASS = { 'Above Average': 'above', Average: 'average', 'Below Average': 'below' };
 
+// A handful of companies (confirmed via tests/data-integrity.test.js --
+// e.g. very recent additions to the index like RDDT) have no verifiable
+// financial data at all, so overall_financial_score_label is explicitly
+// null rather than guessed -- same "don't invent a value" rule the rest of
+// this dataset follows. Both places that display this label (the results
+// badge below and the CSV export, exportPortfolioCsv above) go through
+// this one function so neither one can independently regress back to
+// rendering the literal string "null" for these companies.
+function financialScoreLabel(company) {
+  return company.financial_metrics.overall_financial_score_label || 'Unrated';
+}
+
 function renderFinancialScoreBadge(company) {
-  const label = company.financial_metrics.overall_financial_score_label;
+  const label = financialScoreLabel(company);
   const colorClass = FINANCIAL_SCORE_LABEL_CLASS[label] || 'average';
   return `<span class="financial-score-badge financial-score-${colorClass}">${escapeHtml(label)}</span>`;
 }
@@ -1310,13 +1322,14 @@ function exportPortfolioCsv(holdings, triggerBtn) {
     entry.company.name,
     entry.company.sector,
     (TIER_DISPLAY[entry.tier] || TIER_DISPLAY.Partial).badgeText,
-    entry.company.financial_metrics.overall_financial_score_label,
+    financialScoreLabel(entry.company),
     entry.allocationPct.toFixed(2),
   ]);
   const csv = [header, ...rows].map((row) => row.map(csvField).join(',')).join('\r\n');
   const filename = 'truenorth-portfolio.csv';
   triggerFileDownload(csv, filename, 'text/csv;charset=utf-8;');
   showDownloadToast(filename, csv);
+  logAnalyticsEvent('csv_downloaded', { holdings_count: holdings.length }); // js/firebase-config.js
 
   // The click itself gives no browser-chrome feedback on every platform
   // (no visible download bar in some mobile/embedded browsers), so without

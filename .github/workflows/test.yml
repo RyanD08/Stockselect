@@ -1,0 +1,23 @@
+name: Tests
+
+# Runs on every push/PR to every branch, deliberately unrestricted --
+# claude/values-portfolio-builder-2gmxub (the branch that actually
+# deploys to truenorthportfolios.com via GitHub Pages) is this repo's
+# default branch, not "main", so a branch-scoped trigger would risk
+# missing the one branch this matters most for.
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # No install step -- tests/ has zero dependencies by design (see
+      # tests/lib/runner.js), matching the site's own no-build-step
+      # philosophy.
+      - run: node tests/run.js

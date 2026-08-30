@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ryand08.github.io/Stockselect/sitemap.xml
+Sitemap: https://truenorthportfolios.com/sitemap.xml

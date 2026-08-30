@@ -9,6 +9,14 @@
     content="TrueNorth is a values-guided investing tool that builds an illustrative, personalized portfolio screen from your environmental, social, governance, and financial priorities."
   />
 
+  <!-- Starts the DNS/TCP/TLS handshake for the Firebase SDK scripts (below,
+       near the end of body) as early as possible -- the only external
+       origin this site talks to. Shaves real time off when those 4 script
+       tags actually start downloading, since the connection is already
+       warm by then. -->
+  <link rel="preconnect" href="https://www.gstatic.com" />
+  <link rel="dns-prefetch" href="https://www.gstatic.com" />
+
   <!-- Favicon + home-screen icons, cropped from the compass mark in
        assets/truenorth-logo-transparent.png -- that file's interior is
        genuinely transparent (only a thin ~18px border frame is opaque),
@@ -74,7 +82,104 @@
     }
   </script>
 
-  <link rel="stylesheet" href="css/styles.css?v=20260829h" />
+  <!-- FAQPage structured data -- lets Google show these as an expandable
+       rich result directly in search, rather than requiring a click
+       through to the site first. Mirrors the real FAQ_HTML content
+       (js/app.js, the "FAQ" footer link's modal) as plain text; per
+       Google's own guidance, structured data for content that's collapsed
+       by default and expands on click (like this FAQ modal) is an
+       accepted pattern, not cloaking -- update this block whenever
+       FAQ_HTML's questions/answers change so the two never drift apart. -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is TrueNorth?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A free tool that builds an illustrative, personalized portfolio from your own environmental, social, governance, and financial priorities. Answer a short questionnaire and it screens a universe of S&P 500 companies against what you told it you care about."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where does the data come from?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Financial data (P/E, revenue growth, margins, ROE, market cap, beta, dividend policy, analyst consensus, recent returns) comes from SEC EDGAR filings and live Finnhub market data. Values/ESG data is sourced per-company from SEC EDGAR (10-K and DEF 14A filings), EPA ECHO, OSHA, FEC, and FTC records -- each field carries its own confidence rating and source citation rather than a single blended score."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How current is it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Market data (price, market cap, and similar figures) is pulled from a live feed. The underlying company fundamentals and values/ESG data come from periodic SEC filings and public records, which are refreshed on an ongoing basis rather than continuously."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why the S&P 500?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It's a large, well-documented universe with consistent public filings to draw from, which keeps the underlying data verifiable rather than guessed at."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this financial advice?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. TrueNorth is an educational, illustrative tool, not licensed financial advice, and the results shouldn't be relied on for actual investment decisions. Please consult a registered financial advisor before making any investment decisions."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is TrueNorth free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, entirely -- no paywall, no premium tier."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need an account?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. You can take the survey, view your results, use Ticker Tester, and compare companies without one. An account just lets you save portfolios, keep a watchlist, and track Learn progress between visits."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my data sold or shared?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. TrueNorth doesn't sell your information and doesn't show ads."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How accurate is the values/ESG data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Coverage is real but not complete for every company or every question -- some fields have no comprehensive public data source at S&P 500 scale and will always show as unverified rather than guessed. Each field's confidence rating is shown alongside it so you can judge how much weight to give it."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What's the $15,000 historical simulation?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A hypothetical, backward-looking illustration only -- it applies today's recommended portfolio to last year's actual price history. It doesn't reflect a real investment, future performance, fees, or taxes, and this exact portfolio didn't exist a year ago."
+          }
+        }
+      ]
+    }
+  </script>
+
+  <link rel="stylesheet" href="css/styles.css?v=20260829i" />
 </head>
 <body>
   <a href="#app" class="skip-link">Skip to main content</a>
@@ -192,10 +297,10 @@
        bump the value whenever any js/*.js file changes, or a deploy can
        serve a stale script indefinitely to a visitor who already has it
        cached (no build step here to hash the filename automatically). -->
-  <script src="js/firebase-config.js?v=20260829h"></script>
-  <script src="js/auth.js?v=20260829h"></script>
-  <script src="js/learn.js?v=20260829h"></script>
-  <script src="js/badges.js?v=20260829h"></script>
+  <script src="js/firebase-config.js?v=20260829i"></script>
+  <script src="js/auth.js?v=20260829i"></script>
+  <script src="js/learn.js?v=20260829i"></script>
+  <script src="js/badges.js?v=20260829i"></script>
 
   <!-- Chart.js (radar chart on the Ticker Tester screen). `defer` is
        required, not cosmetic: a plain synchronous <script src> here would
@@ -207,12 +312,12 @@
        category list, no crash and no blank gap, if this never loads --
        see js/ticker-tester.js. -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
-  <script src="js/ticker-tester.js?v=20260829h"></script>
+  <script src="js/ticker-tester.js?v=20260829i"></script>
 
-  <script src="js/data.js?v=20260829h"></script>
-  <script src="js/questions.js?v=20260829h"></script>
-  <script src="js/scoring.js?v=20260829h"></script>
-  <script src="js/simulation.js?v=20260829h"></script>
-  <script src="js/app.js?v=20260829h"></script>
+  <script src="js/data.js?v=20260829i"></script>
+  <script src="js/questions.js?v=20260829i"></script>
+  <script src="js/scoring.js?v=20260829i"></script>
+  <script src="js/simulation.js?v=20260829i"></script>
+  <script src="js/app.js?v=20260829i"></script>
 </body>
 </html>

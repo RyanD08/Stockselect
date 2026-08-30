@@ -513,6 +513,7 @@ async function saveNewPortfolio(answers) {
 // empty array) happened to be sitting there from before -- then runs the
 // real award check, popup included.
 async function afterPortfolioSaved() {
+  logAnalyticsEvent('portfolio_saved'); // js/firebase-config.js
   try {
     myPortfoliosViewState.portfolios = await listSavedPortfolios();
   } catch (err) {
