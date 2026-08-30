@@ -170,7 +170,28 @@ function describeFirestoreError(err, action) {
 async function signUp(email, password) {
   if (!firebaseReady) throw new Error('Account features are unavailable right now.');
   const credential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+  // Best-effort: the account itself is already created at this point, and
+  // nothing in the app requires a verified email to work (unlike a real
+  // financial platform, this is a values-alignment/education tool with no
+  // real money involved) -- so a failure here (offline, Firebase quota)
+  // should never block signup or surface as the signup error. onAuthState
+  // Changed below shows a persistent reminder banner for as long as the
+  // account stays unverified, so this isn't the only chance to send it.
+  try {
+    await credential.user.sendEmailVerification({ url: siteUrl });
+  } catch (err) {
+    console.warn('sendEmailVerification failed (account was still created):', err);
+  }
   return credential.user;
+}
+
+// Reused by the "Resend Email" button on the verify-email reminder banner
+// (js/app.js showVerifyEmailBanner) -- same actionCodeSettings.url as the
+// signup-time send above and resetPassword below, so Firebase's hosted
+// confirmation page can link back to the real site.
+async function resendVerificationEmail() {
+  if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
+  await authState.user.sendEmailVerification({ url: siteUrl });
 }
 
 async function logIn(email, password) {
@@ -231,6 +252,27 @@ if (firebaseReady) {
     renderSiteNavMenu(); // js/app.js -- refreshes the hamburger dropdown's email line
 
     if (user) {
+      // Reload once for an unverified user so a client who clicks the
+      // verification link in another tab and switches back sees the
+      // reminder banner clear right away, instead of waiting up to an hour
+      // for Firebase's own background token refresh to pick up the change.
+      // Same "accepted, deliberate cost for correctness" tradeoff as the
+      // watchlist read below -- one extra request per page load/sign-in,
+      // only while still unverified.
+      if (!user.emailVerified) {
+        try {
+          await user.reload();
+          authState.user = firebaseAuth.currentUser;
+        } catch (err) {
+          console.warn('user.reload() failed (verify-email banner state may be stale):', err);
+        }
+      }
+      if (authState.user && !authState.user.emailVerified) {
+        showVerifyEmailBanner(authState.user.email); // js/app.js
+      } else {
+        hideVerifyEmailBanner(); // js/app.js
+      }
+
       // Fire-and-forget: populates watchlistState.tickers so every ☆/★
       // toggle button (Ticker Tester, Compare, Results table) shows the
       // right state as soon as possible, not just once My Watchlist is
@@ -252,6 +294,7 @@ if (firebaseReady) {
       // sign-in/page-load, not only after a visit to Learn or My Badges.
       loadBadgeState().then(renderAccountWidget);
     } else {
+      hideVerifyEmailBanner(); // js/app.js -- nothing to remind a signed-out visitor about
       watchlistState.tickers = new Set();
       watchlistState.loaded = false;
       // js/learn.js and js/badges.js -- same reset-on-logout reasoning as

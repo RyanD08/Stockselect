@@ -253,6 +253,77 @@ body {
   font-size: 0.88rem;
 }
 
+.verify-email-banner {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border: 1px solid #f0dfb8;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 4px 16px rgba(15, 31, 61, 0.18);
+}
+
+.verify-email-banner p {
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.verify-email-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.verify-email-banner-actions button:first-child {
+  background: none;
+  border: 1px solid var(--warn-text);
+  color: var(--warn-text);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.verify-email-banner-actions button:first-child:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+#verify-email-dismiss-btn {
+  background: none;
+  border: none;
+  color: var(--warn-text);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.15rem;
+}
+
+@media (max-width: 480px) {
+  .verify-email-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .verify-email-banner-actions {
+    justify-content: flex-end;
+  }
+}
+
 .site-header {
   background: var(--navy);
   padding: 0.85rem 1.5rem;
@@ -3362,6 +3433,7 @@ h1 .category-icon {
   .modal-overlay,
   .global-error-banner,
   .offline-banner,
+  .verify-email-banner,
   button {
     display: none !important;
   }
