@@ -430,6 +430,16 @@ function renderReview() {
   });
 
   document.getElementById('review-submit-btn').addEventListener('click', () => {
+    // Log survey_completed only the first time this session actually
+    // finishes -- reaching this button again via "Edit My Answers" (results
+    // screen) -> tweak an answer -> resubmit hits this same handler without
+    // ever passing back through the survey_started buttons, which was
+    // silently letting completions outnumber starts in Analytics.
+    // hasPersonalizedAnswers already means exactly "has this session
+    // finished the survey at least once" (false again after Start Over --
+    // see resetSurveyState -- so a genuine second full attempt still logs
+    // its own completion), so it doubles as that guard with no new state.
+    const isFirstCompletion = !state.hasPersonalizedAnswers;
     state.hasPersonalizedAnswers = true; // real answers now exist -- see ticker-tester.js
     // A fresh computation from these (possibly just-edited) answers --
     // any prior manual remove/repopulate edits belonged to the last
@@ -437,7 +447,7 @@ function renderReview() {
     state.manualPortfolioTickers = null;
     state.excludedHoldingTickers.clear();
     state.confirmingRemoveTicker = null;
-    logAnalyticsEvent('survey_completed'); // js/firebase-config.js
+    if (isFirstCompletion) logAnalyticsEvent('survey_completed'); // js/firebase-config.js
     state.view = 'results';
     render();
   });
