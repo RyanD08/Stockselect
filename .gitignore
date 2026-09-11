@@ -2,3 +2,30 @@
 scripts/cache/
 __pycache__/
 *.pyc
+
+# Raw/intermediate data-pipeline output. The live site only ever reads
+# data/financial_dataset_sp500.json and data/esg_dataset_sp500.json (see
+# js/data.js) -- everything else here is scratch input/output from the
+# scripts/ pipeline (raw source dumps, enrichment reports, pre-merge
+# backups, session notes) that was previously tracked in git and, because
+# this repo is what GitHub Pages deploys from, was publicly served at
+# every path under truenorthportfolios.com/data/. Kept locally so the
+# pipeline scripts still work; no longer committed. See README.md.
+data/additional_sources_raw.json
+data/backups/
+data/candidate_additional_criteria.json
+data/esg_enrichment_report.json
+data/governance_revenue_enrichment.json
+data/governance_revenue_remediation_notes.md
+data/import_schema_comparison.md
+data/incoming_candidate_additional_criteria.json
+data/incoming_company_schema.json
+data/incoming_sp500_dataset.json
+data/merge_conflict_log.json
+data/mining_session_notes.md
+data/sp500_full_dataset.json
+data/values_portfolio_dataset_full_market.json
+data/values_portfolio_dataset_full_market_debug.json
+data/values_portfolio_dataset_full_market_esg_enriched.json
+data/values_portfolio_dataset_sp500.json
+data/values_portfolio_dataset_v5_100.json
