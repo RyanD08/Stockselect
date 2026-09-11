@@ -108,7 +108,7 @@
           "name": "Where does the data come from?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Financial data (P/E, revenue growth, margins, ROE, market cap, beta, dividend policy, analyst consensus, recent returns) comes from SEC EDGAR filings and live Finnhub market data. Values/ESG data is sourced per-company from SEC EDGAR (10-K and DEF 14A filings), EPA ECHO, OSHA, FEC, and FTC records -- each field carries its own confidence rating and source citation rather than a single blended score."
+            "text": "Financial data (P/E, revenue growth, margins, ROE, market cap, beta, dividend policy, analyst consensus, recent returns) comes from SEC EDGAR filings and live Finnhub market data. Values/ESG data is sourced per-company from SEC EDGAR (10-K, DEF 14A, and 8-K filings), EPA ECHO, OSHA, NLRB, Fossil Free Funds, and Wikipedia -- each field carries its own confidence rating and source citation rather than a single blended score. See the Methodology link below for the full breakdown."
           }
         },
         {
@@ -179,7 +179,7 @@
     }
   </script>
 
-  <link rel="stylesheet" href="css/styles.css?v=20260829j" />
+  <link rel="stylesheet" href="css/styles.css?v=20260829k" />
 </head>
 <body>
   <a href="#app" class="skip-link">Skip to main content</a>
@@ -279,6 +279,7 @@
       </div>
       <p class="site-footer-links">
         <button type="button" id="faq-link" class="site-disclaimer-toggle">FAQ</button>
+        <button type="button" id="methodology-link" class="site-disclaimer-toggle">Methodology</button>
         <button type="button" id="privacy-policy-link" class="site-disclaimer-toggle">Privacy Policy</button>
         <a href="mailto:ryan.delp08@gmail.com" class="site-disclaimer-toggle">Contact</a>
       </p>
@@ -297,10 +298,10 @@
        bump the value whenever any js/*.js file changes, or a deploy can
        serve a stale script indefinitely to a visitor who already has it
        cached (no build step here to hash the filename automatically). -->
-  <script src="js/firebase-config.js?v=20260829j"></script>
-  <script src="js/auth.js?v=20260829j"></script>
-  <script src="js/learn.js?v=20260829j"></script>
-  <script src="js/badges.js?v=20260829j"></script>
+  <script src="js/firebase-config.js?v=20260829k"></script>
+  <script src="js/auth.js?v=20260829k"></script>
+  <script src="js/learn.js?v=20260829k"></script>
+  <script src="js/badges.js?v=20260829k"></script>
 
   <!-- Chart.js (radar chart on the Ticker Tester screen). `defer` is
        required, not cosmetic: a plain synchronous <script src> here would
@@ -312,12 +313,12 @@
        category list, no crash and no blank gap, if this never loads --
        see js/ticker-tester.js. -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
-  <script src="js/ticker-tester.js?v=20260829j"></script>
+  <script src="js/ticker-tester.js?v=20260829k"></script>
 
-  <script src="js/data.js?v=20260829j"></script>
-  <script src="js/questions.js?v=20260829j"></script>
-  <script src="js/scoring.js?v=20260829j"></script>
-  <script src="js/simulation.js?v=20260829j"></script>
-  <script src="js/app.js?v=20260829j"></script>
+  <script src="js/data.js?v=20260829k"></script>
+  <script src="js/questions.js?v=20260829k"></script>
+  <script src="js/scoring.js?v=20260829k"></script>
+  <script src="js/simulation.js?v=20260829k"></script>
+  <script src="js/app.js?v=20260829k"></script>
 </body>
 </html>

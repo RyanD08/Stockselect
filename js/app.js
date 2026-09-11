@@ -1793,7 +1793,7 @@ const FAQ_HTML = `
   <p>A free tool that builds an illustrative, personalized portfolio from your own environmental, social, governance, and financial priorities. Answer a short questionnaire and it screens a universe of S&amp;P 500 companies against what you told it you care about.</p>
 
   <h3>Where does the data come from?</h3>
-  <p>Financial data (P/E, revenue growth, margins, ROE, market cap, beta, dividend policy, analyst consensus, recent returns) comes from SEC EDGAR filings and live Finnhub market data. Values/ESG data is sourced per-company from SEC EDGAR (10-K and DEF 14A filings), EPA ECHO, OSHA, FEC, and FTC records -- each field carries its own confidence rating and source citation rather than a single blended score.</p>
+  <p>Financial data (P/E, revenue growth, margins, ROE, market cap, beta, dividend policy, analyst consensus, recent returns) comes from SEC EDGAR filings and live Finnhub market data. Values/ESG data is sourced per-company from SEC EDGAR (10-K, DEF 14A, and 8-K filings), EPA ECHO, OSHA, NLRB, Fossil Free Funds, and Wikipedia -- each field carries its own confidence rating and source citation rather than a single blended score. See the Methodology link below for the full breakdown.</p>
 
   <h3>How current is it?</h3>
   <p>Market data (price, market cap, and similar figures) is pulled from a live feed. The underlying company fundamentals and values/ESG data come from periodic SEC filings and public records, which are refreshed on an ongoing basis rather than continuously -- see "Read more" in the footer disclaimer for the full breakdown of what's live versus periodic.</p>
@@ -1902,6 +1902,135 @@ function initPrivacyPolicyLink() {
   const link = document.getElementById('privacy-policy-link');
   if (!link) return;
   link.addEventListener('click', openPrivacyModal);
+}
+
+// Detailed data-sourcing/scoring writeup, shown from its own footer link
+// (separate from the FAQ's short "Where does the data come from?" answer).
+// Every source link below points at the actual public tool/API TrueNorth's
+// offline data pipeline (scripts/) reads from -- verified live, not just
+// named -- so a reader can go check a claim directly rather than take it on
+// faith. Field-by-field detail mirrors js/scoring.js's own header comment
+// and ALIGNMENT_FNS; keep the two in sync if the scoring logic changes.
+const METHODOLOGY_HTML = `
+  <h3>1. What TrueNorth Does</h3>
+  <p>You answer a 29-question survey about environmental, social, governance, ethical, and financial-risk priorities. TrueNorth scores every eligible S&amp;P&nbsp;500 company against those specific answers and returns a diversified portfolio (up to 15 holdings, at most 5 per sector) of the best-fitting companies, each with a plain-language reason it was included. There is no single blended "ESG score" anywhere in this system -- every company attribute is stored, scored, and shown as its own field, with its own source and confidence rating.</p>
+
+  <h3>2. The Universe</h3>
+  <p>Candidates are drawn from the S&amp;P&nbsp;500 -- currently 502 companies for which both the financial dataset and the values/ESG dataset have a matching ticker (a company present in only one of the two is excluded rather than scored on half-missing data; see <code>js/data.js</code>). It's a large, consistently-documented universe where every underlying claim can be checked against a real public filing, rather than a smaller hand-picked list.</p>
+
+  <h3>3. Data Sources</h3>
+  <p>Two independently-built, independently-updatable datasets are merged by ticker at load time. Every source below is linked to the actual public tool or API the pipeline queries -- nothing here is a third-party aggregator or a paid ESG data vendor.</p>
+  <p><strong>Financial fundamentals and market data</strong></p>
+  <ul>
+    <li><a href="https://www.sec.gov/edgar/sec-api-documentation" target="_blank" rel="noopener noreferrer">SEC EDGAR company-facts API</a> (<code>data.sec.gov</code>) -- P/E, PEG, revenue growth, profit margin, ROE, free cash flow margin, and other figures extracted directly from companies' own XBRL-tagged filings.</li>
+    <li><a href="https://finnhub.io" target="_blank" rel="noopener noreferrer">Finnhub</a> -- live market data: price, market cap, beta, dividend yield, analyst consensus and price targets, recent returns.</li>
+  </ul>
+  <p><strong>Environmental</strong></p>
+  <ul>
+    <li><a href="https://fossilfreefunds.org/how-it-works" target="_blank" rel="noopener noreferrer">Fossil Free Funds</a>, a project of the nonprofit As You Sow -- a named-list fossil-fuel involvement screen, preferred over a keyword scan wherever available (covers 497 of 502 companies here; see the note in <code>js/scoring.js</code> on why the two methods can disagree).</li>
+    <li><a href="https://echo.epa.gov/" target="_blank" rel="noopener noreferrer">EPA ECHO</a> (Enforcement and Compliance History Online) -- real environmental-penalty enforcement data, not a self-reported figure.</li>
+    <li><a href="https://www.sec.gov/edgar/search/" target="_blank" rel="noopener noreferrer">SEC EDGAR full-text search</a> -- 10-K "Item 1 Business" keyword scans, used as a fallback for fossil-fuel involvement and as the only signal for clean-tech/renewable involvement and sustainable agriculture/resource use.</li>
+  </ul>
+  <p><strong>Social &amp; labor</strong></p>
+  <ul>
+    <li><a href="https://www.osha.gov/ords/imis/establishment.html" target="_blank" rel="noopener noreferrer">OSHA Establishment Search</a> -- matched inspection/establishment records, used conservatively (a matched row is not the same as a confirmed violation -- see Limitations below).</li>
+    <li><a href="https://www.nlrb.gov/search/case" target="_blank" rel="noopener noreferrer">NLRB case search</a> -- labor dispute and unfair-labor-practice case history.</li>
+    <li>SEC EDGAR 10-K text -- fair-wage/labor-practice language and workplace diversity, equity &amp; inclusion disclosures.</li>
+  </ul>
+  <p><strong>Governance</strong></p>
+  <ul>
+    <li>SEC EDGAR <strong>DEF&nbsp;14A</strong> proxy statements -- board independence, CEO pay ratio, and share-class/voting-structure data, extracted directly from each company's own proxy filing.</li>
+    <li>SEC EDGAR <strong>8-K Item&nbsp;1.05</strong> filings (the SEC's cybersecurity-incident disclosure requirement) -- data-privacy/security incident history, via the same <a href="https://www.sec.gov/edgar/sec-api-documentation" target="_blank" rel="noopener noreferrer">submissions API</a>.</li>
+    <li>SEC EDGAR 10-K "Item&nbsp;3 Legal Proceedings" -- fraud/corruption/scandal history.</li>
+  </ul>
+  <p><strong>Ethical / "sin stock" screens</strong> (tobacco, alcohol, gambling, weapons/defense, adult entertainment, interest-based financial products) and <strong>political donation transparency</strong> are read directly from each company's own SEC EDGAR filings.</p>
+  <p><strong>Company identity</strong> (founder-led, family-owned, women-led) is drawn from <a href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">Wikipedia</a> and SEC filings, matched by company name rather than inferred.</p>
+
+  <h3>4. How a Field Becomes a Score</h3>
+  <p>Every judgment-based field (environmental, social/labor, governance, political -- everything except the objective sin-stock booleans and identity fields) is stored as an object carrying its own <strong>value</strong>, <strong>source</strong>, <strong>confidence rating</strong> (High/Medium/Low/None), and last-updated date -- not a single number. Two rules follow directly from that:</p>
+  <ul>
+    <li><strong>No verifiable data found</strong> (confidence "None") always scores a neutral 0, for every company, on every question -- it never counts as a strike against a company, and a client's priority on an unanswerable question is excluded from that client's weighting entirely rather than silently diluting their real, answerable priorities.</li>
+    <li>A well-documented, <strong>High</strong>-confidence finding counts more than a <strong>Low</strong>-confidence or unverified one of the same nominal severity (confidence weights: High 1.0, Medium 0.7, Low 0.4, None 0).</li>
+  </ul>
+  <p>Each scored question is one of three types: <strong>exclusionary</strong> (rate how much you want to avoid a trait -- can only hurt a company's score, never help it), <strong>preference</strong> (rate how much you want to seek out a trait -- can only help, never hurt), or <strong>trade-off</strong> (a preference between two genuine opposites, like stability vs. growth, where either end can score positively).</p>
+
+  <h3>5. The Scoring Formula</h3>
+  <p>Every question contributes to one weighted average:</p>
+  <p><code>contribution = clientImportance &times; companyAlignment</code><br><code>score = 50 + 50 &times; (&Sigma;contribution &divide; &Sigma;clientImportance)</code>, clipped to 0-100</p>
+  <p>50 is the neutral starting point -- a score only moves up or down as far as the client's own stated priorities and the company's real, sourced attributes justify. A client's 1-5 rating is <em>squared</em> before being used as the importance weight, not used linearly: an earlier version of this formula let a client's genuine top priorities (4s and 5s) get diluted into an indistinguishable band by the ~25 other questions left at the neutral default of 3. Squaring the rating, combined with excluding genuinely-missing data from the weighting denominator entirely, was tested against all 502 companies and measurably fixed this -- see Section&nbsp;8.</p>
+
+  <h3>6. Financial Quality</h3>
+  <p>Financial quality is not a separate filter bolted on afterward -- it is one more criterion in the exact same weighted sum, built from 9 normalized sub-metrics (P/E, PEG, revenue growth, profit margin, ROE, free-cash-flow margin, analyst consensus, analyst price-target upside, and a time-horizon-selected return). Its importance weight comes directly from the client's own "willingness to accept lower returns for values alignment" answer, so it behaves like any other question rather than a fixed, unavoidable factor. The time-horizon-selected return is itself weighted differently depending on the client's derived risk profile: a Growth-oriented client is rewarded for return <em>and</em> volatility tolerance, a Conservative client is rewarded more for large-cap stability and dividend yield, and a Balanced client is rewarded for risk-adjusted return (return relative to beta).</p>
+
+  <h3>7. Risk &amp; Portfolio Preferences</h3>
+  <p>Three additional trade-off questions -- preference for stability over growth, a soft preference for larger "blue-chip" companies, and a preference for dividend-paying income stocks -- each contribute their own term to the same weighted sum. A hard version of the blue-chip preference (rating it 5/5) instead pre-filters the entire candidate pool down to mega-cap companies only, rather than just nudging the score. These use a different importance mapping than every other question (importance = rating &minus; 1) specifically so that a rating of 1 ("not important to me") produces literally zero effect in either direction, rather than a small, easy-to-miss penalty falling out of how a weighted average happens to divide.</p>
+
+  <h3>8. Correcting for Structural Bias</h3>
+  <p>A blended score across 25+ weighted criteria has a real failure mode: a company that simply isn't in any commonly-screened industry can end up with zero negative marks on every question it has data for, regardless of what a client says matters to them -- not because it's a strong values match, but because no exclusionary question can ever touch it. A simulation of 3,000 randomly generated client profiles against the full company universe confirmed this in practice: about 9% of companies were structurally immune to every exclusionary screen, and one of them (a major domestic automaker) appeared in 75% of all simulated portfolios regardless of stated priorities. A continuous ranking discount, sized to how few real negative findings a company has, corrects for this without touching eligibility -- a company still can't buy its way onto the values floor with a clean record alone. After the fix, no company appeared in more than half of simulated portfolios, and the fraction of the universe that could ever appear in a recommendation rose from roughly 50% to 66%.</p>
+
+  <h3>9. Reserved Theme Slots</h3>
+  <p>A blended-average score structurally can't let one or two questions dominate a ranking without breaking every other client's results -- simulation confirmed that even maximizing every clean-energy-related answer only moved the closest pure-play clean-energy company in this dataset to roughly the 66th-ranked company of 502. Rather than distort the scoring formula for every client, a client who rates "prioritizing renewable/clean tech" 4-5 out of 5 gets 1-2 of their 15 portfolio slots reserved for a small, manually-verified list of genuine clean-energy companies (currently one ticker) -- a narrow, explicit guarantee instead of a blended-average hope. This list is hand-checked against the fossil-fuel screen in Section&nbsp;3 and against each company's actual primary business, not generated automatically.</p>
+
+  <h3>10. Building the Portfolio</h3>
+  <p>Companies are ranked by match tier (Strong Match, then Partial Match), then score, then a tie-break counting how many distinct concern signals (fossil-fuel involvement, pollution penalties, labor disputes, fraud/scandal history, voting-structure concerns, or operations in countries of concern) are present at all, regardless of the client's own answers. Up to 15 companies are selected, with at most 5 from any one sector, filling from the highest-ranked qualifying candidates first. A company clears the "Strong Match" tier only if none of the client's own high-priority (4-5 rated) questions land on a strong conflict for that company; otherwise it's labeled "Partial Match" with the specific conflicting preference(s) named. If too few companies clear the minimum values-match floor to fill a full portfolio, remaining slots are filled from the next-best companies below that floor, each explicitly labeled as not meeting it -- a portfolio is never silently padded with unlabeled weak matches. All holdings in a finished portfolio are allocated equally.</p>
+
+  <h3>11. Financial Caution Flags</h3>
+  <p>Independent of values fit, a company can carry a visible caution flag for real financial red flags -- a Sell/Strong Sell analyst consensus, unprofitability paired with weak analyst confidence, negative returns across every available time horizon, or a severe single-year decline. A caution flag caps that company's tier at Partial Match and applies a flat ranking penalty, regardless of how well it otherwise matches the client's values -- so a values-aligned but financially troubled company is never presented without that context.</p>
+
+  <h3>12. Known Limitations</h3>
+  <ul>
+    <li><strong>Coverage is real but not complete.</strong> Some fields have no comprehensive public data source at S&amp;P&nbsp;500 scale for every company and will always show as unverified (confidence "None") rather than guessed at.</li>
+    <li><strong>NLRB case data is sparse in practice</strong> -- the case-search tool is inconsistently reachable from this pipeline's environment for most companies, so this field is neutral for the large majority of the universe and only real where a search actually succeeded.</li>
+    <li><strong>OSHA matches are conservative by design.</strong> A matched establishment record is not the same as a confirmed violation, per OSHA's own data caveats -- this field is scored to under-penalize rather than over-penalize on ambiguous matches.</li>
+    <li><strong>The curated clean-energy list is short and manually maintained</strong> (currently one ticker) because no per-company field in this dataset can reliably distinguish a genuine clean-energy business from one that merely mentions renewable energy in a filing. It will not update itself as S&amp;P&nbsp;500 membership changes.</li>
+    <li><strong>A "religious/faith-based investment compliance" question was removed entirely</strong> after a data-quality audit found 0% real coverage across the dataset -- no comprehensive public source exists for it at this scale, and a hardcoded-neutral answer for every company would have been actively misleading rather than genuinely uninformative.</li>
+    <li><strong>Market data is live; fundamentals and values/ESG data are periodic.</strong> Price-derived figures update from a live feed. Company fundamentals and values/ESG data are refreshed on an ongoing but not continuous basis, sourced from periodic filings (10-K, DEF&nbsp;14A, 8-K) and public records rather than a real-time feed.</li>
+    <li><strong>The historical simulation shown with results is hypothetical.</strong> It applies today's recommended portfolio to last year's actual price history -- it does not reflect a real investment, future performance, fees, or taxes, and this exact portfolio did not exist a year ago.</li>
+  </ul>
+
+  <h3>13. Not Investment Advice</h3>
+  <p>TrueNorth is an educational, illustrative tool built to make values-based investing screening transparent and checkable -- not licensed financial advice. Please consult a registered financial advisor before making any actual investment decisions.</p>
+`;
+
+function handleMethodologyModalKeydown(evt) {
+  if (evt.key === 'Escape') closeMethodologyModal();
+  trapModalTabFocus(evt, '#methodology-modal-overlay .modal-card');
+}
+
+// Same document.body-append modal pattern as FAQ/Privacy Policy above.
+function openMethodologyModal() {
+  if (document.getElementById('methodology-modal-overlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'methodology-modal-overlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="methodology-modal-title">
+      <div class="modal-header">
+        <h2 id="methodology-modal-title">Methodology</h2>
+        <button type="button" id="methodology-modal-close-btn" class="modal-close-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" tabindex="0">${METHODOLOGY_HTML}</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  focusModal('#methodology-modal-overlay .modal-card');
+  document.getElementById('methodology-modal-close-btn').addEventListener('click', closeMethodologyModal);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) closeMethodologyModal();
+  });
+  document.addEventListener('keydown', handleMethodologyModalKeydown);
+}
+
+function closeMethodologyModal() {
+  const overlay = document.getElementById('methodology-modal-overlay');
+  if (overlay) overlay.remove();
+  document.removeEventListener('keydown', handleMethodologyModalKeydown);
+}
+
+function initMethodologyLink() {
+  const link = document.getElementById('methodology-link');
+  if (!link) return;
+  link.addEventListener('click', openMethodologyModal);
 }
 
 // Same document.body-append pattern as the modals above -- survives any
@@ -2255,6 +2384,7 @@ async function init() {
   initSiteDisclaimerToggle();
   initPrivacyPolicyLink();
   initFaqLink();
+  initMethodologyLink();
   initSiteNavMenu();
   initDesktopNavBar();
   initSurveyKeyboardShortcuts();
