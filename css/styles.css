@@ -2218,6 +2218,28 @@ h1 .category-icon {
   line-height: 1.55;
 }
 
+.modal-body ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.modal-body li {
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.modal-body code {
+  background: var(--bg-alt, #f4f6fa);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin: 0.15rem 0;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
