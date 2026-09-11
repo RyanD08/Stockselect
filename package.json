@@ -1,0 +1,11 @@
+{
+  "name": "truenorth",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Values-guided investing tool -- survey-driven portfolio builder for the S&P 500.",
+  "homepage": "https://truenorthportfolios.com",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "node tests/run.js"
+  }
+}
