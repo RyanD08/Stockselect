@@ -15,8 +15,15 @@
  * ~500 companies, just applied to the one selected company. There is no
  * second scoring implementation here; a company scored "Strong Match" here
  * will always also be a Strong Match in a real portfolio built from the
- * same answers (mirrors buildPortfolio's own floor-check/tier-override/
- * blue-chip-filter logic exactly, see buildCompanyScoreEntry below).
+ * same answers (mirrors buildPortfolio's own floor-check/tier-override
+ * logic exactly, see buildCompanyScoreEntry below). isBlueChipEligible() is
+ * the one exception: buildPortfolio() uses it as a hard pre-filter that
+ * removes an ineligible company from the candidate pool entirely, but
+ * Ticker Tester deliberately does NOT withhold scoring for it -- this is a
+ * lookup tool, so any looked-up company always gets its full breakdown,
+ * with blue-chip ineligibility surfaced as an informational note instead
+ * (2026-09-12: this used to replace the whole result with a blocking
+ * "wouldn't appear in your portfolio" message and nothing else).
  *
  * Personalization source (see hasPersonalizationSource()): reuses
  * app.js's `state.answers` as-is, gated on `state.hasPersonalizedAnswers`
@@ -188,23 +195,33 @@ function tickerTesterCtx() {
   };
 }
 
-// Mirrors buildPortfolio()'s own per-company logic exactly (see
-// scoring.js): the hard blue-chip filter, the values-floor tier override,
-// and buildScoredEntry() itself. Kept as one small function here purely so
-// Ticker Tester's two call sites (top summary + breakdown) don't each
-// re-derive ctx/riskProfile separately -- not a second scoring pass.
+// Mirrors buildPortfolio()'s own per-company logic (see scoring.js): the
+// values-floor tier override and buildScoredEntry() itself. Kept as one
+// small function here purely so Ticker Tester's two call sites (top
+// summary + breakdown) don't each re-derive ctx/riskProfile separately --
+// not a second scoring pass.
+//
+// Deliberately does NOT short-circuit on the hard blue-chip filter the way
+// buildPortfolio() does. That filter exists to keep a real 15-slot
+// portfolio from ever including a company the client set as a hard
+// requirement to exclude -- a portfolio-construction rule, not a values-fit
+// judgment. Ticker Tester's job is different: show how ANY looked-up
+// company stacks up against the client's values, every time, no matter
+// what -- so blueChipExcluded is now just an informational flag the render
+// functions use to add a small note, never a reason to withhold the
+// breakdown itself (this used to replace the whole result with a "would
+// never appear in your portfolio" message and nothing else, which is the
+// opposite of what a lookup tool is for).
 function buildCompanyScoreEntry(company) {
   const ctx = tickerTesterCtx();
   const riskProfile = deriveRiskProfile(state.answers);
-  if (!isBlueChipEligible(company, state.answers)) {
-    return { blueChipExcluded: true, riskProfile };
-  }
   const entry = buildScoredEntry(company, state.answers, ctx, riskProfile);
+  const blueChipExcluded = !isBlueChipEligible(company, state.answers);
   if (!meetsValuesFloor(company, state.answers, ctx)) {
     entry.tier = 'Below Values Threshold';
     entry.note = BELOW_VALUES_THRESHOLD_NOTE;
   }
-  return { entry, riskProfile, ctx };
+  return { entry, riskProfile, ctx, blueChipExcluded };
 }
 
 function filterCompanies(query) {
@@ -483,23 +500,6 @@ function renderTickerResult(company) {
   }
 
   const scored = buildCompanyScoreEntry(company);
-
-  if (scored.blueChipExcluded) {
-    return `
-      <div class="ticker-result">
-        ${changeCompanyRow}
-        <div class="ticker-personalize-prompt">
-          <p>
-            You rated "large, established blue-chip companies" a 5/5 -- your hardest requirement. ${escapeHtml(company.name)}
-            (${escapeHtml(company.market_profile.market_cap_tier)} cap) doesn't meet that bar, so it would never
-            appear in your recommended portfolio regardless of how well it otherwise matches your values.
-          </p>
-        </div>
-        ${renderRawCompanyData(company)}
-      </div>
-    `;
-  }
-
   const { entry, ctx } = scored;
   const display = tickerTierDisplay(entry.tier);
   const categoryScores = computeCategoryScores(company, entry, ctx);
@@ -519,6 +519,7 @@ function renderTickerResult(company) {
         <p><span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span></p>
         <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
         ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
+        ${scored.blueChipExcluded ? `<p class="ticker-result-note muted">${blueChipExcludedNote(company)}</p>` : ''}
         ${
           entry.cautionFlags && entry.cautionFlags.length > 0
             ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`
@@ -529,6 +530,18 @@ function renderTickerResult(company) {
       ${renderCategorySection(company, categoryScores)}
     </div>
   `;
+}
+
+// Shared by the single-company view and both compare-column views -- the
+// values breakdown always renders in full now (see buildCompanyScoreEntry),
+// this is just the informational aside explaining why this company still
+// wouldn't make it into a real 15-slot portfolio for this client.
+function blueChipExcludedNote(company) {
+  return (
+    `Wouldn't appear in your recommended portfolio: you rated "large, established blue-chip companies" a 5/5, ` +
+    `your hardest requirement, and ${escapeHtml(company.name)} (${escapeHtml(company.market_profile.market_cap_tier)} cap) ` +
+    `doesn't meet that bar. The breakdown below still reflects how it fits your other priorities.`
+  );
 }
 
 // Ticker Tester's own badge labeling only -- the shared TIER_DISPLAY object
@@ -691,12 +704,14 @@ function wrapChartLabel(label, maxLineLength = 14) {
 
 // Runs after renderTickerTester() has already written the canvas into the
 // DOM (Chart.js needs a real <canvas> element to bind to). No-ops
-// (destroying any prior chart) whenever personalization isn't available or
-// the company is blue-chip-excluded, since renderTickerResult doesn't emit
-// a canvas in either of those cases. Degrades to the numeric list alone,
-// with no crash and no blank gap, if Chart.js itself never loaded (e.g.
-// CDN blocked) -- same graceful-degradation convention as every other
-// optional external SDK on this site (see firebase-config.js).
+// (destroying any prior chart) whenever personalization isn't available,
+// since renderTickerResult doesn't emit a canvas in that case -- a
+// blue-chip-excluded company still gets a full breakdown and chart now
+// (see buildCompanyScoreEntry), it's no longer a no-canvas case. Degrades
+// to the numeric list alone, with no crash and no blank gap, if Chart.js
+// itself never loaded (e.g. CDN blocked) -- same graceful-degradation
+// convention as every other optional external SDK on this site (see
+// firebase-config.js).
 function renderTickerRadarChartIfPresent(company) {
   const canvas = document.getElementById('ticker-radar-chart');
   if (!canvas) {
@@ -712,7 +727,6 @@ function renderTickerRadarChartIfPresent(company) {
   }
 
   const scored = buildCompanyScoreEntry(company);
-  if (!scored.entry) return; // blue-chip-excluded or otherwise no entry -- no chart to draw
   const categoryScores = computeCategoryScores(company, scored.entry, scored.ctx);
 
   destroyTickerRadarChart();
@@ -1019,7 +1033,6 @@ function renderCompareResults(companyA, companyB) {
 
   const scoredA = buildCompanyScoreEntry(companyA);
   const scoredB = buildCompanyScoreEntry(companyB);
-  const bothScored = !scoredA.blueChipExcluded && !scoredB.blueChipExcluded;
 
   return `
     <div class="ticker-compare-results">
@@ -1028,19 +1041,13 @@ function renderCompareResults(companyA, companyB) {
         ${renderCompareColumn(companyB, scoredB)}
       </div>
 
-      ${
-        bothScored
-          ? `
-        <div class="ticker-categories ticker-compare-chart-section">
-          <h3>Category Match Scores</h3>
-          <div class="ticker-radar-wrap ticker-compare-radar-wrap">
-            <canvas id="ticker-compare-radar-chart" role="img" aria-label="Radar chart comparing both companies' category match scores"></canvas>
-            <p id="ticker-compare-radar-unavailable" class="muted ticker-radar-unavailable" hidden>Chart unavailable — see the scores above.</p>
-          </div>
+      <div class="ticker-categories ticker-compare-chart-section">
+        <h3>Category Match Scores</h3>
+        <div class="ticker-radar-wrap ticker-compare-radar-wrap">
+          <canvas id="ticker-compare-radar-chart" role="img" aria-label="Radar chart comparing both companies' category match scores"></canvas>
+          <p id="ticker-compare-radar-unavailable" class="muted ticker-radar-unavailable" hidden>Chart unavailable — see the scores above.</p>
         </div>
-      `
-          : ''
-      }
+      </div>
 
       ${renderCompareVerdict(companyA, companyB, scoredA, scoredB)}
     </div>
@@ -1057,28 +1064,13 @@ function wireCompareResultActions() {
   }
 }
 
-// One company's half of the side-by-side comparison -- same three states
-// as the single-company view's own result (blue-chip-excluded / scored),
-// same tier badge, rationale, note, caution flags, and category list, just
-// without the search/change-company row (that's handled once by the
+// One company's half of the side-by-side comparison -- always the full
+// scored breakdown now (see buildCompanyScoreEntry), same as the single-
+// company view's own result: tier badge, rationale, note, an added note if
+// blue-chip-excluded, caution flags, and category list, just without the
+// search/change-company row (that's handled once by the
 // shared pickers above, not per column).
 function renderCompareColumn(company, scored) {
-  if (scored.blueChipExcluded) {
-    return `
-      <div class="ticker-compare-column">
-        <h2>${escapeHtml(company.name)} (${escapeHtml(company.ticker)})</h2>
-        <div class="ticker-personalize-prompt">
-          <p>
-            You rated "large, established blue-chip companies" a 5/5 -- your hardest requirement. ${escapeHtml(company.name)}
-            (${escapeHtml(company.market_profile.market_cap_tier)} cap) doesn't meet that bar, so it would never
-            appear in your recommended portfolio regardless of how well it otherwise matches your values.
-          </p>
-        </div>
-        ${renderRawCompanyData(company)}
-      </div>
-    `;
-  }
-
   const { entry, ctx } = scored;
   const display = tickerTierDisplay(entry.tier);
   const categoryScores = computeCategoryScores(company, entry, ctx);
@@ -1091,6 +1083,7 @@ function renderCompareColumn(company, scored) {
       <p><span class="tier-badge tier-${display.cssKey}">${display.badgeText}</span></p>
       <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
       ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
+      ${scored.blueChipExcluded ? `<p class="ticker-result-note muted">${blueChipExcludedNote(company)}</p>` : ''}
       ${
         entry.cautionFlags && entry.cautionFlags.length > 0
           ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`
@@ -1111,13 +1104,15 @@ function destroyTickerCompareRadarChart() {
 }
 
 // Same pattern as renderTickerRadarChartIfPresent (single-company view):
-// runs after the DOM already has the canvas, degrades to "chart
-// unavailable" if Chart.js never loaded, no-ops (destroying any prior
-// chart) if either company is blue-chip-excluded since renderCompareResults
-// doesn't emit a canvas in that case. The only real difference is two
-// overlaid datasets (gold for Company A, navy for Company B -- this site's
-// only two brand colors, same pairing the single chart already uses) with
-// a visible legend, since here the two shapes need to be told apart.
+// runs after the DOM already has the canvas (renderCompareResults always
+// emits one once personalization data exists -- see buildCompanyScoreEntry,
+// which no longer withholds scoring for a blue-chip-excluded company),
+// degrades to "chart unavailable" if Chart.js never loaded, no-ops
+// (destroying any prior chart) if the canvas genuinely isn't in the DOM for
+// some other reason. The only real difference from the single-company chart
+// is two overlaid datasets (gold for Company A, navy for Company B -- this
+// site's only two brand colors, same pairing the single chart already uses)
+// with a visible legend, since here the two shapes need to be told apart.
 function renderCompareRadarChartIfPresent(companyA, companyB) {
   const canvas = document.getElementById('ticker-compare-radar-chart');
   if (!canvas) {
@@ -1134,7 +1129,6 @@ function renderCompareRadarChartIfPresent(companyA, companyB) {
 
   const scoredA = buildCompanyScoreEntry(companyA);
   const scoredB = buildCompanyScoreEntry(companyB);
-  if (!scoredA.entry || !scoredB.entry) return;
 
   const categoryScoresA = computeCategoryScores(companyA, scoredA.entry, scoredA.ctx);
   const categoryScoresB = computeCategoryScores(companyB, scoredB.entry, scoredB.ctx);
@@ -1296,32 +1290,11 @@ function compareCategoryDominance(scoresA, scoresB) {
 // compareRiskTiebreak, and only once the values-fit scores are within
 // VALUES_TIE_THRESHOLD of each other.
 function renderCompareVerdict(companyA, companyB, scoredA, scoredB) {
-  if (scoredA.blueChipExcluded && scoredB.blueChipExcluded) {
-    return `
-      <div class="ticker-compare-verdict">
-        <p>
-          Neither company meets your hard requirement for large, established blue-chip companies (rated 5/5) --
-          neither would ever appear in your recommended portfolio, so there's no meaningful values-fit comparison
-          to make here.
-        </p>
-      </div>
-    `;
-  }
-  if (scoredA.blueChipExcluded || scoredB.blueChipExcluded) {
-    const excluded = scoredA.blueChipExcluded ? companyA : companyB;
-    const winner = scoredA.blueChipExcluded ? companyB : companyA;
-    return `
-      <div class="ticker-compare-verdict">
-        <p>
-          <strong>${escapeHtml(winner.name)} (${escapeHtml(winner.ticker)})</strong> is the better fit by default --
-          ${escapeHtml(excluded.name)} doesn't meet your hard requirement for large, established blue-chip
-          companies (rated 5/5), so it would never appear in your recommended portfolio regardless of how well it
-          otherwise matches your values.
-        </p>
-      </div>
-    `;
-  }
-
+  // Blue-chip exclusion (see buildCompanyScoreEntry) no longer short-
+  // circuits this verdict -- it's surfaced as a per-column note instead
+  // (renderCompareColumn), and the values-fit comparison below still runs
+  // and is still meaningful even for a company that wouldn't clear the
+  // client's hard portfolio-construction filter.
   const categoryScoresA = computeCategoryScores(companyA, scoredA.entry, scoredA.ctx);
   const categoryScoresB = computeCategoryScores(companyB, scoredB.entry, scoredB.ctx);
   const dominance = compareCategoryDominance(categoryScoresA, categoryScoresB);
