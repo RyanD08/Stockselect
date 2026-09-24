@@ -45,6 +45,7 @@ const VIEW_TITLES = {
   sharedResult: 'Shared Portfolio — TrueNorth',
   learn: 'Learn — TrueNorth',
   myBadges: 'My Badges — TrueNorth',
+  simulator: 'Simulator — TrueNorth',
 };
 
 // Keeps the browser tab title (and so also history/bookmarks) meaningful
@@ -83,6 +84,7 @@ function renderInPlace() {
   else if (state.view === 'learn') renderLearnHub(); // js/learn.js
   else if (state.view === 'learnLesson') renderLearnLesson(); // js/learn.js
   else if (state.view === 'myBadges') renderMyBadges(); // js/badges.js
+  else if (state.view === 'simulator') renderSimulator(); // js/simulator.js
 
   // Unconditional, regardless of which view just rendered: the ☆/★
   // watchlist toggle button (js/auth.js) can appear on several different
@@ -1772,11 +1774,11 @@ const PRIVACY_POLICY_HTML = `
   <h3>5. Analytics</h3>
   <p>We use Firebase Analytics (also a Google service) to understand overall usage -- things like which pages get visited and which features get used (e.g. that a survey was completed, or a company comparison was run). This is aggregate usage data, not tied to any specific action you take with your saved data.</p>
 
-  <h3>6. Staying Signed In</h3>
-  <p>TrueNorth uses your browser's local storage to keep you signed in between visits. We don't use third-party advertising cookies or trackers.</p>
+  <h3>6. Staying Signed In and Browser Storage</h3>
+  <p>TrueNorth uses your browser's local storage to keep you signed in between visits. The Simulator's practice portfolio (your virtual cash, holdings, and practice trades) is also kept in your browser's local storage on that device only -- it isn't sent to us. We don't use third-party advertising cookies or trackers.</p>
 
   <h3>7. Deleting Your Data</h3>
-  <p>The "Delete Account" option removes your saved portfolios, watchlist, Learn progress, badges, and account itself, immediately and permanently. As noted above, any results you previously shared publicly are not tied to your account and are not removed by this.</p>
+  <p>The "Delete Account" option removes your saved portfolios, watchlist, Learn progress, badges, and account itself, immediately and permanently, and clears your Simulator practice portfolio from the browser you delete from. As noted above, any results you previously shared publicly are not tied to your account and are not removed by this.</p>
 
   <h3>8. Children's Privacy</h3>
   <p>TrueNorth is not directed at children under 13, and we don't knowingly collect information from them.</p>
@@ -2262,6 +2264,17 @@ function navigateToWatchlist() {
   }, 'my_watchlist');
 }
 
+function navigateToSimulator() {
+  closeHamburgerDropdown();
+  if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
+    openSimulator(); // js/simulator.js
+    return;
+  }
+  redirectGatedNavItemToLogin(() => {
+    pendingSimulatorRedirect = true; // js/simulator.js
+  }, 'simulator');
+}
+
 function navigateToLearn() {
   closeHamburgerDropdown();
   if (typeof firebaseReady !== 'undefined' && firebaseReady && authState.user) {
@@ -2299,6 +2312,7 @@ function renderSiteNavMenu() {
     <button type="button" id="nav-menu-compare" class="hamburger-item" role="menuitem">Compare Two Companies</button>
     <button type="button" id="nav-menu-portfolios" class="hamburger-item" role="menuitem">My Portfolios</button>
     <button type="button" id="nav-menu-watchlist" class="hamburger-item" role="menuitem">My Watchlist</button>
+    <button type="button" id="nav-menu-simulator" class="hamburger-item" role="menuitem">Simulator</button>
     <button type="button" id="nav-menu-learn" class="hamburger-item" role="menuitem">Learn</button>
     <button type="button" id="nav-menu-my-badges" class="hamburger-item" role="menuitem">My Badges</button>
   `;
@@ -2307,6 +2321,7 @@ function renderSiteNavMenu() {
   document.getElementById('nav-menu-compare').addEventListener('click', navigateToCompare);
   document.getElementById('nav-menu-portfolios').addEventListener('click', navigateToPortfolios);
   document.getElementById('nav-menu-watchlist').addEventListener('click', navigateToWatchlist);
+  document.getElementById('nav-menu-simulator').addEventListener('click', navigateToSimulator);
   document.getElementById('nav-menu-learn').addEventListener('click', navigateToLearn);
   document.getElementById('nav-menu-my-badges').addEventListener('click', navigateToMyBadges);
 }
@@ -2351,6 +2366,7 @@ function initDesktopNavBar() {
   document.getElementById('nav-bar-compare').addEventListener('click', navigateToCompare);
   document.getElementById('nav-bar-portfolios').addEventListener('click', navigateToPortfolios);
   document.getElementById('nav-bar-watchlist').addEventListener('click', navigateToWatchlist);
+  document.getElementById('nav-bar-simulator').addEventListener('click', navigateToSimulator);
   document.getElementById('nav-bar-learn').addEventListener('click', navigateToLearn);
   document.getElementById('nav-bar-my-badges').addEventListener('click', navigateToMyBadges);
 }

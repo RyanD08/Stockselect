@@ -226,6 +226,9 @@ async function resetPassword(email) {
 // the ability to retry) still exists, rather than leaving a deleted
 // account with undeletable leftover data.
 const ALL_USER_SUBCOLLECTIONS = ['savedPortfolios', 'watchlist', 'meta', 'savedSurveys', 'savedSurvey', 'surveys', 'learnProgress', 'badges'];
+// The Simulator's practice-mode portfolio lives in this browser's
+// localStorage, not Firestore (see js/simulator.js), so it's cleared
+// separately below.
 
 async function deleteAccount(password) {
   if (!firebaseReady || !authState.user) throw new Error('You need to be logged in.');
@@ -246,6 +249,7 @@ async function deleteAccount(password) {
   );
 
   await user.delete();
+  simForgetUser(user.uid); // js/simulator.js
 }
 
 if (firebaseReady) {
@@ -310,6 +314,7 @@ if (firebaseReady) {
       badgeState.loaded = false;
       badgeState.earnedIds = new Set();
       badgeState.equippedId = null;
+      simResetForSignOut(); // js/simulator.js
     }
 
     if (user && pendingSaveAnswers) {
@@ -391,6 +396,13 @@ if (firebaseReady) {
       // Same, for the nav's "Learn" (js/learn.js).
       pendingLearnRedirect = false;
       openLearnHub(); // js/learn.js
+      return;
+    }
+
+    if (user && pendingSimulatorRedirect) {
+      // Same, for the nav's "Simulator" (js/simulator.js).
+      pendingSimulatorRedirect = false;
+      openSimulator(); // js/simulator.js
       return;
     }
 
@@ -966,7 +978,7 @@ function renderAccountWidget() {
     document.getElementById('account-delete-btn').addEventListener('click', openDeleteAccountModal);
     document.getElementById('account-logout-btn').addEventListener('click', async () => {
       await logOut();
-      if (state.view === 'account' || state.view === 'portfolios' || state.view === 'watchlist') {
+      if (state.view === 'account' || state.view === 'portfolios' || state.view === 'watchlist' || state.view === 'simulator') {
         state.view = 'intro';
         render();
       }
@@ -1340,6 +1352,7 @@ function renderAccount() {
     pendingWatchlistViewRedirect = false;
     pendingLearnRedirect = false; // js/learn.js
     pendingMyBadgesRedirect = false; // js/badges.js
+    pendingSimulatorRedirect = false; // js/simulator.js
     state.view = 'intro';
     render();
   });

@@ -3470,3 +3470,770 @@ h1 .category-icon {
     padding: 0;
   }
 }
+
+/* ==========================================================================
+   Simulator (js/simulator.js) -- paper trading. Built on the site's own
+   tokens; the two chart series colors are the one addition: lifted
+   navy/gold from the same families, because --navy reads near-black and
+   --gold is too faint on white for a 2px chart line.
+   ========================================================================== */
+.sim-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.1rem;
+}
+
+.sim-page .card {
+  padding: 1.4rem 1.5rem;
+  min-width: 0;
+}
+
+.sim-page h1 {
+  margin-bottom: 0.3rem;
+}
+
+.sim-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sim-card-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.sim-small {
+  font-size: 0.82rem;
+}
+
+.sim-up {
+  color: var(--success-text);
+}
+
+.sim-down {
+  color: var(--danger-text);
+}
+
+.sim-flat {
+  color: var(--muted);
+}
+
+.sim-intro {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem 1.5rem;
+}
+
+.sim-intro .lede {
+  margin: 0;
+}
+
+.sim-practice-note {
+  flex-basis: 100%;
+  margin: 0;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.88rem;
+}
+
+.sim-market-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.sim-market-open {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.sim-market-closed {
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+}
+
+.sim-market-clock {
+  font-weight: 500;
+}
+
+.sim-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* Summary row */
+.sim-page .sim-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  overflow: hidden;
+}
+
+.sim-stat {
+  padding: 1.1rem 1.2rem;
+  border-left: 1px solid var(--border);
+}
+
+.sim-stat:first-child {
+  border-left: none;
+}
+
+.sim-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.sim-stat-value {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--navy);
+  margin-top: 0.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-stat-value.sim-up {
+  color: var(--success-text);
+}
+
+.sim-stat-value.sim-down {
+  color: var(--danger-text);
+}
+
+.sim-stat-sub {
+  font-size: 0.8rem;
+  margin-top: 0.1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Performance chart */
+.sim-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  font-size: 0.82rem;
+}
+
+.sim-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sim-swatch {
+  width: 22px;
+  border-top: 2.5px solid;
+}
+
+.sim-swatch-you {
+  border-color: #2b4c85;
+}
+
+.sim-swatch-spy {
+  border-color: #a8791f;
+  border-top-style: dashed;
+}
+
+.sim-chart-wrap {
+  position: relative;
+}
+
+.sim-chart-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.sim-chart-note {
+  font-size: 0.88rem;
+  margin: 0.4rem 0 0;
+}
+
+.sim-tooltip {
+  position: absolute;
+  pointer-events: none;
+  min-width: 170px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 6px 20px rgba(15, 31, 61, 0.25);
+  z-index: 5;
+}
+
+.sim-tooltip-date {
+  color: var(--gold-light);
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.sim-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
+.sim-tooltip-diff {
+  color: var(--gold-light);
+  margin-top: 0.15rem;
+}
+
+.sim-table-view {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+}
+
+.sim-table-view summary {
+  color: var(--gold-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Trade + Values side by side */
+.sim-two-up {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.sim-two-up .ticker-search {
+  margin: 0 0 0.5rem;
+}
+
+.sim-quick-picks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sim-chip {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--navy);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sim-chip:hover {
+  border-color: var(--gold);
+}
+
+.sim-quote {
+  display: grid;
+  gap: 0.8rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 0.75rem;
+}
+
+.sim-quote-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.sim-quote-name {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--navy);
+}
+
+.sim-quote-price {
+  text-align: right;
+}
+
+.sim-quote-price-value {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-score {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-quote .sim-score {
+  margin-top: 0.35rem;
+}
+
+.sim-score-strong {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.sim-score-meets {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+}
+
+.sim-score-below {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.sim-order-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.8rem;
+}
+
+.sim-seg {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  background: var(--bg);
+}
+
+.sim-seg button {
+  border: none;
+  background: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.95rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.sim-seg button[aria-pressed='true'] {
+  background: #fff;
+  color: var(--navy);
+  box-shadow: 0 1px 3px rgba(15, 31, 61, 0.15);
+}
+
+.sim-seg-side button[aria-pressed='true'][data-sim-side='buy'] {
+  color: var(--success-text);
+}
+
+.sim-seg-side button[aria-pressed='true'][data-sim-side='sell'] {
+  color: var(--danger-text);
+}
+
+.sim-amount {
+  position: relative;
+}
+
+.sim-amount input {
+  width: 100%;
+  padding: 0.65rem 0.8rem 0.65rem 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-amount-shares input {
+  padding-left: 0.8rem;
+}
+
+.sim-amount input:focus {
+  outline: 2px solid var(--gold-light);
+  outline-offset: 1px;
+}
+
+.sim-amount-prefix {
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.sim-estimate {
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-error {
+  margin: 0;
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.88rem;
+}
+
+.sim-review,
+.sim-confirm {
+  display: grid;
+  gap: 0.55rem;
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+
+.sim-review {
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.sim-review p,
+.sim-confirm p {
+  margin: 0;
+}
+
+.sim-confirm {
+  width: 100%;
+  border: 1px solid #e7c3c1;
+  background: var(--danger-bg);
+}
+
+.sim-confirm p {
+  color: var(--danger-text);
+}
+
+.sim-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 0.35rem;
+  color: var(--gold-text);
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sim-btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.sim-btn-row .btn-secondary {
+  margin-right: 0;
+}
+
+.sim-btn-buy {
+  background: var(--success-text);
+  color: #fff;
+}
+
+.sim-btn-buy:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.sim-btn-reset {
+  background: #fff;
+  color: var(--danger-text);
+  border: 1px solid #e7c3c1;
+}
+
+.sim-btn-reset:hover {
+  background: var(--danger-bg);
+}
+
+/* Values Alignment */
+.sim-va-score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.sim-va-big {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--navy);
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-meter {
+  margin-top: 1rem;
+}
+
+.sim-meter-track {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--neutral-bg);
+}
+
+.sim-meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: #2b4c85;
+}
+
+.sim-meter-floor {
+  position: absolute;
+  top: -5px;
+  bottom: -5px;
+  width: 2px;
+  background: var(--navy);
+}
+
+.sim-meter-labels {
+  position: relative;
+  height: 1.9rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.sim-meter-labels span {
+  position: absolute;
+  top: 0.35rem;
+  white-space: nowrap;
+}
+
+.sim-va-list {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+}
+
+.sim-va-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.35rem;
+}
+
+.sim-prompt {
+  background: var(--warn-bg);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.sim-prompt p {
+  margin: 0 0 0.75rem;
+}
+
+/* Holdings + history tables */
+.sim-table-scroll {
+  overflow-x: auto;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-table th {
+  text-align: right;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sim-table td {
+  text-align: right;
+  padding: 0.65rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.sim-table th:first-child,
+.sim-table td:first-child {
+  text-align: left;
+}
+
+.sim-row {
+  cursor: pointer;
+}
+
+.sim-row:hover {
+  background: #faf8f3;
+}
+
+.sim-row-ticker {
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.sim-row-name {
+  display: block;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.sim-cash-row td {
+  color: var(--muted);
+}
+
+/* Recent trades */
+.sim-trades {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.88rem;
+}
+
+.sim-trades li {
+  display: grid;
+  grid-template-columns: 4.2rem 3.2rem 3.6rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+}
+
+.sim-trades li:first-child {
+  border-top: none;
+}
+
+.sim-trades li.sim-trades-empty {
+  display: block;
+}
+
+.sim-side {
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+}
+
+.sim-side-buy {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.sim-side-sell {
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.sim-reset-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+}
+
+.sim-reset-card > p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.sim-footnote {
+  text-align: center;
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.sim-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  z-index: 92;
+  max-width: calc(100% - 2rem);
+  background: var(--navy);
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.7rem 1.1rem;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 20px rgba(15, 31, 61, 0.35);
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  pointer-events: none;
+}
+
+.sim-toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (max-width: 760px) {
+  .sim-two-up {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sim-page .sim-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sim-stat:nth-child(3) {
+    border-left: none;
+  }
+
+  .sim-stat:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  .sim-page .card {
+    padding: 1.1rem;
+  }
+
+  .sim-trades li {
+    grid-template-columns: 3.4rem 3rem minmax(0, 1fr) auto;
+    row-gap: 0.15rem;
+  }
+
+  .sim-trade-detail {
+    grid-column: 2 / -1;
+    grid-row: 2;
+  }
+
+  .sim-trade-total {
+    grid-column: 4;
+    grid-row: 1;
+  }
+}
+
+@media print {
+  .sim-toast {
+    display: none;
+  }
+}
