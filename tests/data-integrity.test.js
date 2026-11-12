@@ -41,3 +41,17 @@ describe('Dataset integrity', () => {
     assert.equal(dupes.length, 0, `Duplicate tickers: ${dupes.join(', ')}`);
   });
 });
+
+describe('Sectors match official GICS sectors', () => {
+  const companies = loadCompanies();
+  const GICS = new Set(['Communication Services', 'Consumer Discretionary', 'Consumer Staples', 'Energy', 'Financials',
+    'Health Care', 'Industrials', 'Information Technology', 'Materials', 'Real Estate', 'Utilities']);
+  test('every company has one of the 11 GICS sectors', () => {
+    const bad = companies.filter((c) => !GICS.has(c.sector)).map((c) => `${c.ticker}:${c.sector}`);
+    assert.equal(bad.length, 0, bad.join(', '));
+  });
+  test('spot checks against known GICS sectors', () => {
+    const want = { KLAC: 'Information Technology', AMT: 'Real Estate', EQR: 'Real Estate', ABNB: 'Consumer Discretionary', ACN: 'Information Technology', BALL: 'Materials' };
+    for (const [t, s] of Object.entries(want)) assert.equal(companies.find((c) => c.ticker === t).sector, s, t);
+  });
+});

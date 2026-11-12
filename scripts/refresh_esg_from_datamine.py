@@ -10,12 +10,17 @@ and only for companies that exist in both files:
   - each field is copied as {value, confidence} only -- the same trimming the
     live file got on 2026-08-29 (source/source_url/notes/last_updated are
     never read by the site, so they aren't shipped);
-  - sector, hq_country, name, additional_data_sources, and anything else on
-    the live record are left alone;
+  - each company's sector is set to the incoming file's official GICS sector
+    (gics_sector), in BOTH live files so they stay identical -- the live
+    sectors originally came from an older pipeline and about a quarter were
+    wrong (e.g. REITs filed under Financials). Two live companies the
+    incoming file lacks get their sector from MANUAL_SECTORS below;
+  - hq_country, name, additional_data_sources, and anything else on the
+    live record are left alone;
   - dual-class duplicate tickers (FOX, GOOG, NWS) are skipped, and live
     tickers missing from the incoming file (AVB, EQR) keep their data, both
     exactly as the first import decided;
-  - data/financial_dataset_sp500.json is never touched.
+  - data/financial_dataset_sp500.json is only touched for `sector`.
 
 Every change is classified and printed: "filled" (no data -> real data),
 "changed" (real -> different real), "lost" (real -> no data), and
@@ -36,6 +41,13 @@ import json
 import sys
 
 LIVE_PATH = "data/esg_dataset_sp500.json"
+FINANCIAL_PATH = "data/financial_dataset_sp500.json"
+GICS_SECTORS = {
+    "Communication Services", "Consumer Discretionary", "Consumer Staples", "Energy", "Financials",
+    "Health Care", "Industrials", "Information Technology", "Materials", "Real Estate", "Utilities",
+}
+# Live companies the incoming file doesn't cover. Both are residential REITs.
+MANUAL_SECTORS = {"AVB": "Real Estate", "EQR": "Real Estate"}
 EXCLUDED_DUPLICATE_TICKERS = {"FOX", "GOOG", "NWS"}
 ESG_FIELD_KEYS = [
     "carbon_fossil_fuel_involvement", "renewable_clean_tech_involvement",
@@ -107,7 +119,23 @@ def main():
                 overwrites.append((company["ticker"], key, old, new))
             company[key] = new
 
+    with open(FINANCIAL_PATH) as f:
+        financial = json.load(f)
+    sector_changes = []
+    for dataset in (live, financial):
+        for company in dataset["companies"]:
+            source = incoming_by_ticker.get(company["ticker"])
+            sector = (source or {}).get("gics_sector") or MANUAL_SECTORS.get(company["ticker"])
+            if sector not in GICS_SECTORS or sector == company.get("sector"):
+                continue
+            if dataset is live:
+                sector_changes.append((company["ticker"], company.get("sector"), sector))
+            company["sector"] = sector
+
     live_tickers = {c["ticker"] for c in live["companies"]}
+    print(f"Sector corrections: {len(sector_changes)}")
+    for ticker, old, new in sector_changes[:15]:
+        print(f"  {ticker:6s} {old} -> {new}")
     print("Changes by field:")
     for key in ESG_FIELD_KEYS:
         if counts[key]:
@@ -133,7 +161,9 @@ def main():
     )
     with open(LIVE_PATH, "w") as f:
         json.dump(live, f, separators=(",", ":"))
-    print(f"\nWrote {LIVE_PATH}")
+    with open(FINANCIAL_PATH, "w") as f:
+        json.dump(financial, f, separators=(",", ":"))
+    print(f"\nWrote {LIVE_PATH} and {FINANCIAL_PATH}")
 
 
 if __name__ == "__main__":

@@ -67,8 +67,8 @@
  * Net question count: 30 -> 29 rated + the horizon selector.
  *
  * Every scored question (ids 1-25 are the values screens; ids 26, 28, 29
- * are risk/portfolio-construction preferences added directly to the same
- * sum, id 27 plays a dual role — see "Risk preferences" below) is either:
+ * are risk/portfolio-construction preferences scored in the financial part,
+ * id 27 sets the values/financial ratio -- see valuesWeight) is either:
  *
  *   - EXCLUSIONARY: the client is rating how much they want to *avoid* a
  *     trait. A company's alignment value a_i sits in [-1, 0] — 0 if the
@@ -102,18 +102,11 @@
  * Financial quality — valuation (P/E, PEG), growth, profitability (margin,
  * ROE, FCF margin), analyst sentiment, and a time-horizon-selected return
  * weighted by beta/market-cap/dividends per the client's derived Risk
- * Profile — is folded in as one more preference-type criterion in the exact
- * same weighted sum (see financialQualityAlignment), not a separate post-hoc
- * blend. Its importance weight comes from the client's "willingness to
- * accept lower returns for values alignment" answer, inverted, so it
- * behaves exactly like any other question: a client who rates it a
- * 5-equivalent priority gets the same proportional influence as a 5/5 on
- * any values question, no more.
- *
- * Risk preferences (stability, blue-chip, dividend-income, plus the
- * values-over-returns question's second role below) each have their own
- * direct term in the same weighted sum everything else uses, so they
- * always contribute proportionally to the visible score, on their own.
+ * Profile (see financialQualityAlignment) -- and the risk preferences
+ * (stability, blue-chip, dividend-income) together make up the financial
+ * part of the score, blended with the values part at an explicit ratio.
+ * See the 2026-11-12 note at the end of this comment; until then all of
+ * these sat in the same weighted sum as the values questions.
  *
  * These terms use a different importance mapping than every other question
  * in this file: importance = rating - 1 (so 1->0, 5->4), instead of the
@@ -126,14 +119,10 @@
  * can't push a company the "wrong" way — only trade-off-style, both-
  * directions questions have that risk.)
  *
- * The values-over-returns question plays two roles: it still sets
- * financialImportance (how much the financial-quality criterion counts
- * overall) exactly as before, AND it separately contributes its own
- * trade-off term rewarding companies with weaker financial-quality scores
- * — a real "prioritize values over financial strength" nudge, not just a
- * smaller shrug at financials. Its importance also uses the rating-1
- * mapping, so at a rating of 1 this second term is fully inert and never
- * penalizes a strong company for being strong.
+ * The values-over-returns question (Q27) sets the values/financial ratio
+ * (see valuesWeight). Before 2026-11-12 it instead set how much financial
+ * quality counted in the shared sum and added its own term rewarding
+ * weaker financials.
  *
  * The derived Risk Profile (Conservative/Balanced/Growth) still exists and
  * is still shown to the client (see deriveRiskProfile) — it just no longer
@@ -142,13 +131,31 @@
  * (see that function) since "what counts as a good return for a Growth
  * client" is a genuinely different question than "for a Conservative client.")
  *
- * contribution_i = clientImportance_i * a_i
- * score = 50 + 50 * (Σcontribution_i / ΣclientImportance_i), clipped to [0,100]
+ * 2026-11-12 (owner's choice): the ranking score is now an explicit
+ * values/financial split instead of one shared weighted sum. Previously
+ * financial quality, the risk preferences, and Q27's "reward weaker
+ * financials" nudge all competed inside the same sum as the 25 values
+ * questions, so how much they mattered depended on how many values
+ * questions a company happened to have data for. Now:
  *
- * 50 is the neutral starting point; the score moves up or down only as far
- * as the client's own stated priorities and the company's real attributes
- * justify. Strong Match always ranks above Partial Match; score only orders
- * within a tier.
+ *   valuesPart    = 50 + 50 * (Σ importance_i * a_i / Σ importance_i), values questions 1-25
+ *   financialPart = 50 + 50 * (Σ importance_j * a_j / Σ importance_j), financial quality + Q26/28/29
+ *   score = w * valuesPart + (1 - w) * financialPart - overrepPenalty, clipped to [0,100]
+ *
+ * w slides from 0.60 to 0.70 with Q27 ("willingness to accept lower returns
+ * for values alignment") -- see valuesWeight(). That question now does this
+ * one job; its old second role (a separate term rewarding weaker
+ * financials) is gone, since a higher values weight already expresses it.
+ *
+ * Also 2026-11-12: companies with real data on fewer than
+ * MIN_VALUES_DATA_QUESTIONS values questions are never recommended (see
+ * hasEnoughValuesData). Missing data scores neutral, so a company with
+ * almost none could never conflict with anything a client cared about and
+ * read as a Strong Match by default -- EQR and AVB, with data on 2 of 24
+ * questions, were in about 60% of simulated portfolios because of it.
+ *
+ * 50 is the neutral starting point for each part. Strong Match always ranks
+ * above Partial Match; score only orders within a tier.
  */
 
 const SCORED_QUESTION_IDS = Array.from({ length: 25 }, (_, i) => i + 1); // 1-25
@@ -163,6 +170,34 @@ const SCORED_QUESTION_IDS = Array.from({ length: 25 }, (_, i) => i + 1); // 1-25
 // change what counts as a genuine values match any more than a company's
 // P/E ratio should.
 const RISK_DIRECT_QUESTION_IDS = [26, 28, 29];
+
+// Explicit values/financial split (see header comment, 2026-11-12). Q27
+// rated 1 ("not willing to accept lower returns for values") gives 60/40;
+// rated 5 gives 70/30; the default 3 gives 65/35.
+const VALUES_WEIGHT_MIN = 0.6;
+const VALUES_WEIGHT_MAX = 0.7;
+function valuesWeight(answers) {
+  const rating = answers[27] || 3;
+  return VALUES_WEIGHT_MIN + ((VALUES_WEIGHT_MAX - VALUES_WEIGHT_MIN) * (rating - 1)) / 4;
+}
+
+// Fixed weight of overall financial quality inside the financial part,
+// on the same 0-4 scale the risk preferences use (rating - 1). 3 = as much
+// as a risk preference the client rated 4/5.
+const FINANCIAL_QUALITY_IMPORTANCE = 3;
+
+// Minimum number of values questions (out of the 24 that don't depend on
+// the client's own industry-tie answer) a company needs real data on to be
+// recommended. 10 keeps ExxonMobil (10, including its fossil-fuel screen)
+// and excludes EQR, AVB (2 each) and HONA (9). Owner-chosen 2026-11-12.
+const MIN_VALUES_DATA_QUESTIONS = 10;
+const DATA_COVERAGE_QUESTION_IDS = Array.from({ length: 25 }, (_, i) => i + 1).filter((id) => id !== 24);
+function valuesDataCount(company, ctx) {
+  return DATA_COVERAGE_QUESTION_IDS.filter((qid) => questionHasData(qid, company, ctx)).length;
+}
+function hasEnoughValuesData(company, ctx) {
+  return valuesDataCount(company, ctx) >= MIN_VALUES_DATA_QUESTIONS;
+}
 
 // One "scoring unit" per scored question id. (v2 had MERGED_QUESTION_GROUPS
 // here, folding Q1/Q3 and Q8/Q9 into one term each because both members of
@@ -191,16 +226,29 @@ function unitLabel(unit) {
 // 3.60 on a fixed neutral profile) -- confirming the flat linear average
 // was compressing nearly every company into an indistinguishable ~50-58
 // band, not the values-match floor (see MINIMUM_VALUES_MATCH below).
+//
+// Steepened to the 4th power 2026-11-12, for the same reason: with squaring,
+// a 5 counted only 2.8x a 3, so the ~18 questions a typical person leaves at
+// the default 3 together outweighed the 3-6 they actually rated 4-5, and
+// companies that look mildly good on everything won for nearly everyone.
+// At the 4th power a 5 counts 7.7x a 3. Simulated on 1,000 realistic
+// surveys: holdings fit people's 4-5 rated priorities ~11% better, the
+// number of companies ever recommended rose from 155 to ~250, and the
+// most-picked company fell from 72% of portfolios to under 50%.
+const IMPORTANCE_EXPONENT = 4;
+function questionImportance(rating) {
+  return Math.pow(rating || 3, IMPORTANCE_EXPONENT);
+}
 function unitImportance(unit, answers) {
-  const sum = unit.ids.reduce((total, id) => total + Math.pow(answers[id] || 3, 2), 0);
+  const sum = unit.ids.reduce((total, id) => total + questionImportance(answers[id]), 0);
   return sum / unit.ids.length;
 }
 
-// The RAW (unsquared) 1-5 rating -- used wherever code asks "did the
+// The RAW (un-powered) 1-5 rating -- used wherever code asks "did the
 // client actually rate this a high priority?" (classifyTier's conflict
 // detection, buildRationale's high-priority filter), as opposed to
-// unitImportance's squared value, which is only meant for the weighted-sum
-// math above. Squared importance's minimum possible value (9, at the
+// unitImportance's 4th-power value, which is only meant for the weighted-sum
+// math above. That value's minimum (81, at the
 // default rating of 3) already exceeds HIGH_PRIORITY_THRESHOLD (4), so
 // using it for these "is this really a 4-5 rating" checks would trigger
 // unconditionally -- every question would read as "high priority," and in
@@ -349,7 +397,11 @@ function themedReservedSlotCount(answers) {
 // (0 negatives: 2.6%, 1: 2.3%, 2: 3.8%, 3: 3.3%, 4+: 1.5%). Still does not
 // touch valuesFitScore/meetsValuesFloor -- eligibility (and the Aug-21
 // reachability fix) is untouched either way, only the ranking score is.
-const OVERREP_MAX_PENALTY = 12;
+// 2026-11-12: now subtracted from the values part (whose spread across
+// companies is only a few points) instead of the whole score, so 12 became
+// 2. Swept 0-6 in simulation: 2 spread picks slightly more than 0 with no
+// loss in how well holdings fit people's priorities.
+const OVERREP_MAX_PENALTY = 2;
 
 // Judgment-based ESG scores are dampened by how well-documented they are,
 // so a Low-confidence "safe" finding no longer counts the same as a
@@ -677,8 +729,8 @@ const RISK_ALIGNMENT_FNS = {
 };
 
 function scoreCompany(company, answers, ctx, riskProfile) {
-  let numerator = 0;
-  let denominator = 0;
+  let valuesNum = 0;
+  let valuesDen = 0;
   const alignments = {};
 
   SCORING_UNITS.forEach((unit) => {
@@ -686,36 +738,33 @@ function scoreCompany(company, answers, ctx, riskProfile) {
     const importance = hasData ? unitImportance(unit, answers) : 0;
     const alignment = unitAlignment(unit, company, ctx);
     unit.ids.forEach((id) => { alignments[id] = alignment; });
-    numerator += importance * alignment;
-    denominator += importance;
+    valuesNum += importance * alignment;
+    valuesDen += importance;
   });
 
-  // Financial quality as one more weighted criterion (see header comment).
-  // Importance driven by the values-over-returns question (id 27).
-  const financialImportance = 6 - (answers[27] || 3);
+  // Financial part: overall financial quality (rescaled from its 0-1
+  // reward-only range to -1..+1 so it can sit below the neutral 50 too)
+  // plus the stability/blue-chip/dividend preferences, each with the
+  // rating-1 mapping so a rating of 1 is a true no-op.
   const financialAlignment = financialQualityAlignment(company, riskProfile, ctx.timeHorizon);
-  numerator += financialImportance * financialAlignment;
-  denominator += financialImportance;
-
-  // Risk/portfolio-construction trade-off terms (stability, blue-chip,
-  // dividend-income) — rating-1 importance mapping so a rating of 1 is a
-  // true no-op (see header comment).
+  let financialNum = FINANCIAL_QUALITY_IMPORTANCE * (2 * financialAlignment - 1);
+  let financialDen = FINANCIAL_QUALITY_IMPORTANCE;
   RISK_DIRECT_QUESTION_IDS.forEach((qId) => {
     const importance = Math.max(0, (answers[qId] || 3) - 1);
     const alignment = RISK_ALIGNMENT_FNS[qId](company);
     alignments[qId] = alignment;
-    numerator += importance * alignment;
-    denominator += importance;
+    financialNum += importance * alignment;
+    financialDen += importance;
   });
 
-  // The values-over-returns question's second role: reward weaker
-  // financial-quality companies (a real "prioritize values over financial
-  // strength" nudge), same rating-1 mapping so it never penalizes a strong
-  // company when that rating is 1.
-  const valuesOverReturnsImportance = Math.max(0, (answers[27] || 3) - 1);
-  const valuesOverReturnsAlignment = 1 - 2 * financialAlignment;
-  numerator += valuesOverReturnsImportance * valuesOverReturnsAlignment;
-  denominator += valuesOverReturnsImportance;
+  const valuesPart = valuesDen > 0 ? 50 + 50 * (valuesNum / valuesDen) : 50;
+  const financialPart = 50 + 50 * (financialNum / financialDen);
+  const w = valuesWeight(answers);
+
+  // Only used by buildRationale, to decide whether "strong financial
+  // fundamentals" is worth naming as a reason: high when the client was
+  // unwilling to trade returns for values.
+  const financialImportance = 6 - (answers[27] || 3);
 
   // Over-representation dampener (see OVERREP_MAX_PENALTY above): count how
   // many values questions a company has real data on AND scores negatively.
@@ -732,21 +781,25 @@ function scoreCompany(company, answers, ctx, riskProfile) {
   });
   const overrepPenalty = OVERREP_MAX_PENALTY / (1 + negativeCount);
 
-  const raw = (denominator > 0 ? 50 + 50 * (numerator / denominator) : 50) - overrepPenalty;
+  // Standalone score for a single company with no pool to compare against
+  // (Ticker Tester). Portfolio ranking replaces this with the scale-matched
+  // blend in applyBlendedRankScores.
+  const raw = w * (valuesPart - overrepPenalty) + (1 - w) * financialPart;
   const score = Math.round(Math.min(100, Math.max(0, raw)));
   return {
     score,
     alignments,
     financialImportance,
     financialAlignment,
-    valuesOverReturnsImportance,
-    valuesOverReturnsAlignment,
+    valuesPart,
+    financialPart,
+    overrepPenalty,
   };
 }
 
 // Values-only score -- the confidence-weighted formula over
-// SCORED_QUESTION_IDS alone, before financial quality is folded into the
-// same weighted sum. Deliberately excludes financial quality AND the
+// SCORED_QUESTION_IDS alone, before it is blended with the financial
+// sub-score. Deliberately excludes financial quality AND the
 // risk/portfolio-construction trade-off terms so a company can't buy its
 // way past a genuine values mismatch with good financials or a risk-
 // profile match -- this is what the minimum values match floor
@@ -1060,6 +1113,10 @@ function financialQualityAlignment(company, riskProfile, timeHorizon) {
 // naming the specific concern(s) so a client can tell a low ranking is
 // about financial health, values misalignment, or both.
 const CAUTION_PENALTY = 15;
+// The same penalty for portfolio ranking, where scores are in standard
+// deviations of the pool (see applyBlendedRankScores) rather than points.
+// 3 SD is about what 15 points was against the old score's spread.
+const CAUTION_PENALTY_SD = 3;
 
 function detectCautionFlags(company) {
   const fm = company.financial_metrics;
@@ -1096,7 +1153,8 @@ const BELOW_VALUES_THRESHOLD_NOTE =
   'Shown only to fill out your 15-company portfolio because not enough companies met that bar within your other preferences.';
 
 function buildScoredEntry(company, answers, ctx, riskProfile) {
-  const { score, alignments, financialImportance, financialAlignment } = scoreCompany(company, answers, ctx, riskProfile);
+  const parts = scoreCompany(company, answers, ctx, riskProfile);
+  const { score, alignments, financialImportance, financialAlignment } = parts;
   const { tier: valuesFitTier, conflicts } = classifyTier(alignments, answers);
   const cautionFlags = detectCautionFlags(company);
   // Tier cap: a caution flag overrides an otherwise-Strong values match —
@@ -1110,6 +1168,8 @@ function buildScoredEntry(company, answers, ctx, riskProfile) {
   return {
     company,
     score: penalizedScore,
+    valuesPart: parts.valuesPart - parts.overrepPenalty,
+    financialPart: parts.financialPart,
     alignments,
     tier,
     conflicts,
@@ -1156,6 +1216,41 @@ function fillFromCandidates(candidates, selected, sectorCounts) {
 // remove/repopulate controls (js/app.js) can find the next-best qualified
 // replacement using this exact same ranking, rather than a second,
 // possibly-diverging notion of "next best."
+// Values vs. financial split, by influence (2026-11-12). Across companies
+// the values part barely moves (most of the 24 questions don't apply to a
+// given company, so it typically spans a few points) while the financial
+// part spans tens of points. Blending the raw parts 65/35 therefore let
+// financials decide most of the ranking -- the reverse of the intent. So
+// within each survey both parts are first put on the same scale (standard
+// deviations from the pool's average), then blended with valuesWeight():
+// "65% values" now means values decide 65% of the ordering.
+//
+// The financial side is also capped at FINANCIAL_Z_CAP standard deviations
+// either way, so an exceptional financial score can help a company but
+// can't carry it past better values matches on its own. Without the cap,
+// Amgen (financials ~3 SD above average) landed in 79-91% of simulated
+// portfolios; with it, holdings also fit people's top priorities better.
+// entry.score becomes 50 + 10 x that blend (0-100, ranking only -- never
+// shown to visitors).
+const FINANCIAL_Z_CAP = 0.75;
+function applyBlendedRankScores(entries, answers) {
+  if (entries.length === 0) return;
+  const stats = (key) => {
+    const mean = entries.reduce((s, e) => s + e[key], 0) / entries.length;
+    const sd = Math.sqrt(entries.reduce((s, e) => s + (e[key] - mean) ** 2, 0) / entries.length) || 1;
+    return { mean, sd };
+  };
+  const v = stats('valuesPart');
+  const f = stats('financialPart');
+  const w = valuesWeight(answers);
+  for (const e of entries) {
+    const financialZ = Math.max(-FINANCIAL_Z_CAP, Math.min(FINANCIAL_Z_CAP, (e.financialPart - f.mean) / f.sd));
+    let blend = (w * (e.valuesPart - v.mean)) / v.sd + (1 - w) * financialZ;
+    if (e.cautionFlags.length > 0) blend -= CAUTION_PENALTY_SD;
+    e.score = Math.round(Math.min(100, Math.max(0, 50 + 10 * blend)) * 10) / 10;
+  }
+}
+
 function buildScoredCandidatePool(dataset, answers, clientContext) {
   const ctx = {
     homeCountry: (clientContext && clientContext.homeCountry) || 'United States',
@@ -1169,17 +1264,23 @@ function buildScoredCandidatePool(dataset, answers, clientContext) {
   // backfilled/relaxed, since "only suggest blue-chip" should mean
   // literally that. Ratings 1-4 don't filter anything: they're a soft,
   // graded preference instead (see blueChipDirectAlignment above).
-  const blueChipEligible = dataset.companies.filter((company) => isBlueChipEligible(company, answers));
-
-  const meetsFloor = (c) => meetsValuesFloor(c, answers, ctx);
-  const primaryCandidates = sortScoredEntries(
-    blueChipEligible.filter(meetsFloor).map((c) => buildScoredEntry(c, answers, ctx, riskProfile))
+  // Thin-data companies (see hasEnoughValuesData) are left out here, the
+  // same way and for the same reason as the blue-chip filter: never
+  // recommended or backfilled, but still viewable in Ticker Tester.
+  const blueChipEligible = dataset.companies.filter(
+    (company) => isBlueChipEligible(company, answers) && hasEnoughValuesData(company, ctx)
   );
+
+  const scored = blueChipEligible.map((c) => ({
+    entry: buildScoredEntry(c, answers, ctx, riskProfile),
+    meetsFloor: meetsValuesFloor(c, answers, ctx),
+  }));
+  applyBlendedRankScores(scored.map((s) => s.entry), answers);
+  const primaryCandidates = sortScoredEntries(scored.filter((s) => s.meetsFloor).map((s) => s.entry));
   const backfillCandidates = sortScoredEntries(
-    blueChipEligible
-      .filter((c) => !meetsFloor(c))
-      .map((c) => {
-        const entry = buildScoredEntry(c, answers, ctx, riskProfile);
+    scored
+      .filter((s) => !s.meetsFloor)
+      .map(({ entry }) => {
         entry.tier = 'Below Values Threshold';
         entry.note = BELOW_VALUES_THRESHOLD_NOTE;
         return entry;

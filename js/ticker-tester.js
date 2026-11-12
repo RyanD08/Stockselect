@@ -221,7 +221,8 @@ function buildCompanyScoreEntry(company) {
     entry.tier = 'Below Values Threshold';
     entry.note = BELOW_VALUES_THRESHOLD_NOTE;
   }
-  return { entry, riskProfile, ctx, blueChipExcluded };
+  const thinData = !hasEnoughValuesData(company, ctx); // js/scoring.js
+  return { entry, riskProfile, ctx, blueChipExcluded, thinData };
 }
 
 function filterCompanies(query) {
@@ -520,6 +521,7 @@ function renderTickerResult(company) {
         <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
         ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
         ${scored.blueChipExcluded ? `<p class="ticker-result-note muted">${blueChipExcludedNote(company)}</p>` : ''}
+        ${scored.thinData ? `<p class="ticker-result-note muted">${thinDataNote(company, scored.ctx)}</p>` : ''}
         ${
           entry.cautionFlags && entry.cautionFlags.length > 0
             ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`
@@ -536,6 +538,16 @@ function renderTickerResult(company) {
 // values breakdown always renders in full now (see buildCompanyScoreEntry),
 // this is just the informational aside explaining why this company still
 // wouldn't make it into a real 15-slot portfolio for this client.
+// Same idea as blueChipExcludedNote, for a company TrueNorth has too
+// little values data on to recommend (see hasEnoughValuesData).
+function thinDataNote(company, ctx) {
+  return (
+    `Not recommended in portfolios: TrueNorth has values data on only ${valuesDataCount(company, ctx)} of 24 questions for ` +
+    `${escapeHtml(company.name)}, so missing information would make it look like a better match than it may be. ` +
+    `The breakdown below uses what data there is.`
+  );
+}
+
 function blueChipExcludedNote(company) {
   return (
     `Wouldn't appear in your recommended portfolio: you rated "large, established blue-chip companies" a 5/5, ` +
@@ -563,7 +575,7 @@ function tickerTierDisplay(tier) {
 // violation-penalty model -- all reverted/replaced by explicit request in
 // favor of just reusing the main engine's own math):
 //   - Questions 1-25 (SCORED_QUESTION_IDS): importance = the client's 1-5
-//     rating SQUARED, exactly like unitImportance() -- and, like
+//     rating to the 4th power, exactly like unitImportance() -- and, like
 //     scoreCompany(), a question this company has no verifiable data on
 //     (questionHasData) contributes zero importance rather than being
 //     treated as a false "neutral," so it can't be counted at all, in
@@ -571,13 +583,11 @@ function tickerTierDisplay(tier) {
 //   - Questions 26/28/29 (RISK_DIRECT_QUESTION_IDS): importance =
 //     rating - 1 (so a rating of 1 is a true no-op, never a data-gate),
 //     same as scoreCompany's own RISK_DIRECT_QUESTION_IDS loop.
-//   - Question 27 (values-over-returns): only its second role in
-//     scoreCompany (the direct "reward weaker financial quality"
-//     alignment, importance = rating - 1) applies here -- its first role
-//     (financialImportance/financialAlignment, weighting overall
-//     financial quality as its own criterion) isn't tied to any of the 7
-//     categories a client sees, so it's excluded from every category
-//     subtotal the same way it always has been in this file.
+//   - Question 27 (values-over-returns): sets the values/financial ratio
+//     in scoreCompany rather than scoring anything itself, so its slot in
+//     the Risk Philosophy category carries overall financial quality
+//     instead, with FINANCIAL_QUALITY_IMPORTANCE -- making that category
+//     the same terms scoreCompany's financial part uses.
 //   - raw = denominator > 0 ? 50 + 50*(numerator/denominator) : 50,
 //     clamped to [0,100] -- identical to scoreCompany's own formula --
 //     then divided by 10 for this file's existing 1-10 display scale.
@@ -596,11 +606,13 @@ function computeCategoryScores(company, entry, ctx) {
     let denominator = 0;
 
     questions.forEach((q) => {
+      // Q27 sets the values/financial ratio rather than scoring anything
+      // itself (see valuesWeight in scoring.js), so in this category its
+      // slot shows overall financial quality -- the same term, with the
+      // same weight, scoreCompany() puts in the financial part.
       if (q.id === 27) {
-        const importance = Math.max(0, (state.answers[27] || 3) - 1);
-        const alignment = 1 - 2 * financialAlignment;
-        numerator += importance * alignment;
-        denominator += importance;
+        numerator += FINANCIAL_QUALITY_IMPORTANCE * (2 * financialAlignment - 1);
+        denominator += FINANCIAL_QUALITY_IMPORTANCE;
         return;
       }
       if (RISK_DIRECT_QUESTION_IDS.includes(q.id)) {
@@ -610,7 +622,7 @@ function computeCategoryScores(company, entry, ctx) {
         return;
       }
       if (!questionHasData(q.id, company, ctx)) return;
-      const importance = Math.pow(state.answers[q.id] || 3, 2);
+      const importance = questionImportance(state.answers[q.id]); // js/scoring.js
       numerator += importance * entry.alignments[q.id];
       denominator += importance;
     });
@@ -1084,6 +1096,7 @@ function renderCompareColumn(company, scored) {
       <p class="ticker-result-rationale">${escapeHtml(entry.rationale)}</p>
       ${showNote ? `<p class="ticker-result-note muted">${escapeHtml(entry.note)}</p>` : ''}
       ${scored.blueChipExcluded ? `<p class="ticker-result-note muted">${blueChipExcludedNote(company)}</p>` : ''}
+        ${scored.thinData ? `<p class="ticker-result-note muted">${thinDataNote(company, scored.ctx)}</p>` : ''}
       ${
         entry.cautionFlags && entry.cautionFlags.length > 0
           ? `<p class="caution-note">⚠ Financial caution: ${entry.cautionFlags.map(escapeHtml).join('; ')}</p>`

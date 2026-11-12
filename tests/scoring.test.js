@@ -110,3 +110,36 @@ describe('renderResults() actually uses the shared fill logic (regression guard)
     );
   });
 });
+
+describe('Values/financial split and minimum-data rule (2026-11-12)', () => {
+  const ctxRule = freshCtx();
+  const client = DEFAULT_CLIENT_CONTEXT;
+
+  test('the values weight runs 60% (Q27=1) to 70% (Q27=5), 65% by default', () => {
+    assert.equal(ctxRule.valuesWeight(defaultAnswers({ 27: 1 })), 0.6);
+    assert.equal(Math.round(ctxRule.valuesWeight(defaultAnswers()) * 100), 65);
+    assert.equal(Math.round(ctxRule.valuesWeight(defaultAnswers({ 27: 5 })) * 100), 70);
+  });
+
+  test('companies with values data on fewer than 10 of 24 questions are never recommended', () => {
+    const thin = companies.filter((c) => !ctxRule.hasEnoughValuesData(c, client)).map((c) => c.ticker);
+    assert(thin.length > 0 && thin.length < 10, `unexpected thin-data count: ${thin.join(', ')}`);
+    for (const answers of [defaultAnswers(), defaultAnswers({ 1: 5, 2: 5 }), defaultAnswers({ 28: 1, 26: 1 })]) {
+      const { pool } = ctxRule.buildScoredCandidatePool({ companies }, answers, client);
+      const leaked = pool.filter((e) => thin.includes(e.company.ticker));
+      assert.equal(leaked.length, 0, `thin-data company in candidate pool: ${leaked.map((e) => e.company.ticker)}`);
+    }
+  });
+
+  test('ExxonMobil stays eligible: its 10 covered questions include the fossil-fuel screen', () => {
+    assert(ctxRule.hasEnoughValuesData(companies.find((c) => c.ticker === 'XOM'), client));
+  });
+
+  test('a stronger values score always wins when the financial part is equal', () => {
+    const answers = defaultAnswers({ 1: 5 });
+    const xom = companies.find((c) => c.ticker === 'XOM');
+    const s = ctxRule.scoreCompany(xom, answers, client, ctxRule.deriveRiskProfile(answers));
+    assert(s.valuesPart < 50, `XOM should score below neutral on values for a fossil-fuel avoider, got ${s.valuesPart}`);
+    assert(s.financialPart >= 0 && s.financialPart <= 100, `financial part out of range: ${s.financialPart}`);
+  });
+});
