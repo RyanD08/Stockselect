@@ -1936,7 +1936,7 @@ const METHODOLOGY_HTML = `
   </ul>
   <p><strong>Social &amp; labor</strong></p>
   <ul>
-    <li><a href="https://www.osha.gov/ords/imis/establishment.html" target="_blank" rel="noopener noreferrer">OSHA Establishment Search</a> -- matched inspection/establishment records, used conservatively (a matched row is not the same as a confirmed violation -- see Limitations below).</li>
+    <li><a href="https://www.osha.gov/ords/imis/establishment.html" target="_blank" rel="noopener noreferrer">OSHA Establishment Search</a> -- collected for worker safety, but currently <strong>not used in scoring</strong>: the collected counts turned out to be unusable (see Limitations below).</li>
     <li><a href="https://www.nlrb.gov/search/case" target="_blank" rel="noopener noreferrer">NLRB case search</a> -- labor dispute and unfair-labor-practice case history.</li>
     <li>SEC EDGAR 10-K text -- fair-wage/labor-practice language and workplace diversity, equity &amp; inclusion disclosures.</li>
   </ul>
@@ -1946,7 +1946,15 @@ const METHODOLOGY_HTML = `
     <li>SEC EDGAR <strong>8-K Item&nbsp;1.05</strong> filings (the SEC's cybersecurity-incident disclosure requirement) -- data-privacy/security incident history, via the same <a href="https://www.sec.gov/edgar/sec-api-documentation" target="_blank" rel="noopener noreferrer">submissions API</a>.</li>
     <li>SEC EDGAR 10-K "Item&nbsp;3 Legal Proceedings" -- fraud/corruption/scandal history.</li>
   </ul>
-  <p><strong>Ethical / "sin stock" screens</strong> (tobacco, alcohol, gambling, weapons/defense, adult entertainment, interest-based financial products) and <strong>political donation transparency</strong> are read directly from each company's own SEC EDGAR filings.</p>
+  <p><strong>Industry screens</strong> (tobacco, alcohol, gambling, weapons/defense, interest-based financial products) use each company's official GICS sub-industry from the <a href="https://en.wikipedia.org/wiki/List_of_S%26P_500_companies" target="_blank" rel="noopener noreferrer">S&amp;P&nbsp;500 constituent list</a>, alongside its SEC industry code. The SEC code alone missed most of these industries. It files casino operators under "hotels" and most defense contractors under "aircraft," so until November 2026 companies like Las Vegas Sands and Northrop Grumman were not flagged.</p>
+  <ul>
+    <li><strong>Alcohol</strong> counts producers only (brewers, distillers, and winemakers), not companies with alcohol partnerships or distribution deals.</li>
+    <li><strong>Weapons/defense</strong> flags a company if it appears on the <a href="https://www.sipri.org/databases/armsindustry" target="_blank" rel="noopener noreferrer">SIPRI Top 100 arms-producing companies</a> list (2024 edition), or if weapons is its primary business. This includes some companies whose arms sales are large in dollars but a small share of revenue, such as Eaton and GE Aerospace.</li>
+    <li><strong>Interest-based financial products</strong> covers lenders and brokers: banks, consumer-finance companies, and investment banks and brokerages. Insurers, payment networks, and asset managers are not flagged.</li>
+    <li><strong>Adult entertainment</strong> is screened the same way, though no S&amp;P&nbsp;500 company is currently in that business.</li>
+  </ul>
+  <p><strong>Political donation transparency</strong> is read from Federal Election Commission records of each company's own political action committee.</p>
+  <p><strong>Headquarters country</strong> is where a company is actually run from. The constituent list is the default. For companies it places outside the US, the company's own annual report decides. Medtronic, for example, is legally based in Ireland but its own report says its main operational offices are in Minneapolis, so it counts as US. Accenture and Chubb are run from Dublin and Zurich, so they don't.</p>
   <p><strong>Company identity</strong> (founder-led, family-owned, women-led) is drawn from <a href="https://www.wikipedia.org/" target="_blank" rel="noopener noreferrer">Wikipedia</a> and SEC filings, matched by company name rather than inferred.</p>
   <p><strong>Sectors</strong> are the official GICS (Global Industry Classification Standard) sectors from the <a href="https://en.wikipedia.org/wiki/List_of_S%26P_500_companies" target="_blank" rel="noopener noreferrer">S&amp;P&nbsp;500 constituent list</a>. They decide the 5-per-sector diversification limit, so they matter: an older pipeline had filed about a quarter of companies under the wrong sector (for example, real-estate trusts under Financials). All 135 of those were corrected in November 2026.</p>
 
@@ -1956,7 +1964,7 @@ const METHODOLOGY_HTML = `
     <li><strong>No verifiable data found</strong> (confidence "None") always scores a neutral 0, for every company, on every question -- it never counts as a strike against a company, and a client's priority on an unanswerable question is excluded from that client's weighting entirely rather than silently diluting their real, answerable priorities.</li>
     <li>A well-documented, <strong>High</strong>-confidence finding counts more than a <strong>Low</strong>-confidence or unverified one of the same nominal severity (confidence weights: High 1.0, Medium 0.7, Low 0.4, None 0).</li>
   </ul>
-  <p>Each scored question is one of three types: <strong>exclusionary</strong> (rate how much you want to avoid a trait -- can only hurt a company's score, never help it), <strong>preference</strong> (rate how much you want to seek out a trait -- can only help, never hurt), or <strong>trade-off</strong> (a preference between two genuine opposites, like stability vs. growth, where either end can score positively).</p>
+  <p>Each scored question is one of three types: <strong>exclusionary</strong> (rate how much you want to avoid a trait -- can only hurt a company's score, never help it), <strong>preference</strong> (rate how much you want to seek out a trait -- mostly helps; the one exception is data privacy, where a disclosed cybersecurity breach counts against a company), or <strong>trade-off</strong> (a preference between two genuine opposites, like stability vs. growth, where either end can score positively).</p>
 
   <h3>5. The Scoring Formula</h3>
   <p>Each company gets two separate sub-scores, then the two are blended.</p>
@@ -1990,7 +1998,8 @@ const METHODOLOGY_HTML = `
   <ul>
     <li><strong>Coverage is real but not complete.</strong> Some fields have no comprehensive public data source at S&amp;P&nbsp;500 scale for every company and will always show as unverified (confidence "None") rather than guessed at.</li>
     <li><strong>NLRB case data is sparse in practice</strong> -- the case-search tool is inconsistently reachable from this pipeline's environment for most companies, so this field is neutral for the large majority of the universe and only real where a search actually succeeded.</li>
-    <li><strong>OSHA matches are conservative by design.</strong> A matched establishment record is not the same as a confirmed violation, per OSHA's own data caveats -- this field is scored to under-penalize rather than over-penalize on ambiguous matches.</li>
+    <li><strong>Worker safety is currently not scored.</strong> The collected OSHA data showed exactly one matched record for every company that had any, including employers with thousands of inspected sites, so it could not tell companies apart and had been giving all of them the same small bonus. Until real violation and penalty data replaces it, this question is treated as having no data, and a rating on it does not affect results.</li>
+    <li><strong>Data privacy has a short history.</strong> It relies on the SEC's cybersecurity-incident disclosure rule, which only took effect in December 2023, so it reflects recent reported breaches rather than a company's overall privacy practices.</li>
     <li><strong>The curated clean-energy list is short and manually maintained</strong> (currently one ticker) because no per-company field in this dataset can reliably distinguish a genuine clean-energy business from one that merely mentions renewable energy in a filing. It will not update itself as S&amp;P&nbsp;500 membership changes.</li>
     <li><strong>A "religious/faith-based investment compliance" question was removed entirely</strong> after a data-quality audit found 0% real coverage across the dataset -- no comprehensive public source exists for it at this scale, and a hardcoded-neutral answer for every company would have been actively misleading rather than genuinely uninformative.</li>
     <li><strong>The 60-70% values blend and the financial cap are judgment calls</strong>, tuned by simulation to match each person's stated priorities as closely as possible without a few companies dominating. They are not derived from a published standard.</li>

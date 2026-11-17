@@ -143,3 +143,18 @@ describe('Values/financial split and minimum-data rule (2026-11-12)', () => {
     assert(s.financialPart >= 0 && s.financialPart <= 100, `financial part out of range: ${s.financialPart}`);
   });
 });
+
+describe('Worker safety off, data breaches count against (2026-11-17)', () => {
+  const ctx = loadContext();
+  test('worker safety has no data for any company', () => {
+    const withData = companies.filter((c) => ctx.questionHasData(8, c, DEFAULT_CLIENT_CONTEXT));
+    assert.equal(withData.length, 0);
+  });
+  test('a disclosed cybersecurity incident scores below zero on data privacy', () => {
+    const fns = require('vm').runInContext('ALIGNMENT_FNS', ctx);
+    const breached = companies.find((c) => c.ticker === 'MSFT');
+    const clean = companies.find((c) => c.ticker === 'AAPL');
+    assert.equal(fns[21](breached, DEFAULT_CLIENT_CONTEXT) < 0, true, 'MSFT should score negative');
+    assert.equal(fns[21](clean, DEFAULT_CLIENT_CONTEXT) > 0, true, 'AAPL should score positive');
+  });
+});

@@ -281,7 +281,7 @@ function questionHasData(qid, company, ctx) {
     case 5: return !hasNoData(fieldOf(company, 'fair_wages_labor_practices'));
     case 6: { const f = fieldOf(company, 'labor_disputes_exploitation_history'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.case_count === 'number'; }
     case 7: return !hasNoData(fieldOf(company, 'workplace_diversity_equity_inclusion'));
-    case 8: { const f = fieldOf(company, 'worker_safety_record'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.matched_establishment_rows === 'number'; }
+    case 8: return false; // worker safety: source data unusable, see workerSafetyAlignment
     case 9: { const f = fieldOf(company, 'board_transparency_independence'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.pct_independent_directors === 'number'; }
     case 10: { const f = fieldOf(company, 'ceo_pay_ratio'); return !hasNoData(f) && typeof f.value === 'number'; }
     case 11: { const f = fieldOf(company, 'fraud_corruption_scandal_history'); return !hasNoData(f) && typeof f.value === 'object' && typeof f.value.case_count === 'number'; }
@@ -541,15 +541,17 @@ function diversityAlignment(company) {
   return enumFieldAlignment(company, 'workplace_diversity_equity_inclusion', LEVEL_PREFERENCE);
 }
 
-// Q8: OSHA-matched establishment row count, not a confirmed-violation
-// count (the source dataset's own caveat) -- deliberately conservative.
-function workerSafetyAlignment(company) {
-  const f = fieldOf(company, 'worker_safety_record');
-  if (hasNoData(f) || typeof f.value !== 'object') return 0;
-  const rows = f.value.matched_establishment_rows;
-  if (typeof rows !== 'number') return 0;
-  const raw = rows === 0 ? 0.5 : rows <= 2 ? 0.25 : 0;
-  return raw * confidenceWeight(f.confidence);
+// Q8: treated as no data for every company (2026-11-17). The only source,
+// an OSHA establishment-search row count, came back as exactly 1 for all
+// 184 companies that have it -- Walmart, Amazon, UPS and Tesla included --
+// so it was counting the wrong table, not inspections, and it gave every
+// one of them the same "good safety" bonus. OSHA's site now also blocks
+// the data pipeline. Until real violation/penalty data replaces it (the
+// Labor Department's bulk OSHA files), the question is inert rather than
+// wrong: questionHasData(8) is false, so a client's rating on it is
+// excluded from their weighting.
+function workerSafetyAlignment() {
+  return 0;
 }
 
 function boardIndependenceAlignment(company) {
@@ -617,7 +619,11 @@ function dataPrivacyAlignment(company) {
   if (hasNoData(f) || typeof f.value !== 'object') return 0;
   const count = f.value.item_1_05_incident_count;
   if (typeof count !== 'number') return 0;
-  const raw = count === 0 ? 1 : 0.3;
+  // A disclosed material cybersecurity incident (8-K Item 1.05, required
+  // since Dec 2023) counts against the company. It used to score a small
+  // positive (0.3) -- just less than "no incident" -- which still rewarded
+  // a company that had a reported breach. Changed 2026-11-17.
+  const raw = count === 0 ? 1 : count === 1 ? -0.6 : -1;
   return raw * confidenceWeight(f.confidence);
 }
 

@@ -15,12 +15,15 @@ and only for companies that exist in both files:
     sectors originally came from an older pipeline and about a quarter were
     wrong (e.g. REITs filed under Financials). Two live companies the
     incoming file lacks get their sector from MANUAL_SECTORS below;
-  - hq_country, name, additional_data_sources, and anything else on the
-    live record are left alone;
+  - each company's hq_country is set to the incoming file's hq_country
+    (where the company is actually run from -- see the data-mine's
+    data/reference/hq_country_overrides.json), in BOTH live files;
+  - name, additional_data_sources, and anything else on the live record
+    are left alone;
   - dual-class duplicate tickers (FOX, GOOG, NWS) are skipped, and live
     tickers missing from the incoming file (AVB, EQR) keep their data, both
     exactly as the first import decided;
-  - data/financial_dataset_sp500.json is only touched for `sector`.
+  - data/financial_dataset_sp500.json is only touched for `sector` and `hq_country`.
 
 Every change is classified and printed: "filled" (no data -> real data),
 "changed" (real -> different real), "lost" (real -> no data), and
@@ -122,16 +125,24 @@ def main():
     with open(FINANCIAL_PATH) as f:
         financial = json.load(f)
     sector_changes = []
+    hq_changes = []
     for dataset in (live, financial):
         for company in dataset["companies"]:
             source = incoming_by_ticker.get(company["ticker"])
             sector = (source or {}).get("gics_sector") or MANUAL_SECTORS.get(company["ticker"])
-            if sector not in GICS_SECTORS or sector == company.get("sector"):
-                continue
-            if dataset is live:
-                sector_changes.append((company["ticker"], company.get("sector"), sector))
-            company["sector"] = sector
+            if sector in GICS_SECTORS and sector != company.get("sector"):
+                if dataset is live:
+                    sector_changes.append((company["ticker"], company.get("sector"), sector))
+                company["sector"] = sector
+            country = (source or {}).get("hq_country")
+            if isinstance(country, str) and country and country != company.get("hq_country"):
+                if dataset is live:
+                    hq_changes.append((company["ticker"], company.get("hq_country"), country))
+                company["hq_country"] = country
 
+    print(f"Headquarters country corrections: {len(hq_changes)}")
+    for ticker, old, new in hq_changes:
+        print(f"  {ticker:6s} {old} -> {new}")
     live_tickers = {c["ticker"] for c in live["companies"]}
     print(f"Sector corrections: {len(sector_changes)}")
     for ticker, old, new in sector_changes[:15]:

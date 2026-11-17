@@ -55,3 +55,27 @@ describe('Sectors match official GICS sectors', () => {
     for (const [t, s] of Object.entries(want)) assert.equal(companies.find((c) => c.ticker === t).sector, s, t);
   });
 });
+
+describe('Industry screens and headquarters (2026-11-17)', () => {
+  const companies = loadCompanies();
+  const by = (t) => companies.find((c) => c.ticker === t);
+  const flag = (t, key) => by(t)[key] && by(t)[key].value;
+  test('casino operators are flagged for gambling', () => {
+    for (const t of ['LVS', 'MGM', 'WYNN']) assert.equal(flag(t, 'gambling_casino_involvement'), true, t);
+  });
+  test('major defense contractors are flagged for weapons', () => {
+    for (const t of ['LMT', 'NOC', 'GD', 'RTX', 'LHX', 'HII', 'BA']) assert.equal(flag(t, 'weapons_defense_involvement'), true, t);
+  });
+  test('investment banks and brokers count as interest-based finance; insurers and payment networks do not', () => {
+    for (const t of ['GS', 'MS', 'SCHW', 'JPM']) assert.equal(flag(t, 'interest_based_financial_products'), true, t);
+    for (const t of ['MET', 'V', 'MA']) assert.equal(flag(t, 'interest_based_financial_products'), false, t);
+  });
+  test('alcohol counts producers only', () => {
+    for (const t of ['TAP', 'STZ', 'BF-B']) assert.equal(flag(t, 'alcohol_involvement'), true, t);
+    for (const t of ['PEP', 'KDP']) assert.equal(flag(t, 'alcohol_involvement'), false, t);
+  });
+  test('headquarters country is where the company is run from', () => {
+    const want = { MDT: 'United States', JNJ: 'United States', ACN: 'Ireland', CB: 'Switzerland', STX: 'Singapore', AAPL: 'United States' };
+    for (const [t, country] of Object.entries(want)) assert.equal(by(t).hq_country, country, t);
+  });
+});
