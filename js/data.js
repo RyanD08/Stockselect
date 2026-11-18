@@ -29,7 +29,7 @@
 // keep serving a stale dataset after a content-only change like this one
 // (unlike the script tags, fetch() URLs aren't touched by the HTML's own
 // ?v= query string, so this needed its own).
-const DATASET_CACHE_BUST = '20261112b';
+const DATASET_CACHE_BUST = '20261118a';
 const FINANCIAL_SOURCE_URL = `data/financial_dataset_sp500.json?v=${DATASET_CACHE_BUST}`;
 const ESG_SOURCE_URL = `data/esg_dataset_sp500.json?v=${DATASET_CACHE_BUST}`;
 
